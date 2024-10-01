@@ -1,0 +1,6 @@
+@SmE_CommerceAPI_HostAddress = http://localhost:5022
+
+GET {{SmE_CommerceAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
