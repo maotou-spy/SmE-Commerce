@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class User
 {
-    public uint UserId { get; set; }
+    public Guid UserId { get; set; }
 
     public string Role { get; set; } = null!;
 
@@ -17,7 +17,7 @@ public partial class User
 
     public string? Phone { get; set; }
 
-    public uint Point { get; set; }
+    public int? Point { get; set; }
 
     /// <summary>
     /// Values: active, inactive, suspended
@@ -26,19 +26,23 @@ public partial class User
 
     public DateTime? LastLogin { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
-    public virtual ICollection<Content> Contents { get; set; } = new List<Content>();
+    public virtual ICollection<ChangeLog> ChangeLogs { get; set; } = new List<ChangeLog>();
+
+    public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

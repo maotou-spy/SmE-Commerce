@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class DiscountProduct
 {
-    public uint DiscountProductId { get; set; }
+    public Guid DiscountProductId { get; set; }
 
-    public uint? DiscountId { get; set; }
+    public Guid? DiscountId { get; set; }
 
-    public uint? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
     public virtual Discount? Discount { get; set; }
 

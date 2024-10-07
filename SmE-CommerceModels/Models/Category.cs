@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class Category
 {
-    public uint CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -20,13 +20,13 @@ public partial class Category
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 }

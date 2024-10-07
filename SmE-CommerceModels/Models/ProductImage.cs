@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class ProductImage
 {
-    public uint ImageId { get; set; }
+    public Guid ImageId { get; set; }
 
-    public uint? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
     public string Url { get; set; } = null!;
 

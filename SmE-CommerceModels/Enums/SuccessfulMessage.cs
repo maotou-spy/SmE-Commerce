@@ -1,12 +1,11 @@
-﻿namespace SmE_CommerceModels.Enums
-{
-    public class SuccessfulMessage
-    {
-        public static string Found = "Found Successfully";
-        public static string Created = "Created Successfully";
-        public static string Updated = "Updated Successfully";
-        public static string Deleted = "Deleted Successfully";
+﻿namespace SmE_CommerceModels.Enums;
 
-        public static string NotFound = "Not Found";
-    }
+public static class SuccessfulMessage
+{
+    public const string Found = "Found Successfully";
+    public const string Created = "Created Successfully";
+    public const string Updated = "Updated Successfully";
+    public const string Deleted = "Deleted Successfully";
+
+    public const string Successfully = "Successfully";
 }

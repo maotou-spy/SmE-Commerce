@@ -11,8 +11,4 @@
     <ProjectReference Include="..\SmE-CommerceRepositories\SmE_CommerceRepositories.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interface\" />
-  </ItemGroup>
-
 </Project>

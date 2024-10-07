@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class Discount
 {
-    public uint DiscountId { get; set; }
+    public Guid DiscountId { get; set; }
 
     public string DiscountName { get; set; } = null!;
 
@@ -28,13 +28,13 @@ public partial class Discount
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class Address
 {
-    public uint AddressId { get; set; }
+    public Guid AddressId { get; set; }
 
-    public uint? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     public string ReceiverName { get; set; } = null!;
 
@@ -26,13 +26,13 @@ public partial class Address
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

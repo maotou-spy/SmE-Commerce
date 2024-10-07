@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class PaymentMethod
 {
-    public uint PaymentMethodId { get; set; }
+    public Guid PaymentMethodId { get; set; }
 
     public string Name { get; set; } = null!;
 

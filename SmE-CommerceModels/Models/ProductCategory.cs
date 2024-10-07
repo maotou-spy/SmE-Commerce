@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class ProductCategory
 {
-    public uint ProductCategoryId { get; set; }
+    public Guid ProductCategoryId { get; set; }
 
-    public uint? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
-    public uint? CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
 
     public virtual Category? Category { get; set; }
 

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class Content
 {
-    public uint ContentId { get; set; }
+    public Guid ContentId { get; set; }
 
     public string Title { get; set; } = null!;
 
     public string? Content1 { get; set; }
 
-    public uint? AuthorId { get; set; }
+    public Guid? AuthorId { get; set; }
 
-    public uint? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
     /// <summary>
     /// Values: blog, facebook
@@ -32,24 +32,17 @@ public partial class Content
 
     public DateTime? PublishedAt { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
-
-    /// <summary>
-    /// Bring to homepage
-    /// </summary>
-    public ulong? IsFeature { get; set; }
-
-    public virtual User? Author { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
 
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();
 
-    public virtual Product? Product { get; set; }
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
 }

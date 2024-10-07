@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class BankInfo
 {
-    public uint BankInfoId { get; set; }
+    public Guid BankInfoId { get; set; }
 
     public string BankCode { get; set; } = null!;
 
@@ -22,11 +22,11 @@ public partial class BankInfo
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
+    public Guid? ModifiedById { get; set; }
 }

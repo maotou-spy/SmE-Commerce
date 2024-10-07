@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class OrderItem
 {
-    public uint OrderItemId { get; set; }
+    public Guid OrderItemId { get; set; }
 
-    public uint? OrderId { get; set; }
+    public Guid? OrderId { get; set; }
 
-    public uint? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
 
-    public uint? Quantity { get; set; }
+    public int Quantity { get; set; }
 
     public decimal Price { get; set; }
 

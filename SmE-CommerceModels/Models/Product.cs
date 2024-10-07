@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SmE_CommerceModels.Objects;
+namespace SmE_CommerceModels.Models;
 
 public partial class Product
 {
-    public uint ProductId { get; set; }
+    public Guid ProductId { get; set; }
 
     public string? ProductCode { get; set; }
 
@@ -15,31 +15,26 @@ public partial class Product
 
     public decimal Price { get; set; }
 
-    public int? StockQuantity { get; set; }
+    public int StockQuantity { get; set; }
 
-    public int? SoldQuantity { get; set; }
+    public int SoldQuantity { get; set; }
 
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public uint? CreatedById { get; set; }
+    public Guid? CreateById { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public uint? ModifiedById { get; set; }
-
-    /// <summary>
-    /// feature products
-    /// </summary>
-    public ulong? IsFeature { get; set; }
+    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
-    public virtual ICollection<Content> Contents { get; set; } = new List<Content>();
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
 
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
 
