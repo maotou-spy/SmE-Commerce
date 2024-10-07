@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class Content
+public partial class Content : Common
 {
     public Guid ContentId { get; set; }
 
@@ -31,14 +28,6 @@ public partial class Content
     public string Status { get; set; } = null!;
 
     public DateTime? PublishedAt { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? CreateById { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
 

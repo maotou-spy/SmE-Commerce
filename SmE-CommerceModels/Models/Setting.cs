@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class Setting
+public partial class Setting : Common
 {
     public Guid SettingId { get; set; }
 
@@ -15,12 +12,4 @@ public partial class Setting
     public string Value { get; set; } = null!;
 
     public string? Description { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? CreateById { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
 }

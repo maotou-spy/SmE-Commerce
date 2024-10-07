@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class BlogCategory
+public partial class BlogCategory : Common
 {
     public Guid BlogCategoryId { get; set; }
 
@@ -15,14 +12,6 @@ public partial class BlogCategory
     /// Values: active, inactive, deleted
     /// </summary>
     public string Status { get; set; } = null!;
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? CreateById { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
 
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
 }

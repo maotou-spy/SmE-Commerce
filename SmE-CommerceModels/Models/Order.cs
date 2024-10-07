@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class Order
+public partial class Order : Common
 {
     public Guid OrderId { get; set; }
 
@@ -25,14 +22,6 @@ public partial class Order
     /// Values: pending, processing, completed, cancelled, rejected, returned
     /// </summary>
     public string Status { get; set; } = null!;
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? CreateById { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
 
     public virtual Address? Address { get; set; }
 

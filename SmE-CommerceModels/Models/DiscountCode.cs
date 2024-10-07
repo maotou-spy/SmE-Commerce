@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class DiscountCode
+public partial class DiscountCode : Common
 {
     public Guid CodeId { get; set; }
 
@@ -22,14 +19,6 @@ public partial class DiscountCode
     /// Values: active, inactive, used, deleted
     /// </summary>
     public string Status { get; set; } = null!;
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? CreateById { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
 
     public virtual Discount Discount { get; set; } = null!;
 
