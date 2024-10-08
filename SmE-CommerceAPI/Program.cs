@@ -1,13 +1,12 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using SmE_CommerceModels.DatabaseContext;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
 using SmE_CommerceServices.Interface;
-using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using SmE_CommerceModels.DatabaseContext;
-using SmE_CommerceModels.Models;
 using SmE_CommerceUtilities;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +41,14 @@ builder.Services.AddScoped<DefaultdbContext>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+#endregion
+
+#region Firebase Service
+var defaultApp = FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("serviceAccountKey.json"),
+});
+Console.WriteLine(defaultApp.Name);
 #endregion
 
 #region Repository

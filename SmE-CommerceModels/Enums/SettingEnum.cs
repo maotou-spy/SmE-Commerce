@@ -2,13 +2,13 @@
 {
     public class SettingEnum
     {
-        public static string ShopName = "ShopName";
-        public static string Address = "Address";
-        public static string Phone = "Phone";
-        public static string Email = "Email";
-        public static string MaximumTopReview = "MaximumTopReview";
-        public static string PrivacyPolicy = "PrivacyPolicy";
-        public static string TermsOfService = "TermsOfService";
-        public static string PointsConversionRate = "PointsConversionRate";
+        public const string ShopName = "ShopName";
+        public const string Address = "Address";
+        public const string Phone = "Phone";
+        public const string Email = "Email";
+        public const string MaximumTopReview = "MaximumTopReview";
+        public const string PrivacyPolicy = "PrivacyPolicy";
+        public const string TermsOfService = "TermsOfService";
+        public const string PointsConversionRate = "PointsConversionRate";
     }
 }

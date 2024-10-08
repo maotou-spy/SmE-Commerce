@@ -2,7 +2,7 @@
 {
     public class ContentType
     {
-        public static string ExternalTypeBlog = "blog";
-        public static string ExternalTypeFacebook = "facebook";
+        public const string ExternalTypeBlog = "blog";
+        public const string ExternalTypeFacebook = "facebook";
     }
 }
