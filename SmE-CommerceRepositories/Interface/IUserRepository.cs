@@ -10,4 +10,5 @@ public interface IUserRepository
     Task<Return<User>> GetUserByEmailAsync(string email);
     Task<Return<User>> GetUserByEmailOrPhoneAsync(string emailOrPhone);
     Task<Return<User>> CreateNewUser(User user);
+    Task<Return<User>> UpdateUser(User user);
 }

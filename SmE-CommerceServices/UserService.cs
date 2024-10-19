@@ -5,21 +5,15 @@ using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
 using System.Security.Cryptography;
+using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class UserService : IUserService
+public class UserService(IUserRepository userRepository) : IUserService
 {
-    private readonly IUserRepository _userRepository;
-
-    public UserService(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     public async Task<Return<IEnumerable<User>>> GetAllUsersAsync()
     {
-        return await _userRepository.GetAllUsersAsync();
+        return await userRepository.GetAllUsersAsync();
     }
 
     public async Task<Return<bool>> CreateManagerUser(CreateManagerReqDto req)
@@ -27,7 +21,7 @@ public class UserService : IUserService
         try
         {
             // Check email is already existed
-            var existedManager = await _userRepository.GetUserByEmailAsync(req.Email);
+            var existedManager = await userRepository.GetUserByEmailAsync(req.Email);
             if (!existedManager.Message.Equals(ErrorMessage.NotFound))
             {
                 return new Return<bool>
@@ -38,13 +32,10 @@ public class UserService : IUserService
                 };
             }
 
-            // Create password hash
-            string passwordHash = CreatePasswordHash(req.Password);
-
             User newManager = new()
             {
                 Email = req.Email,
-                PasswordHash = passwordHash,
+                PasswordHash = HashUtil.Hash(req.Password),
                 FullName = req.FullName,
                 Role = RoleEnum.Manager,
                 Status = UserStatus.Active,
@@ -52,7 +43,7 @@ public class UserService : IUserService
                 //CreateAt = DateTime.UtcNow,
             };
 
-            var roleManager = await _userRepository.CreateNewUser(newManager);
+            var roleManager = await userRepository.CreateNewUser(newManager);
             return new Return<bool>
             {
                 IsSuccess = true,
@@ -69,35 +60,4 @@ public class UserService : IUserService
             };
         }
     }
-
-    #region Private Methods
-    // Verify Password Hash
-    private static bool VerifyPassword(string password, string hashedPassword)
-    {
-        byte[] hashBytes = Convert.FromBase64String(hashedPassword);
-        byte[] salt = new byte[16];
-        Array.Copy(hashBytes, 0, salt, 0, 16);
-        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-        byte[] hash = pbkdf2.GetBytes(20);
-        for (int i = 0; i < 20; i++)
-        {
-            if (hashBytes[i + 16] != hash[i])
-                return false;
-        }
-        return true;
-    }
-
-    // Create Password Hash using PBKDF2
-    private static string CreatePasswordHash(string password)
-    {
-        byte[] salt;
-        new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
-        byte[] hash = pbkdf2.GetBytes(20);
-        byte[] hashBytes = new byte[36];
-        Array.Copy(salt, 0, hashBytes, 0, 16);
-        Array.Copy(hash, 0, hashBytes, 16, 20);
-        return Convert.ToBase64String(hashBytes);
-    }
-    #endregion
 }

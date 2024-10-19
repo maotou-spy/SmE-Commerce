@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmE-CommerceModels\SmE_CommerceModels.csproj" />
-    <ProjectReference Include="..\SmE-CommerceUtilities\SmE_CommerceUtilities.csproj" />
   </ItemGroup>
 
 </Project>

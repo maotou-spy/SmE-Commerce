@@ -1,7 +1,4 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using SmE_CommerceModels.Enums;
+﻿using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Auth;
 using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ReturnResult;
@@ -10,102 +7,82 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceUtilities;
 
-public class AuthService : IAuthService
+public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerTokenUtil)
+    : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly BearerTokenUtil _bearerTokenUtil;
-    private const int Iterations = 10000;
-
-    public AuthService(IUserRepository userRepository, BearerTokenUtil bearerTokenUtil)
-    {
-        _userRepository = userRepository;
-        _bearerTokenUtil = bearerTokenUtil;
-    }
 
     public async Task<Return<LoginResDto>> LoginWithAccount(LoginWithAccountReqDto reqDto)
     {
-        var userResult = await _userRepository.GetUserByEmailOrPhoneAsync(reqDto.EmailOrPhone);
-
-        if (!userResult.IsSuccess || userResult.Data == null)
+        try
         {
-            return new Return<LoginResDto>
+            var userResult = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.EmailOrPhone);
+
+            if (!userResult.IsSuccess || userResult.Data == null)
             {
-                IsSuccess = false,
-                Message = ErrorMessage.NotFound
-            };
-        }
-
-        var user = userResult.Data;
-
-        if (user.Status == UserStatus.Inactive)
-        {
-            return new Return<LoginResDto>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.ACCOUNT_IS_INACTIVE
-            };
-        }
-
-        if (!VerifyPassword(reqDto.Password, user.PasswordHash))
-        {
-            return new Return<LoginResDto>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.INVALID_CREDENTIALS
-            };
-        }
-
-        var token = _bearerTokenUtil.GenerateBearerToken(user.UserId, user.Role);
-
-        return new Return<LoginResDto>
-        {
-            Data = new LoginResDto
-            {
-                BearerToken = token,
-                Email = user.Email,
-                Phone = user.Phone,
-                Name = user.FullName
-            },
-            IsSuccess = true,
-            Message = SuccessfulMessage.Successfully
-        };
-    }
-
-    private bool VerifyPassword(string password, string hashedPassword)
-    {
-        byte[] hashBytes = Convert.FromBase64String(hashedPassword);
-
-        byte[] salt = new byte[16];
-        Array.Copy(hashBytes, 0, salt, 0, 16);
-
-        using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, Iterations))
-        {
-            byte[] hash = deriveBytes.GetBytes(20);
-
-            for (int i = 0; i < 20; i++)
-            {
-                if (hashBytes[i + 16] != hash[i])
-                    return false;
+                return new Return<LoginResDto>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFound
+                };
             }
-            return true;
+
+            var user = userResult.Data;
+
+            if (user.Status == UserStatus.Inactive)
+            {
+                return new Return<LoginResDto>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.ACCOUNT_IS_INACTIVE
+                };
+            }
+
+            if (user.PasswordHash != null && !HashUtil.VerifyHashedString(reqDto.Password, user.PasswordHash))
+            {
+                return new Return<LoginResDto>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.INVALID_CREDENTIALS
+                };
+            }
+
+            user.LastLogin = DateTime.Now;
+
+            var updateResult = await userRepository.UpdateUser(user);
+
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+            {
+                return new Return<LoginResDto>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.SERVER_ERROR
+                };
+            }
+
+            var token = bearerTokenUtil.GenerateBearerToken(user.UserId, user.Role);
+
+            return new Return<LoginResDto>
+            {
+                Data = new LoginResDto
+                {
+                    BearerToken = token,
+                    Name = user.FullName ?? "",
+                    Email = user.Email,
+                    Phone = user.Phone,
+                },
+                IsSuccess = true,
+                Message = SuccessfulMessage.Successfully
+            };
         }
-    }
-
-    public string HashPassword(string password)
-    {
-        byte[] salt;
-        byte[] hash;
-
-        using (var deriveBytes = new Rfc2898DeriveBytes(password, 16, Iterations))
+        catch (Exception ex)
         {
-            salt = deriveBytes.Salt;
-            hash = deriveBytes.GetBytes(20);  // 20 bytes for SHA1
+            return new Return<LoginResDto>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
         }
-
-        byte[] hashBytes = new byte[36];
-        Array.Copy(salt, 0, hashBytes, 0, 16);
-        Array.Copy(hash, 0, hashBytes, 16, 20);
-
-        return Convert.ToBase64String(hashBytes);
     }
+
 }
