@@ -8,4 +8,5 @@ public static class SuccessfulMessage
     public const string Deleted = "Deleted Successfully";
 
     public const string Successfully = "Successfully";
+    public const string ValidToken = "Token verification successful";
 }

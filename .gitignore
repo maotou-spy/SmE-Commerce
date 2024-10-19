@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 SmE-CommerceAPI/appsettings.json
 SmE-CommerceAPI/serviceAccountKey.json
+/.idea
