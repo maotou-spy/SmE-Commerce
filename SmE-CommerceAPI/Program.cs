@@ -57,6 +57,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion
 
+#region Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<BearerTokenUtil>();
+#endregion
+
 #region Auth
 
 //
