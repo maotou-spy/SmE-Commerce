@@ -8,7 +8,7 @@ using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, IHelperService helperService) : IUserService
 {
     public async Task<Return<IEnumerable<User>>> GetAllUsersAsync()
     {
@@ -19,6 +19,16 @@ public class UserService(IUserRepository userRepository) : IUserService
     {
         try
         {
+            var currentUser = await helperService.GetCurrentUser(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                };
+            }
+
             // Check email is already existed
             var existedManager = await userRepository.GetUserByEmailAsync(req.Email);
             if (!existedManager.Message.Equals(ErrorMessage.NotFound))
@@ -26,7 +36,7 @@ public class UserService(IUserRepository userRepository) : IUserService
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.USER_ALREADY_EXISTS,
+                    Message = ErrorMessage.UserAlreadyExists,
                     InternalErrorMessage = existedManager.InternalErrorMessage,
                 };
             }
@@ -38,8 +48,8 @@ public class UserService(IUserRepository userRepository) : IUserService
                 FullName = req.FullName,
                 Role = RoleEnum.Manager,
                 Status = UserStatus.Active,
-                //CreateById = Guid.Empty,
-                //CreateAt = DateTime.UtcNow,
+                CreateById = currentUser.Data.UserId,
+                CreatedAt = DateTime.Now
             };
 
             var roleManager = await userRepository.CreateNewUser(newManager);

@@ -41,7 +41,7 @@ public class UserController : ControllerBase
         } catch (Exception ex)
         {
             _logger.LogInformation("Error at login with google: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.SERVER_ERROR });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
 }

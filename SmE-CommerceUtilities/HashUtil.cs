@@ -14,19 +14,12 @@ public static class HashUtil
         var salt = new byte[SaltSize];
         Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
-        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
-        try
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
+        var hash = pbkdf2.GetBytes(HashSize);
+        for (var i = 0; i < HashSize; i++)
         {
-            var hash = pbkdf2.GetBytes(HashSize);
-            for (var i = 0; i < HashSize; i++)
-            {
-                if (hashBytes[i + SaltSize] != hash[i])
-                    return false;
-            }
-        }
-        finally
-        {
-            pbkdf2.Dispose();
+            if (hashBytes[i + SaltSize] != hash[i])
+                return false;
         }
 
         return true;

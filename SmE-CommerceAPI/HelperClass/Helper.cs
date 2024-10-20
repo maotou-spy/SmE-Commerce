@@ -18,7 +18,7 @@ namespace SmE_CommerceAPI.HelperClass
             {
                 Data = errors,
                 IsSuccess = false,
-                Message = ErrorMessage.INVALID_INPUT
+                Message = ErrorMessage.InvalidInput
             };
         }
 
@@ -28,8 +28,8 @@ namespace SmE_CommerceAPI.HelperClass
 
             return error switch
             {
-                ErrorMessage.NOT_AUTHENTICATION => new ObjectResult(result) { StatusCode = 401 },
-                ErrorMessage.NOT_AUTHORITY => new ObjectResult(result) { StatusCode = 409 },
+                ErrorMessage.NotAuthentication => new ObjectResult(result) { StatusCode = 401 },
+                ErrorMessage.NotAuthority => new ObjectResult(result) { StatusCode = 409 },
                 _ => new ObjectResult(result) { StatusCode = 500 },
             };
         }

@@ -1,4 +1,4 @@
-﻿namespace SmE_CommerceModels.ResponseDtos;
+﻿namespace SmE_CommerceModels.ResponseDtos.Auth;
 
 public class LoginResDto
 {

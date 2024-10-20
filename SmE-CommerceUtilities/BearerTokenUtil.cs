@@ -12,13 +12,13 @@ public class BearerTokenUtil(IConfiguration configuration)
     public string GenerateBearerToken(Guid userId, string role)
     {
         // Encrypt role
-        var encryptedRole = Encrypt(role);
+        var encryptedRole = HashUtil.Hash(role);
 
         // Create claims list
         List<Claim> claims =
         [
             new Claim(ClaimTypes.Sid, userId.ToString()),
-            new Claim(ClaimTypes.Role, encryptedRole)
+            new Claim(ClaimTypes.Role, encryptedRole),
         ];
 
         // Get security key from configuration
@@ -46,83 +46,52 @@ public class BearerTokenUtil(IConfiguration configuration)
         return tokenHandler.WriteToken(token) ?? throw new Exception("SERVER_ERROR: Token generation failed");
     }
 
-    public bool VerifyToken(string token)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Token").Value
-            ?? throw new Exception("SERVER_ERROR: Token key is missing"));
-
-        tokenHandler.ValidateToken(token, new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        }, out var validatedToken);
-
-        return validatedToken != null;
-    }
-
-    private string Encrypt(string plainText)
-    {
-        var value = configuration.GetSection("AppSettings:EncryptionKey").Value
-                    ?? throw new Exception("SERVER_ERROR: Encryption key is missing");
-        var key = Encoding.UTF8.GetBytes(value);
-        using var aes = Aes.Create();
-        aes.Key = key;
-        aes.GenerateIV();
-        using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-        using var msEncrypt = new MemoryStream();
-        using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-        using (var swEncrypt = new StreamWriter(csEncrypt))
-        {
-            swEncrypt.Write(plainText);
-        }
-
-        var iv = aes.IV;
-        var encryptedContent = msEncrypt.ToArray();
-        var result = new byte[iv.Length + encryptedContent.Length];
-        Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
-        Buffer.BlockCopy(encryptedContent, 0, result, iv.Length, encryptedContent.Length);
-
-        return Convert.ToBase64String(result);
-    }
-
-    private string Decrypt(string cipherText)
-    {
-        var fullCipher = Convert.FromBase64String(cipherText);
-        var iv = new byte[16];
-        var cipher = new byte[16];
-
-        Buffer.BlockCopy(fullCipher, 0, iv, 0, iv.Length);
-        Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, cipher.Length);
-
-        var value = configuration.GetSection("AppSettings:EncryptionKey").Value
-                    ?? throw new Exception("SERVER_ERROR: Encryption key is missing");
-        var key = Encoding.UTF8.GetBytes(value);
-
-        using var aes = Aes.Create();
-        aes.Key = key;
-        aes.IV = iv;
-        using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-        using var msDecrypt = new MemoryStream(cipher);
-        using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
-        using var srDecrypt = new StreamReader(csDecrypt);
-
-        return srDecrypt.ReadToEnd();
-    }
-
-    public string GetRoleFromToken(string token)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtToken = tokenHandler.ReadJwtToken(token);
-        var encryptedRole = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-
-        if (encryptedRole == null)
-        {
-            throw new Exception("SERVER_ERROR: Role not found in token");
-        }
-
-        return Decrypt(encryptedRole);
-    }
+    // private string Encrypt(string plainText)
+    // {
+    //     var value = configuration.GetSection("AppSettings:EncryptionKey").Value
+    //                 ?? throw new Exception("SERVER_ERROR: Encryption key is missing");
+    //     var key = Encoding.UTF8.GetBytes(value);
+    //     using var aes = Aes.Create();
+    //     aes.Key = key;
+    //     aes.GenerateIV();
+    //     using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+    //     using var msEncrypt = new MemoryStream();
+    //     using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+    //     using (var swEncrypt = new StreamWriter(csEncrypt))
+    //     {
+    //         swEncrypt.Write(plainText);
+    //     }
+    //
+    //     var iv = aes.IV;
+    //     var encryptedContent = msEncrypt.ToArray();
+    //     var result = new byte[iv.Length + encryptedContent.Length];
+    //     Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
+    //     Buffer.BlockCopy(encryptedContent, 0, result, iv.Length, encryptedContent.Length);
+    //
+    //     return Convert.ToBase64String(result);
+    // }
+    //
+    // private string Decrypt(string cipherText)
+    // {
+    //     var fullCipher = Convert.FromBase64String(cipherText);
+    //     var iv = new byte[16];
+    //     var cipher = new byte[16];
+    //
+    //     Buffer.BlockCopy(fullCipher, 0, iv, 0, iv.Length);
+    //     Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, cipher.Length);
+    //
+    //     var value = configuration.GetSection("AppSettings:EncryptionKey").Value
+    //                 ?? throw new Exception("SERVER_ERROR: Encryption key is missing");
+    //     var key = Encoding.UTF8.GetBytes(value);
+    //
+    //     using var aes = Aes.Create();
+    //     aes.Key = key;
+    //     aes.IV = iv;
+    //     using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+    //     using var msDecrypt = new MemoryStream(cipher);
+    //     using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+    //     using var srDecrypt = new StreamReader(csDecrypt);
+    //
+    //     return srDecrypt.ReadToEnd();
+    // }
 }

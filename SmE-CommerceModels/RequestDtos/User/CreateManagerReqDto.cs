@@ -11,12 +11,12 @@ namespace SmE_CommerceModels.RequestDtos.User
     {
         [Required]
         [EmailAddress(ErrorMessage = "Must be email format")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Required]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = null!;
     }
 }
