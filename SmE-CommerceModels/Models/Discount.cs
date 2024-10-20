@@ -24,6 +24,7 @@ public partial class Discount : Common
     /// Values: active, inactive, deleted
     /// </summary>
     public string Status { get; set; } = null!;
+
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();

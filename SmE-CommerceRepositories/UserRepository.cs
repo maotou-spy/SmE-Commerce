@@ -7,20 +7,13 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(DefaultdbContext dbContext) : IUserRepository
 {
-    private readonly DefaultdbContext _dbContext;
-
-    public UserRepository(DefaultdbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<Return<IEnumerable<User>>> GetAllUsersAsync()
     {
         try
         {
-            var result = await _dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted).ToListAsync();
+            var result = await dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted).ToListAsync();
 
             return new Return<IEnumerable<User>>
             {
@@ -47,7 +40,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var result = await _dbContext.Users
+            var result = await dbContext.Users
                 .Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.UserId == id);
 
@@ -76,7 +69,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var result = await _dbContext.Users
+            var result = await dbContext.Users
                 .Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Email == email);
 
@@ -105,7 +98,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            var result = await _dbContext.Users
+            var result = await dbContext.Users
                 .Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Email == emailOrPhone || x.Phone == emailOrPhone);
 
@@ -134,8 +127,8 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
+            await dbContext.Users.AddAsync(user);
+            await dbContext.SaveChangesAsync();
 
             return new Return<User>
             {
@@ -162,8 +155,8 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
 
             return new Return<User>
             {
@@ -190,8 +183,8 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
 
             return new Return<User>
             {
@@ -218,8 +211,8 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            _dbContext.Users.Update(user);
-            await _dbContext.SaveChangesAsync();
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
 
             return new Return<User>
             {

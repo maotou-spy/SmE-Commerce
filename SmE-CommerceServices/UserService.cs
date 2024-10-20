@@ -4,7 +4,6 @@ using SmE_CommerceModels.RequestDtos.User;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using System.Security.Cryptography;
 using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;

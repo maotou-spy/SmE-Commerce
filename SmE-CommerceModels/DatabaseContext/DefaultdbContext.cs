@@ -55,6 +55,8 @@ public partial class DefaultdbContext : DbContext
 
     public virtual DbSet<ProductImage> ProductImages { get; set; }
 
+    public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
+
     public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<Setting> Settings { get; set; }
@@ -689,6 +691,29 @@ public partial class DefaultdbContext : DbContext
                 .HasConstraintName("fk_productimage");
         });
 
+        modelBuilder.Entity<ProductAttribute>(entity =>
+        {
+            entity.HasKey(e => e.AttributeId).HasName("productattributes_pk");
+
+            entity.ToTable("productattributes");
+
+            entity.Property(e => e.AttributeId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("attributeid");
+            entity.Property(e => e.AttributeName)
+                .HasMaxLength(100)
+                .HasColumnName("attributename");
+            entity.Property(e => e.AttributeValue)
+                .HasMaxLength(255)
+                .HasColumnName("attributevalue");
+            entity.Property(e => e.ProductId).HasColumnName("productid");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductAttributes)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_productproductattribute");
+        });
+
         modelBuilder.Entity<Review>(entity =>
         {
             entity.HasKey(e => e.ReviewId).HasName("Reviews_pkey");
@@ -736,8 +761,7 @@ public partial class DefaultdbContext : DbContext
                 .HasColumnName("description");
             entity.Property(e => e.Key)
                 .HasMaxLength(50)
-                .HasComment(
-                    "Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate")
+                .HasComment("Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate")
                 .HasColumnName("key");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")

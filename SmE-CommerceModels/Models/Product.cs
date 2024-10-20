@@ -33,5 +33,7 @@ public partial class Product : Common
 
     public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
+    public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
+
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

@@ -6,14 +6,9 @@ using SmE_CommerceServices.Firebase.Interface;
 
 namespace SmE_CommerceServices.Firebase
 {
-    public class FirebaseAuthService : IFirebaseAuthService
+    public class FirebaseAuthService(IUserRepository userRepository) : IFirebaseAuthService
     {
-        private readonly IUserRepository _userRepository;
-
-        public FirebaseAuthService(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
+        private readonly IUserRepository _userRepository = userRepository;
 
         public async Task<Return<FirebaseToken>> VerifyTokenAsync(string idToken)
         {
