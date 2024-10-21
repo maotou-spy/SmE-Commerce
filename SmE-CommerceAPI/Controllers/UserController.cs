@@ -8,8 +8,8 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[ApiController]
 [Route("api/users")]
+[Authorize(AuthenticationSchemes = "Defaut")]
 public class UserController : ControllerBase
 {
     private readonly IUserService userService;
@@ -22,12 +22,12 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateManagerUser([FromBody] CreateManagerReqDto req)
+    [Authorize]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserReqDto req)
     {
         try
         {
-            var result = await userService.CreateManagerUser(req);
+            var result = await userService.CreateUser(req);
 
             if (!result.IsSuccess)
             {
@@ -38,9 +38,11 @@ public class UserController : ControllerBase
                 return Helper.GetErrorResponse(result.Message);
             }
             return StatusCode(200, result);
-        } catch (Exception ex)
+
+        }
+        catch (Exception ex)
         {
-            _logger.LogInformation("Error at login with google: {e}", ex);
+            _logger.LogInformation("Error at create manager user: {e}", ex);
             return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
