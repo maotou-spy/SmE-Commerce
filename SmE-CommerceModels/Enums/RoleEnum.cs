@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Enums
 {
-    public class RoleEnum
+    public static class RoleEnum
     {
         public const string Customer = "Customer";
 

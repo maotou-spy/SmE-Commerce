@@ -58,34 +58,22 @@ public class HelperService(
             };
         }
 
-        // Check the role
-        var roleCheck = role switch
+        // Improved role check
+        var isAuthorized = role switch
         {
-            nameof(RoleEnum.Customer) when user.Data.Role != RoleEnum.Customer => new Return<User>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.NotAuthority
-            },
-            nameof(RoleEnum.Staff) when (user.Data.Role != RoleEnum.Staff && user.Data.Role != RoleEnum.Manager) => new Return<User>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.NotAuthority
-            },
-            nameof(RoleEnum.Manager) when user.Data.Role != RoleEnum.Manager => new Return<User>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.NotAuthority
-            },
-            _ => new Return<User>
-            {
-                IsSuccess = false,
-                Message = ErrorMessage.InvalidRole
-            }
+            nameof(RoleEnum.Customer) => user.Data.Role == RoleEnum.Customer,
+            nameof(RoleEnum.Staff) => user.Data.Role is RoleEnum.Staff or RoleEnum.Manager,
+            nameof(RoleEnum.Manager) => user.Data.Role == RoleEnum.Manager,
+            _ => false
         };
 
-        if (!roleCheck.IsSuccess)
+        if (!isAuthorized)
         {
-            return roleCheck;
+            return new Return<User>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.NotAuthority
+            };
         }
 
         return new Return<User>

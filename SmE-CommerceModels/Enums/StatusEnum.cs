@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Enums
 {
-    public class GeneralStatus
+    public static class GeneralStatus
     {
         public const string Active = "Active";
         public const string Inactive = "Inactive";
@@ -31,7 +31,7 @@
         public const string Completed = "Completed";
     }
 
-    public class UserStatus
+    public static class UserStatus
     {
         public const string Active = "Active";
         public const string Inactive = "Inactive";

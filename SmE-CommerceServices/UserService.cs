@@ -16,57 +16,78 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
     }
 
     public async Task<Return<bool>> CreateManagerUser(CreateManagerReqDto req)
+{
+    try
     {
-        try
+        // Validate input
+        if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password) || string.IsNullOrWhiteSpace(req.FullName))
         {
-            var currentUser = await helperService.GetCurrentUser(nameof(RoleEnum.Manager));
-            if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
-                return new Return<bool>
-                {
-                    IsSuccess = false,
-                    Message = currentUser.Message,
-                };
-            }
-
-            // Check email is already existed
-            var existedManager = await userRepository.GetUserByEmailAsync(req.Email);
-            if (!existedManager.Message.Equals(ErrorMessage.NotFound))
-            {
-                return new Return<bool>
-                {
-                    IsSuccess = false,
-                    Message = ErrorMessage.UserAlreadyExists,
-                    InternalErrorMessage = existedManager.InternalErrorMessage,
-                };
-            }
-
-            User newManager = new()
-            {
-                Email = req.Email,
-                PasswordHash = HashUtil.Hash(req.Password),
-                FullName = req.FullName,
-                Role = RoleEnum.Manager,
-                Status = UserStatus.Active,
-                CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.Now
-            };
-
-            var roleManager = await userRepository.CreateNewUser(newManager);
             return new Return<bool>
             {
-                IsSuccess = true,
-                Message = SuccessfulMessage.Created,
+                IsSuccess = false,
+                Message = ErrorMessage.InvalidInput,
             };
         }
-        catch (Exception ex)
+
+        var currentUser = await helperService.GetCurrentUser(nameof(RoleEnum.Manager));
+        if (!currentUser.IsSuccess || currentUser.Data == null)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                Message = currentUser.Message ?? ErrorMessage.NotAuthority,
+            };
+        }
+
+        // Check if email already exists
+        var existedManager = await userRepository.GetUserByEmailAsync(req.Email);
+        if (existedManager is { IsSuccess: true, Data: not null })
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.UserAlreadyExists,
+            };
+        }
+
+        User newManager = new()
+        {
+            Email = req.Email,
+            PasswordHash = HashUtil.Hash(req.Password),
+            FullName = req.FullName,
+            Role = RoleEnum.Manager,
+            Status = UserStatus.Active,
+            CreateById = currentUser.Data.UserId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var createResult = await userRepository.CreateNewUser(newManager);
+        if (!createResult.IsSuccess || createResult.Data == null)
         {
             return new Return<bool>
             {
                 IsSuccess = false,
                 Message = ErrorMessage.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = createResult.InternalErrorMessage,
             };
         }
+
+        return new Return<bool>
+        {
+            IsSuccess = true,
+            Message = SuccessfulMessage.Created,
+            Data = true
+        };
     }
+    catch (Exception ex)
+    {
+        // Log the exception here
+        return new Return<bool>
+        {
+            IsSuccess = false,
+            Message = ErrorMessage.InternalServerError,
+            InternalErrorMessage = ex,
+        };
+    }
+}
 }
