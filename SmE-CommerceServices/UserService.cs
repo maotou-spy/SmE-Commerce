@@ -26,7 +26,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message ?? ErrorMessage.NotAuthority,
+                    Message = currentUser.Message,
                 };
             }
 
@@ -43,13 +43,13 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             User newManager = new()
             {
-                Email = req.Email,
+                Email = req.Email.ToLower(),
                 PasswordHash = HashUtil.Hash(req.Password),
                 FullName = req.FullName,
                 Role = req.Role,
                 Status = UserStatus.Active,
                 CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             var createResult = await userRepository.CreateNewUser(newManager);

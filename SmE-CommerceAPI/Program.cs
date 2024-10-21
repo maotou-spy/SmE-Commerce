@@ -69,13 +69,17 @@ builder.Services.AddScoped<BearerTokenUtil>();
 #endregion
 
 #region Auth
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(option =>
+    {
+        option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer("Defaut", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token")?.Value
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value
                                                                                         ?? throw new Exception("Invalid Token in configuration"))),
             ValidateIssuer = false,
             ValidateAudience = false,

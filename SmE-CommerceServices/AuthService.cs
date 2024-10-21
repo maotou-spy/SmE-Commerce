@@ -5,8 +5,9 @@ using SmE_CommerceModels.ResponseDtos.Auth;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities;
 
-namespace SmE_CommerceUtilities;
+namespace SmE_CommerceServices;
 
 public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerTokenUtil)
     : IAuthService
@@ -15,7 +16,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
     {
         try
         {
-            var userResult = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.EmailOrPhone);
+            var userResult = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.EmailOrPhone.ToLower());
             if (!userResult.IsSuccess || userResult.Data == null)
             {
                 return new Return<LoginResDto>
@@ -86,7 +87,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
     {
         try
         {
-            var existedUser = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.Email);
+            var existedUser = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.Email.ToLower());
             if (existedUser is { IsSuccess: true, Data: not null })
             {
                 return new Return<bool>
@@ -98,7 +99,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
 
             User newUser = new()
             {
-                Email = reqDto.Email,
+                Email = reqDto.Email.ToLower(),
                 PasswordHash = HashUtil.Hash(reqDto.Password),
                 FullName = reqDto.FullName,
                 Phone = reqDto.Phone,

@@ -10,17 +10,8 @@ namespace SmE_CommerceAPI.Controllers;
 
 [Route("api/users")]
 [Authorize(AuthenticationSchemes = "Defaut")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService, ILogger<AuthController> logger) : ControllerBase
 {
-    private readonly IUserService userService;
-    private readonly ILogger<AuthController> _logger;
-
-    public UserController(IUserService userService, ILogger<AuthController> logger)
-    {
-        this.userService = userService;
-        _logger = logger;
-    }
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserReqDto req)
@@ -29,20 +20,17 @@ public class UserController : ControllerBase
         {
             var result = await userService.CreateUser(req);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
             {
-                if (result.InternalErrorMessage is not null)
-                {
-                    _logger.LogError("Error at create manager user: {ex}", result.InternalErrorMessage);
-                }
-                return Helper.GetErrorResponse(result.Message);
+                logger.LogError("Error at create manager user: {ex}", result.InternalErrorMessage);
             }
-            return StatusCode(200, result);
+            return Helper.GetErrorResponse(result.Message);
 
         }
         catch (Exception ex)
         {
-            _logger.LogInformation("Error at create manager user: {e}", ex);
+            logger.LogInformation("Error at create manager user: {e}", ex);
             return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
