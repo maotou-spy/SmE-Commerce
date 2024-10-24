@@ -17,7 +17,7 @@ public class HelperService(
     IHttpContextAccessor httpContextAccessor,
     IUserRepository userRepository) : IHelperService
 {
-    public async Task<Return<User>> GetCurrentUser(string role)
+    public async Task<Return<User>> GetCurrentUser()
     {
         var token = httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token) || !VerifyToken(token))
@@ -57,6 +57,18 @@ public class HelperService(
                 Message = ErrorMessage.AccountIsInactive
             };
         }
+
+        return new Return<User>
+        {
+            IsSuccess = true,
+            Data = user.Data,
+            Message = SuccessfulMessage.Successfully
+        };
+    }
+
+    public async Task<Return<User>> GetCurrentUserWithRole(string role)
+    {
+        var user = await GetCurrentUser();
 
         // Improved role check
         var isAuthorized = role switch

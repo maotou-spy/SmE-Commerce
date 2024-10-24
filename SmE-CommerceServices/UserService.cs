@@ -20,7 +20,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUser(nameof(RoleEnum.Manager));
+            var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<bool>
