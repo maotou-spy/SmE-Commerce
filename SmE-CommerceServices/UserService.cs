@@ -1,6 +1,7 @@
 ﻿using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
+using SmE_CommerceModels.ResponseDtos.User;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -81,4 +82,106 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             };
         }
     }
+
+    public async Task<Return<GetUserProfileResDto>> GetUserProfileAsync()
+    {
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUser();
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<GetUserProfileResDto>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
+                };
+            }
+
+            var user = new GetUserProfileResDto
+            {
+                Email = currentUser.Data.Email,
+                FullName = currentUser.Data.FullName,
+                Phone = currentUser.Data.Phone,
+                Point = currentUser.Data.Point
+            };
+
+            return new Return<GetUserProfileResDto>
+            {
+                IsSuccess = true,
+                Data = user,
+                Message = SuccessfulMessage.Successfully
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<GetUserProfileResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+    public async Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid Id)
+    {
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<GetUserProfileResDto>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
+                };
+            }
+
+            var user = await userRepository.GetUserByIdAsync(Id);
+            if (!user.IsSuccess || user == null) 
+            {
+                return new Return<GetUserProfileResDto>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFound,
+                };
+            }
+
+            var userProfileDto = new GetUserProfileResDto
+            {
+                Email = user.Data.Email,
+                FullName = user.Data.FullName,
+                Phone = user.Data.Phone,
+                Point = user.Data.Point
+            };
+
+            return new Return<GetUserProfileResDto>
+            {
+                IsSuccess = true,
+                Data = userProfileDto,
+                Message = SuccessfulMessage.Successfully,
+                TotalRecord = user.TotalRecord
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<GetUserProfileResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+
 }
+ 
