@@ -13,7 +13,7 @@ namespace SmE_CommerceServices;
 
 public class UserService(IUserRepository userRepository, IHelperService helperService) : IUserService
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber)
+    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber, string? phone, string? email, string? name)
     {
         try
         {
@@ -28,7 +28,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            var users = await userRepository.GetAllUsersAsync(status, pageSize, pageNumber);
+            var users = await userRepository.GetAllUsersAsync(status, pageSize, pageNumber, phone, email, name);
             if (!users.IsSuccess || users.Data == null)
             {
                 return new Return<IEnumerable<User>>
@@ -49,7 +49,6 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         }
         catch (Exception ex)
         {
-            // Log the exception here
             return new Return<IEnumerable<User>>
             {
                 IsSuccess = false,
