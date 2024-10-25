@@ -5,7 +5,7 @@ namespace SmE_CommerceRepositories.Interface;
 
 public interface IUserRepository
 {
-    Task<Return<IEnumerable<User>>> GetAllUsersAsync();
+    Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber);
     Task<Return<User>> GetUserByIdAsync(Guid id);
     Task<Return<User>> GetUserByEmailAsync(string email);
     Task<Return<User>> GetUserByEmailOrPhoneAsync(string emailOrPhone);

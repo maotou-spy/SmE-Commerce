@@ -238,4 +238,27 @@ public class UserController(IUserService userService, IAddressService addressSer
             return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? pageNumber)
+    {
+        try
+        {
+            var result = await userService.GetAllUsersAsync(status, pageSize, pageNumber);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+            {
+                logger.LogError("Error at get all users: {ex}", result.InternalErrorMessage);
+            }
+            return Helper.GetErrorResponse(result.Message);
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get all users: {e}", ex);
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+        }
+    }
 }

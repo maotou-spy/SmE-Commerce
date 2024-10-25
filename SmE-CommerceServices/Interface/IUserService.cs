@@ -7,7 +7,7 @@ namespace SmE_CommerceServices.Interface;
 
 public interface IUserService
 {
-    Task<Return<IEnumerable<User>>> GetAllUsersAsync();
+    Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber);
     Task<Return<bool>> CreateUser(CreateUserReqDto req);
     Task<Return<GetUserProfileResDto>> GetUserProfileAsync();
     Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid Id);

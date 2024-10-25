@@ -9,9 +9,11 @@ namespace SmE_CommerceModels.RequestDtos.User
 {
     public class UpdateUserProfileReqDto
     {
-        public string? FullName { get; set; }
+        [Required]
+        public required string FullName { get; set; }
 
+        [Required]
         [RegularExpression(@"^0\d{9}$", ErrorMessage = "Phone number invalid")]
-        public string? Phone { get; set; }
+        public required string Phone { get; set; }
     }
 }
