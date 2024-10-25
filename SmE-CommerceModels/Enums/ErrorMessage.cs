@@ -15,4 +15,5 @@ public static class ErrorMessage
     public const string UserAlreadyExists = "User already exists";
     public const string ServerError = "Server error";
     public const string Duplicated = "Duplicated";
+    public const string NoChanges = "No changes";
 }

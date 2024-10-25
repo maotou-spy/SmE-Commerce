@@ -118,12 +118,12 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
 
             var address = new Address
             {
-                ReceiverName = addressReq.ReceiverName,
-                ReceiverPhone = addressReq.ReceiverPhone,
-                Address1 = addressReq.Address,
-                Ward = addressReq.Ward,
-                District = addressReq.District,
-                City = addressReq.City,
+                ReceiverName = addressReq.ReceiverName.Trim(),
+                ReceiverPhone = addressReq.ReceiverPhone.Trim(),
+                Address1 = addressReq.Address.Trim(),
+                Ward = addressReq.Ward.Trim(),
+                District = addressReq.District.Trim(),
+                City = addressReq.City.Trim(),
                 IsDefault = addressReq.IsDefault,
                 UserId = currentCustomer.Data.UserId,
                 CreatedAt = DateTime.Now,
@@ -194,6 +194,28 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 };
             }
 
+            // Check if there is no changes in the address
+            if (!HasAddressChanged(existingAddress.Data, addressReq))
+            {
+                return new Return<GetUserAddressesResDto>
+                {
+                    Data = new GetUserAddressesResDto
+                    {
+                        AddressId = existingAddress.Data.AddressId,
+                        ReceiverName = existingAddress.Data.ReceiverName,
+                        ReceiverPhone = existingAddress.Data.ReceiverPhone,
+                        Address = existingAddress.Data.Address1,
+                        Ward = existingAddress.Data.Ward,
+                        District = existingAddress.Data.District,
+                        City = existingAddress.Data.City,
+                        IsDefault = existingAddress.Data.IsDefault
+                    },
+                    IsSuccess = true,
+                    Message = ErrorMessage.NoChanges
+                };
+            }
+
+
             var isDuplicate = await CheckDuplicateAddressAsync(addressReq, currentCustomer.Data.UserId, addressId);
             if (!isDuplicate.IsSuccess || isDuplicate.Data)
             {
@@ -220,12 +242,12 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 }
             }
 
-            existingAddress.Data.ReceiverName = addressReq.ReceiverName;
-            existingAddress.Data.ReceiverPhone = addressReq.ReceiverPhone;
-            existingAddress.Data.Address1 = addressReq.Address;
-            existingAddress.Data.Ward = addressReq.Ward;
-            existingAddress.Data.District = addressReq.District;
-            existingAddress.Data.City = addressReq.City;
+            existingAddress.Data.ReceiverName = addressReq.ReceiverName.Trim();
+            existingAddress.Data.ReceiverPhone = addressReq.ReceiverPhone.Trim();
+            existingAddress.Data.Address1 = addressReq.Address.Trim();
+            existingAddress.Data.Ward = addressReq.Ward.Trim();
+            existingAddress.Data.District = addressReq.District.Trim();
+            existingAddress.Data.City = addressReq.City.Trim();
             existingAddress.Data.IsDefault = addressReq.IsDefault;
             existingAddress.Data.ModifiedAt = DateTime.Now;
             existingAddress.Data.ModifiedById = currentCustomer.Data.UserId;
@@ -424,5 +446,16 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             IsSuccess = true,
             Message = isDuplicate ? ErrorMessage.Duplicated : SuccessfulMessage.NotDuplicate
         };
+    }
+
+    private static bool HasAddressChanged(Address existingAddress, AddressReqDto newAddress)
+    {
+        return !string.Equals(existingAddress.ReceiverName.Trim(), newAddress.ReceiverName.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.ReceiverPhone.Trim(), newAddress.ReceiverPhone.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.Address1.Trim(), newAddress.Address.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.Ward.Trim(), newAddress.Ward.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.District.Trim(), newAddress.District.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.City.Trim(), newAddress.City.Trim(), StringComparison.OrdinalIgnoreCase) ||
+               existingAddress.IsDefault != newAddress.IsDefault;
     }
 }
