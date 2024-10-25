@@ -18,23 +18,24 @@ public class AddressRepository(DefaultdbContext defaultdbContext) : IAddressRepo
                 .CountAsync();
 
             var query = defaultdbContext.Addresses
-                .Where(x =>x.UserId == userId && x.Status != GeneralStatus.Deleted)
+                .Where(x => x.UserId == userId && x.Status != GeneralStatus.Deleted)
                 .OrderByDescending(x => x.CreatedAt);
 
-            if (pageSize is not > 0) pageSize = totalRecord;
-            if (pageNumber is not > 0) pageNumber = 1;
+            List<Address> result;
 
+            if (pageSize is > 0)
+            {
+                pageNumber ??= 1;
 
-            if (query == null)
-                return new Return<IEnumerable<Address>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
-                    TotalRecord = 0
-                };
-
-            var result = await query.ToListAsync();
+                result = await query
+                    .Skip((pageNumber.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value)
+                    .ToListAsync();
+            }
+            else
+            {
+                result = await query.ToListAsync();
+            }
 
             return new Return<IEnumerable<Address>>
             {
