@@ -224,7 +224,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         }
     }
 
-    public async Task<Return<bool>> UpdateProfile(UpdateUserProfileReqDto req)
+    public async Task<Return<bool>> UpdateProfileAsync(UpdateUserProfileReqDto req)
     {
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
@@ -293,6 +293,79 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Message = SuccessfulMessage.Updated,
+                Data = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> DeleteUserAsync(Guid Id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
+                };
+            }
+
+            var user = await userRepository.GetUserByIdAsync(Id);
+            if (!user.IsSuccess || user.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFound,
+                    InternalErrorMessage = user.InternalErrorMessage
+                };
+            }
+
+            if (user.Data.Role.Equals(RoleEnum.Manager))
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.MANAGERCANNOTDELETED,
+                    InternalErrorMessage = user.InternalErrorMessage
+                };
+            }
+
+            user.Data.Status = UserStatus.Deleted;
+            user.Data.ModifiedAt = DateTime.Now;
+            user.Data.ModifiedById = currentUser.Data.UserId;
+
+            var updateResult = await userRepository.UpdateUser(user.Data);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                };
+            }
+
+            scope.Complete();
+
+            return new Return<bool>
+            {
+                IsSuccess = true,
+                Message = SuccessfulMessage.Deleted,
                 Data = true
             };
         }

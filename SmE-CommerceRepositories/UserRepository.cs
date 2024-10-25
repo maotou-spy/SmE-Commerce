@@ -218,34 +218,6 @@ public class UserRepository(DefaultdbContext dbContext) : IUserRepository
         }
     }
 
-    public async Task<Return<User>> ChangeUserStatus(User user)
-    {
-        try
-        {
-            dbContext.Users.Update(user);
-            await dbContext.SaveChangesAsync();
-
-            return new Return<User>
-            {
-                Data = user,
-                IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
-                TotalRecord = 1
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<User>
-            {
-                Data = null,
-                IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                InternalErrorMessage = ex,
-                TotalRecord = 0
-            };
-        }
-    }
-
     public async Task<Return<User>> ChangeUserPassword(User user)
     {
         try
