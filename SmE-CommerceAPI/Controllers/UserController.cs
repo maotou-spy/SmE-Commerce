@@ -241,11 +241,11 @@ public class UserController(IUserService userService, IAddressService addressSer
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? pageNumber)
+    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? pageNumber, [FromQuery] string? phone, [FromQuery] string? email, [FromQuery] string name)
     {
         try
         {
-            var result = await userService.GetAllUsersAsync(status, pageSize, pageNumber);
+            var result = await userService.GetAllUsersAsync(status, pageSize, pageNumber, phone, email, name);
 
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)

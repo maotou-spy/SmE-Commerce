@@ -9,27 +9,40 @@ namespace SmE_CommerceRepositories;
 
 public class UserRepository(DefaultdbContext dbContext) : IUserRepository
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber)
+    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(
+    string? status, int? pageSize, int? pageNumber,
+    string? phone, string? email, string? name)
     {
         try
         {
-            var totalRecord = await dbContext.Users
-                .Where(x => x.Status != GeneralStatus.Deleted)
-                .CountAsync();
-
             var query = dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted);
-
-            List<User> result;
 
             if (!string.IsNullOrWhiteSpace(status))
             {
                 query = query.Where(x => x.Status == status);
             }
 
+            if (!string.IsNullOrWhiteSpace(phone))
+            {
+                query = query.Where(x => x.Phone.Contains(phone));
+            }
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                query = query.Where(x => x.Email.Contains(email));
+            }
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(x => x.FullName.Contains(name));
+            }
+
+            var totalRecord = await query.CountAsync();
+
+            List<User> result;
             if (pageSize is > 0)
             {
                 pageNumber ??= 1;
-
                 result = await query
                     .Skip((pageNumber.Value - 1) * pageSize.Value)
                     .Take(pageSize.Value)
@@ -40,12 +53,13 @@ public class UserRepository(DefaultdbContext dbContext) : IUserRepository
                 result = await query.ToListAsync();
             }
 
+            // Trả về kết quả
             return new Return<IEnumerable<User>>
             {
                 Data = result,
                 IsSuccess = true,
                 Message = result.Any() ? SuccessfulMessage.Found : ErrorMessage.NotFound,
-                TotalRecord = result.Count
+                TotalRecord = totalRecord
             };
         }
         catch (Exception ex)
