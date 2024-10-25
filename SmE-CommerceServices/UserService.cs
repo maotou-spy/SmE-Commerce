@@ -6,6 +6,8 @@ using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
+using System.Transactions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SmE_CommerceServices;
 
@@ -182,6 +184,78 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         }
     }
 
+    public async Task<Return<bool>> UpdateProfile(UpdateUserProfileReqDto req)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUser();
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
+                };
+            }
 
+            var user = await userRepository.GetUserByIdAsync(currentUser.Data.UserId);
+            if (!user.IsSuccess || user.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFound,
+                    InternalErrorMessage = user.InternalErrorMessage
+                };
+            }
+
+            var existedUser = await userRepository.GetUserByEmailOrPhoneAsync(req.Phone);
+            if (existedUser.IsSuccess && existedUser.Data != null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.UserAlreadyExists,
+                };
+            }
+
+            user.Data.FullName = req.FullName ?? user.Data.FullName;
+            user.Data.Phone = req.Phone ?? user.Data.Phone;
+            user.Data.CreatedAt = DateTime.Now;
+            user.Data.CreateById = currentUser.Data.UserId;
+
+            var updateResult = await userRepository.UpdateUser(user.Data);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                };
+            }
+
+            scope.Complete();
+
+            return new Return<bool>
+            {
+                IsSuccess = true,
+                Message = SuccessfulMessage.Updated,
+                Data = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
 }
  

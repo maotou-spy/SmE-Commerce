@@ -20,6 +20,10 @@ public class UserController(IUserService userService, IAddressService addressSer
     {
         try
         {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            }
             var result = await userService.CreateUser(req);
 
             if (result.IsSuccess) return StatusCode(200, result);
@@ -205,6 +209,33 @@ public class UserController(IUserService userService, IAddressService addressSer
         {
             logger.LogInformation("Error at set default address: {e}", ex);
             return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileReqDto req)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            }
+            var result = await userService.UpdateProfile(req);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+            {
+                logger.LogError("Error at update user profile: {ex}", result.InternalErrorMessage);
+            }
+            return Helper.GetErrorResponse(result.Message);
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update user profile: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
 }
