@@ -13,9 +13,50 @@ namespace SmE_CommerceServices;
 
 public class UserService(IUserRepository userRepository, IHelperService helperService) : IUserService
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync()
+    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber)
     {
-        return await userRepository.GetAllUsersAsync();
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<IEnumerable<User>>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                };
+            }
+
+            var users = await userRepository.GetAllUsersAsync(status, pageSize, pageNumber);
+            if (!users.IsSuccess || users.Data == null)
+            {
+                return new Return<IEnumerable<User>>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = users.InternalErrorMessage,
+                };
+            }
+
+            return new Return<IEnumerable<User>>
+            {
+                IsSuccess = true,
+                Message = SuccessfulMessage.Created,
+                Data = users.Data,
+                TotalRecord = users.TotalRecord
+            };
+        }
+        catch (Exception ex)
+        {
+            // Log the exception here
+            return new Return<IEnumerable<User>>
+            {
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
     }
 
     public async Task<Return<bool>> CreateUser(CreateUserReqDto req)
@@ -212,8 +253,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            var existedUser = await userRepository.GetUserByEmailOrPhoneAsync(req.Phone);
-            if (existedUser.IsSuccess && existedUser.Data != null)
+            var existedPhone = await userRepository.GetUserByEmailOrPhoneAsync(req.Phone);
+            if (existedPhone.IsSuccess && existedPhone.Data != null)
             {
                 return new Return<bool>
                 {
@@ -222,8 +263,17 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            user.Data.FullName = req.FullName ?? user.Data.FullName;
-            user.Data.Phone = req.Phone ?? user.Data.Phone;
+            if(req.Phone.Equals(user.Data.Phone) && req.FullName.Equals(user.Data.FullName))
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NoChanges,
+                };
+            }
+
+            user.Data.FullName = req.FullName;
+            user.Data.Phone = req.Phone;
             user.Data.CreatedAt = DateTime.Now;
             user.Data.CreateById = currentUser.Data.UserId;
 

@@ -9,17 +9,42 @@ namespace SmE_CommerceRepositories;
 
 public class UserRepository(DefaultdbContext dbContext) : IUserRepository
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync()
+    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber)
     {
         try
         {
-            var result = await dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted).ToListAsync();
+            var totalRecord = await dbContext.Users
+                .Where(x => x.Status != GeneralStatus.Deleted)
+                .CountAsync();
+
+            var query = dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted);
+
+            List<User> result;
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(x => x.Status == status);
+            }
+
+            if (pageSize is > 0)
+            {
+                pageNumber ??= 1;
+
+                result = await query
+                    .Skip((pageNumber.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value)
+                    .ToListAsync();
+            }
+            else
+            {
+                result = await query.ToListAsync();
+            }
 
             return new Return<IEnumerable<User>>
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Count > 0 ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result.Any() ? SuccessfulMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result.Count
             };
         }
