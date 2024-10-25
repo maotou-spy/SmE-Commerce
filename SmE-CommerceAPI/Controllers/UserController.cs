@@ -262,7 +262,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
     {

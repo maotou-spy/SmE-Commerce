@@ -16,5 +16,5 @@ public static class ErrorMessage
     public const string ServerError = "Server error";
     public const string Duplicated = "Duplicated";
     public const string NoChanges = "No changes";
-    public const string MANAGERCANNOTDELETED = "Manager cannot deleted";
+    public const string MANAGERCANNOTBEBANNED = "Manager cannot be banned";
 }

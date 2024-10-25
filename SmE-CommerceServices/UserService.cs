@@ -312,7 +312,6 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // Validate user
             var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
@@ -340,12 +339,15 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.MANAGERCANNOTDELETED,
+                    Message = ErrorMessage.MANAGERCANNOTBEBANNED,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }
 
-            user.Data.Status = UserStatus.Deleted;
+            user.Data.Status = user.Data.Status == UserStatus.Active
+                ? UserStatus.Inactive
+                : UserStatus.Active;
+
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 
@@ -356,7 +358,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                    InternalErrorMessage = updateResult.InternalErrorMessage
                 };
             }
 
@@ -365,7 +367,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Deleted,
+                Message = SuccessfulMessage.Updated,
                 Data = true
             };
         }
@@ -373,11 +375,13 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         {
             return new Return<bool>
             {
+                Data = false,
                 IsSuccess = false,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
+                TotalRecord = 0
             };
         }
     }
+
 }
- 
