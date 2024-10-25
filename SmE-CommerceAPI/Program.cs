@@ -43,13 +43,6 @@ builder.Services.AddScoped<DefaultdbContext>();
 
 #endregion
 
-#region Service
-
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-#endregion
-
 #region Firebase Service
 var defaultApp = FirebaseApp.Create(new AppOptions()
 {
@@ -58,19 +51,21 @@ var defaultApp = FirebaseApp.Create(new AppOptions()
 Console.WriteLine(defaultApp.Name);
 #endregion
 
-#region Repository
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-
-#endregion
-
 #region Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IHelperService, HelperService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<BearerTokenUtil>();
+#endregion
+
+#region Repository
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 #endregion
 
 #region Auth
