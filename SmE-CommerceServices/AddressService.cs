@@ -27,7 +27,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 };
             }
 
-            var result = await addressRepository.GetAddressesByUserIdAsync(currentCustomer.Data.UserId,  pageSize, pageNumber);
+            var result = await addressRepository.GetAddressesByUserIdAsync(currentCustomer.Data.UserId);
 
             if (!result.IsSuccess || result.Data == null)
             {
@@ -425,7 +425,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
 
     private async Task<Return<bool>> CheckDuplicateAddressAsync(AddressReqDto addressReq, Guid userId, Guid? addressId = null)
     {
-        var existingAddresses = await addressRepository.GetAddressesByUserIdAsync(userId, null, null);
+        var existingAddresses = await addressRepository.GetAddressesByUserIdAsync(userId);
 
         if (!existingAddresses.IsSuccess || existingAddresses.Data == null)
         {

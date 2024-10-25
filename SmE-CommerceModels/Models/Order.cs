@@ -14,6 +14,10 @@ public partial class Order : Common
 
     public Guid? DiscountCodeId { get; set; }
 
+    public decimal DiscountAmount { get; set; }
+
+    public string? Note { get; set; }
+
     public string? Reason { get; set; }
 
     public int PointsEarned { get; set; }

@@ -492,7 +492,6 @@ public partial class DefaultdbContext : DbContext
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.OrderId).HasName("Orders_pkey");
-
             entity.Property(e => e.OrderId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("orderId");
@@ -500,6 +499,10 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.ShippingCode)
                 .HasColumnType("character varying")
                 .HasColumnName("shippingCode");
+            entity.Property(e => e.Note).HasColumnName("note");
+            entity.Property(e => e.DiscountAmount)
+                .HasPrecision(15)
+                .HasColumnName("discountAmount");
             entity.Property(e => e.CreateById).HasColumnName("createById");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")

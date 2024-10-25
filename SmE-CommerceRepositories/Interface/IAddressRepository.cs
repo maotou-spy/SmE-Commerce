@@ -5,7 +5,7 @@ namespace SmE_CommerceRepositories.Interface;
 
 public interface IAddressRepository
 {
-    Task<Return<IEnumerable<Address>>> GetAddressesByUserIdAsync(Guid userId, int? pageSize, int? pageNumber);
+    Task<Return<IEnumerable<Address>>> GetAddressesByUserIdAsync(Guid userId);
     Task<Return<Address>> GetAddressByIdAsync(Guid addressId);
     Task<Return<bool>> AddAddressAsync(Address address);
     Task<Return<Address>> UpdateAddressAsync(Address address);

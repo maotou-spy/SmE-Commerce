@@ -9,42 +9,21 @@ namespace SmE_CommerceRepositories;
 
 public class AddressRepository(DefaultdbContext defaultdbContext) : IAddressRepository
 {
-    public async Task<Return<IEnumerable<Address>>> GetAddressesByUserIdAsync(Guid userId, int? pageSize, int? pageNumber)
+    public async Task<Return<IEnumerable<Address>>> GetAddressesByUserIdAsync(Guid userId)
     {
         try
         {
-            var totalRecord = await defaultdbContext.Addresses
-                .Where(x =>x.UserId == userId &&  x.Status != GeneralStatus.Deleted)
-                .CountAsync();
-
-            var query = defaultdbContext.Addresses
+            var result = await defaultdbContext.Addresses
                 .Where(x => x.UserId == userId && x.Status != GeneralStatus.Deleted)
-                .OrderByDescending(x => x.CreatedAt);
-
-            List<Address> result;
-
-            if (pageSize is > 0)
-            {
-                pageNumber ??= 1;
-
-                result = await query
-                    .Skip((pageNumber.Value - 1) * pageSize.Value)
-                    .Take(pageSize.Value)
-                    .ToListAsync();
-            }
-            else
-            {
-                result = await query.ToListAsync();
-            }
+                .ToListAsync();
 
             return new Return<IEnumerable<Address>>
             {
                 Data = result,
                 IsSuccess = true,
                 Message = result.Count > 0 ? SuccessfulMessage.Found : ErrorMessage.NotFound,
-                TotalRecord = totalRecord
+                TotalRecord = result.Count
             };
-
         }
         catch (Exception ex)
         {
