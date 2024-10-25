@@ -18,6 +18,8 @@ public partial class Address : Common
 
     public string City { get; set; } = null!;
 
+    public bool IsDefault { get; set; } = false;
+
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>

@@ -123,6 +123,7 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.Ward)
                 .HasMaxLength(100)
                 .HasColumnName("ward");
+            entity.Property(e => e.IsDefault).HasColumnName("isDefault");
 
             entity.HasOne(d => d.User).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.UserId)
@@ -496,9 +497,9 @@ public partial class DefaultdbContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("orderId");
             entity.Property(e => e.AddressId).HasColumnName("addressId");
-            entity.Property(e => e.BOlid)
+            entity.Property(e => e.ShippingCode)
                 .HasColumnType("character varying")
-                .HasColumnName("bOLId");
+                .HasColumnName("shippingCode");
             entity.Property(e => e.CreateById).HasColumnName("createById");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")

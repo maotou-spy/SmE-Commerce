@@ -8,7 +8,7 @@ public partial class Order : Common
 
     public Guid? AddressId { get; set; }
 
-    public string? BOlid { get; set; }
+    public string? ShippingCode { get; set; }
 
     public decimal TotalAmount { get; set; }
 

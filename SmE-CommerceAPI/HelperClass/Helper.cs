@@ -5,7 +5,7 @@ using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceAPI.HelperClass
 {
-    public class Helper
+    public static class Helper
     {
         public static Return<Dictionary<string, List<string>?>> GetValidationErrors(ModelStateDictionary modelState)
         {

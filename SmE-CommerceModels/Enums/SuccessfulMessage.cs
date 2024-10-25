@@ -9,4 +9,6 @@ public static class SuccessfulMessage
 
     public const string Successfully = "Successfully";
     public const string ValidToken = "Token verification successful";
+
+    public const string NotDuplicate = "Not Duplicate";
 }

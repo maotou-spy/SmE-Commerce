@@ -14,4 +14,5 @@ public static class ErrorMessage
     public const string NotAuthority = "You are not authority to use this function";
     public const string UserAlreadyExists = "User already exists";
     public const string ServerError = "Server error";
+    public const string Duplicated = "Duplicated";
 }
