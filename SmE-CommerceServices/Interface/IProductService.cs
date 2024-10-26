@@ -1,4 +1,6 @@
 ﻿using SmE_CommerceModels.Models;
+using SmE_CommerceModels.RequestDtos.Category;
+using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,6 @@ namespace SmE_CommerceServices.Interface
 {
     public interface IProductService
     {
-        Task<Return<Product>> AddProductAsync(Product product);
+        Task<Return<bool>> AddProductAsync(AddProductReqDto req);
     }
 }

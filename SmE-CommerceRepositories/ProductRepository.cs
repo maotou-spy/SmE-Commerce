@@ -1,4 +1,5 @@
-﻿using SmE_CommerceModels.DatabaseContext;
+﻿using Microsoft.EntityFrameworkCore;
+using SmE_CommerceModels.DatabaseContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
@@ -40,5 +41,7 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+
+        
     }
 }
