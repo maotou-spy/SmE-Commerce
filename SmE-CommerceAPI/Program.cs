@@ -147,6 +147,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//Hello World
+app.MapGet("/", () => "Hello World!");
+
 app.UseAuthentication();
 
 app.UseAuthorization();

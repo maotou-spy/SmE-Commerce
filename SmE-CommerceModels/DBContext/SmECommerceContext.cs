@@ -282,9 +282,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
-            entity.Property(e => e.DisplayOrder)
-                .HasDefaultValue(0)
-                .HasColumnName("displayOrder");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
@@ -818,9 +815,6 @@ public partial class SmECommerceContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("productCategoryId");
             entity.Property(e => e.CategoryId).HasColumnName("categoryId");
-            entity.Property(e => e.DisplayOrder)
-                .HasDefaultValue(0)
-                .HasColumnName("displayOrder");
             entity.Property(e => e.ProductId).HasColumnName("productId");
 
             entity.HasOne(d => d.Category).WithMany(p => p.ProductCategories)

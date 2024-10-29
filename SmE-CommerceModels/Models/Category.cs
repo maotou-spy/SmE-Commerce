@@ -19,7 +19,5 @@ public partial class Category : Common
 
     public string? Slug { get; set; }
 
-    public int? DisplayOrder { get; set; }
-
     public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 }
