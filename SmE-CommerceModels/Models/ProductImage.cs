@@ -1,4 +1,7 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmE_CommerceModels.Models;
 
 public partial class ProductImage
 {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmE_CommerceModels.DatabaseContext;
+using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
@@ -7,7 +7,7 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class UserRepository(DefaultdbContext dbContext) : IUserRepository
+public class UserRepository(SmECommerceContext dbContext) : IUserRepository
 {
     public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(
     string? status, int? pageSize, int? pageNumber,
@@ -24,17 +24,17 @@ public class UserRepository(DefaultdbContext dbContext) : IUserRepository
 
             if (!string.IsNullOrWhiteSpace(phone))
             {
-                query = query.Where(x => x.Phone.Contains(phone));
+                query = query.Where(x => x.Phone != null && x.Phone.Contains(phone));
             }
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                query = query.Where(x => x.Email.Contains(email));
+                query = query.Where(x => x.Email != null && x.Email.Contains(email));
             }
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                query = query.Where(x => x.FullName.Contains(name));
+                query = query.Where(x => x.FullName != null && x.FullName.Contains(name));
             }
 
             var totalRecord = await query.CountAsync();

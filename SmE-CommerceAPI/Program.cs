@@ -1,13 +1,13 @@
 using System.Text;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using SmE_CommerceModels.DatabaseContext;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SmE_CommerceModels.DBContext;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
@@ -39,7 +39,7 @@ builder.Services.AddSingleton(timeZoneInfo);
 
 #region Database
 
-builder.Services.AddScoped<DefaultdbContext>();
+builder.Services.AddScoped<SmECommerceContext>();
 
 #endregion
 

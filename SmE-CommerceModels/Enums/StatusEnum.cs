@@ -48,4 +48,12 @@
         public const string Rejected = "Rejected";
         public const string Returned = "Returned";
     }
+
+    public class ProductStatus
+    {
+        public const string Active = "Active";
+        public const string Inactive = "Inactive";
+        public const string OutOfStock = "Out of Stock";
+        public const string Deleted = "Deleted";
+    }
 }

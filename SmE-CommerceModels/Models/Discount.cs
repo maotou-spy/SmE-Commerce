@@ -25,6 +25,16 @@ public partial class Discount : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
+    public int? UsageLimit { get; set; }
+
+    public int? UsedCount { get; set; }
+
+    public int? MinQuantity { get; set; }
+
+    public int? MaxQuantity { get; set; }
+
+    public bool? IsFirstOrder { get; set; }
+
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();

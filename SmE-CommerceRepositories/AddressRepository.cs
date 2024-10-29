@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmE_CommerceModels.DatabaseContext;
+using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
@@ -7,7 +7,7 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class AddressRepository(DefaultdbContext defaultdbContext) : IAddressRepository
+public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRepository
 {
     public async Task<Return<IEnumerable<Address>>> GetAddressesByUserIdAsync(Guid userId)
     {
@@ -197,7 +197,7 @@ public class AddressRepository(DefaultdbContext defaultdbContext) : IAddressRepo
         try
         {
             var address = await defaultdbContext.Addresses
-                .Where(x => x.UserId == userId && x.IsDefault)
+                .Where(x => x.UserId == userId && x.IsDefault == true && x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync();
 
             if (address == null)

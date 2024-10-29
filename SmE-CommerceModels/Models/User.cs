@@ -23,13 +23,31 @@ public partial class User : Common
 
     public DateTime? LastLogin { get; set; }
 
+    public string? Username { get; set; }
+
+    public string? Avatar { get; set; }
+
+    public DateOnly? DateOfBirth { get; set; }
+
+    public string? Gender { get; set; }
+
+    public bool? IsEmailVerified { get; set; }
+
+    public bool? IsPhoneVerified { get; set; }
+
+    public string? ResetPasswordToken { get; set; }
+
+    public DateTime? ResetPasswordExpires { get; set; }
+
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
+
+    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
-    public virtual ICollection<ChangeLog> ChangeLogs { get; set; } = new List<ChangeLog>();
-
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
+
+    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } = new List<OrderStatusHistory>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

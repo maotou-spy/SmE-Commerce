@@ -1,4 +1,7 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmE_CommerceModels.Models;
 
 public partial class ProductCategory
 {
@@ -7,6 +10,8 @@ public partial class ProductCategory
     public Guid? ProductId { get; set; }
 
     public Guid? CategoryId { get; set; }
+
+    public int? DisplayOrder { get; set; }
 
     public virtual Category? Category { get; set; }
 

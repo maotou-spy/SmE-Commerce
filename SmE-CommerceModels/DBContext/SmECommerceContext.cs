@@ -2,20 +2,22 @@
 using Microsoft.Extensions.Configuration;
 using SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.DatabaseContext;
+namespace SmE_CommerceModels.DBContext;
 
-public partial class DefaultdbContext : DbContext
+public partial class SmECommerceContext : DbContext
 {
-    public DefaultdbContext()
+    public SmECommerceContext()
     {
     }
 
-    public DefaultdbContext(DbContextOptions<DefaultdbContext> options)
+    public SmECommerceContext(DbContextOptions<SmECommerceContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Address> Addresses { get; set; }
+
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
     public virtual DbSet<BankInfo> BankInfos { get; set; }
 
@@ -24,8 +26,6 @@ public partial class DefaultdbContext : DbContext
     public virtual DbSet<CartItem> CartItems { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<ChangeLog> ChangeLogs { get; set; }
 
     public virtual DbSet<Content> Contents { get; set; }
 
@@ -45,23 +45,29 @@ public partial class DefaultdbContext : DbContext
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
+
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
+
     public virtual DbSet<ProductCategory> ProductCategories { get; set; }
 
     public virtual DbSet<ProductImage> ProductImages { get; set; }
 
-    public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
+    public virtual DbSet<ProductVariant> ProductVariants { get; set; }
 
     public virtual DbSet<Review> Reviews { get; set; }
 
     public virtual DbSet<Setting> Settings { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<VariantAttribute> VariantAttributes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -105,6 +111,9 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.District)
                 .HasMaxLength(100)
                 .HasColumnName("district");
+            entity.Property(e => e.IsDefault)
+                .HasDefaultValue(false)
+                .HasColumnName("isDefault");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
@@ -123,11 +132,47 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.Ward)
                 .HasMaxLength(100)
                 .HasColumnName("ward");
-            entity.Property(e => e.IsDefault).HasColumnName("isDefault");
 
             entity.HasOne(d => d.User).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_useraddress");
+        });
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.LogId).HasName("AuditLogs_pkey");
+
+            entity.Property(e => e.LogId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("logId");
+            entity.Property(e => e.Action)
+                .HasMaxLength(50)
+                .HasColumnName("action");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(50)
+                .HasColumnName("ipAddress");
+            entity.Property(e => e.NewValue)
+                .HasColumnType("jsonb")
+                .HasColumnName("newValue");
+            entity.Property(e => e.OldValue)
+                .HasColumnType("jsonb")
+                .HasColumnName("oldValue");
+            entity.Property(e => e.RecordId).HasColumnName("recordId");
+            entity.Property(e => e.TableName)
+                .HasMaxLength(50)
+                .HasColumnName("tableName");
+            entity.Property(e => e.UserAgent)
+                .HasMaxLength(255)
+                .HasColumnName("userAgent");
+            entity.Property(e => e.UserId).HasColumnName("userId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("AuditLogs_userId_fkey");
         });
 
         modelBuilder.Entity<BankInfo>(entity =>
@@ -219,6 +264,8 @@ public partial class DefaultdbContext : DbContext
         {
             entity.HasKey(e => e.CategoryId).HasName("Categories_pkey");
 
+            entity.HasIndex(e => e.Slug, "Categories_slug_key").IsUnique();
+
             entity.Property(e => e.CategoryId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("categoryId");
@@ -235,6 +282,9 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.DisplayOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("displayOrder");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
@@ -242,49 +292,22 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
+            entity.Property(e => e.Slug)
+                .HasMaxLength(255)
+                .HasColumnName("slug");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasComment("Values: active, inactive, deleted")
                 .HasColumnName("status");
         });
 
-        modelBuilder.Entity<ChangeLog>(entity =>
-        {
-            entity.HasKey(e => e.LogId).HasName("ChangeLog_pkey");
-
-            entity.ToTable("ChangeLog");
-
-            entity.Property(e => e.LogId)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("logId");
-            entity.Property(e => e.Action)
-                .HasMaxLength(10)
-                .HasComment("Values: insert, update, delete")
-                .HasColumnName("action");
-            entity.Property(e => e.ChangedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("changedAt");
-            entity.Property(e => e.ChangedById).HasColumnName("changedById");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Reason)
-                .HasMaxLength(255)
-                .HasColumnName("reason");
-            entity.Property(e => e.RecordId)
-                .HasComment("The Id of record has been updated")
-                .HasColumnName("recordId");
-            entity.Property(e => e.TableName)
-                .HasMaxLength(50)
-                .HasColumnName("tableName");
-
-            entity.HasOne(d => d.ChangedBy).WithMany(p => p.ChangeLogs)
-                .HasForeignKey(d => d.ChangedById)
-                .HasConstraintName("fk_changeloguser");
-        });
-
         modelBuilder.Entity<Content>(entity =>
         {
             entity.HasKey(e => e.ContentId).HasName("Contents_pkey");
+
+            entity.HasIndex(e => e.Slug, "Contents_slug_key").IsUnique();
+
+            entity.HasIndex(e => e.Status, "idx_contents_status");
 
             entity.Property(e => e.ContentId)
                 .HasDefaultValueSql("gen_random_uuid()")
@@ -303,6 +326,13 @@ public partial class DefaultdbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("Values: blog, facebook")
                 .HasColumnName("externalType");
+            entity.Property(e => e.Keywords)
+                .HasColumnType("character varying[]")
+                .HasColumnName("keywords");
+            entity.Property(e => e.MetaDescription).HasColumnName("metaDescription");
+            entity.Property(e => e.MetaTitle)
+                .HasMaxLength(255)
+                .HasColumnName("metaTitle");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
@@ -311,6 +341,10 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.PublishedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("publishedAt");
+            entity.Property(e => e.ShortDescription).HasColumnName("shortDescription");
+            entity.Property(e => e.Slug)
+                .HasMaxLength(255)
+                .HasColumnName("slug");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasComment("Values: draft, pending, published, unpublished, deleted")
@@ -318,6 +352,9 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(255)
                 .HasColumnName("title");
+            entity.Property(e => e.ViewCount)
+                .HasDefaultValue(0)
+                .HasColumnName("viewCount");
         });
 
         modelBuilder.Entity<ContentCategoryMap>(entity =>
@@ -408,10 +445,15 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.FromDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("fromDate");
+            entity.Property(e => e.IsFirstOrder)
+                .HasDefaultValue(false)
+                .HasColumnName("isFirstOrder");
             entity.Property(e => e.IsPercentage).HasColumnName("isPercentage");
+            entity.Property(e => e.MaxQuantity).HasColumnName("maxQuantity");
             entity.Property(e => e.MaximumDiscount)
                 .HasPrecision(15)
                 .HasColumnName("maximumDiscount");
+            entity.Property(e => e.MinQuantity).HasColumnName("minQuantity");
             entity.Property(e => e.MinimumOrderAmount)
                 .HasPrecision(15)
                 .HasColumnName("minimumOrderAmount");
@@ -426,11 +468,17 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.ToDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("toDate");
+            entity.Property(e => e.UsageLimit).HasColumnName("usageLimit");
+            entity.Property(e => e.UsedCount)
+                .HasDefaultValue(0)
+                .HasColumnName("usedCount");
         });
 
         modelBuilder.Entity<DiscountCode>(entity =>
         {
             entity.HasKey(e => e.CodeId).HasName("DiscountCodes_pkey");
+
+            entity.HasIndex(e => e.Status, "idx_discountcodes_status");
 
             entity.Property(e => e.CodeId)
                 .HasDefaultValueSql("gen_random_uuid()")
@@ -492,34 +540,61 @@ public partial class DefaultdbContext : DbContext
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.OrderId).HasName("Orders_pkey");
+
+            entity.HasIndex(e => e.OrderCode, "Orders_orderCode_key").IsUnique();
+
+            entity.HasIndex(e => e.Status, "idx_orders_status");
+
+            entity.HasIndex(e => e.UserId, "idx_orders_userid");
+
             entity.Property(e => e.OrderId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("orderId");
+            entity.Property(e => e.ActualDeliveryDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("actualDeliveryDate");
             entity.Property(e => e.AddressId).HasColumnName("addressId");
-            entity.Property(e => e.ShippingCode)
-                .HasColumnType("character varying")
-                .HasColumnName("shippingCode");
-            entity.Property(e => e.Note).HasColumnName("note");
-            entity.Property(e => e.DiscountAmount)
-                .HasPrecision(15)
-                .HasColumnName("discountAmount");
+            entity.Property(e => e.CancelReason)
+                .HasMaxLength(200)
+                .HasColumnName("cancelReason");
             entity.Property(e => e.CreateById).HasColumnName("createById");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.DiscountCodeId).HasColumnName("discountCodeId");
+            entity.Property(e => e.Discountamount)
+                .HasPrecision(15)
+                .HasColumnName("discountamount");
+            entity.Property(e => e.EstimatedDeliveryDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("estimatedDeliveryDate");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
             entity.Property(e => e.ModifiedById).HasColumnName("modifiedById");
+            entity.Property(e => e.Note)
+                .HasColumnType("character varying")
+                .HasColumnName("note");
+            entity.Property(e => e.OrderCode)
+                .HasMaxLength(50)
+                .HasColumnName("orderCode");
             entity.Property(e => e.PointsEarned).HasColumnName("pointsEarned");
-            entity.Property(e => e.Reason)
+            entity.Property(e => e.ReturnReason)
                 .HasMaxLength(200)
-                .HasColumnName("reason");
+                .HasColumnName("returnReason");
+            entity.Property(e => e.ShippingFee)
+                .HasPrecision(15)
+                .HasColumnName("shippingFee");
+            entity.Property(e => e.ShippingCode)
+                .HasColumnType("character varying")
+                .HasColumnName("shippingCode");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasComment("Values: pending, processing, completed, cancelled, rejected, returned")
                 .HasColumnName("status");
+            entity.Property(e => e.SubTotal)
+                .HasPrecision(15)
+                .HasColumnName("subTotal");
             entity.Property(e => e.TotalAmount)
                 .HasPrecision(15)
                 .HasColumnName("totalAmount");
@@ -551,11 +626,18 @@ public partial class DefaultdbContext : DbContext
                 .HasPrecision(15)
                 .HasColumnName("price");
             entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(100)
+                .HasColumnName("productName");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasComment("Values: active, inactive, deleted")
                 .HasColumnName("status");
+            entity.Property(e => e.VariantId).HasColumnName("variantId");
+            entity.Property(e => e.VariantName)
+                .HasMaxLength(100)
+                .HasColumnName("variantName");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
@@ -564,6 +646,43 @@ public partial class DefaultdbContext : DbContext
             entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("fk_orderitemproduct");
+
+            entity.HasOne(d => d.Variant).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.VariantId)
+                .HasConstraintName("OrderItems_variantId_fkey");
+        });
+
+        modelBuilder.Entity<OrderStatusHistory>(entity =>
+        {
+            entity.HasKey(e => e.HistoryId).HasName("OrderStatusHistory_pkey");
+
+            entity.ToTable("OrderStatusHistory");
+
+            entity.Property(e => e.HistoryId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("historyId");
+            entity.Property(e => e.ChangedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("changedAt");
+            entity.Property(e => e.ChangedById).HasColumnName("changedById");
+            entity.Property(e => e.FromStatus)
+                .HasMaxLength(50)
+                .HasColumnName("fromStatus");
+            entity.Property(e => e.Note).HasColumnName("note");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.ToStatus)
+                .HasMaxLength(50)
+                .HasColumnName("toStatus");
+
+            entity.HasOne(d => d.ChangedBy).WithMany(p => p.OrderStatusHistories)
+                .HasForeignKey(d => d.ChangedById)
+                .HasConstraintName("OrderStatusHistory_changedById_fkey");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderStatusHistories)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("OrderStatusHistory_orderId_fkey");
         });
 
         modelBuilder.Entity<Payment>(entity =>
@@ -620,6 +739,10 @@ public partial class DefaultdbContext : DbContext
         {
             entity.HasKey(e => e.ProductId).HasName("Products_pkey");
 
+            entity.HasIndex(e => e.Slug, "Products_slug_key").IsUnique();
+
+            entity.HasIndex(e => e.Status, "idx_products_status");
+
             entity.Property(e => e.ProductId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("productId");
@@ -628,6 +751,16 @@ public partial class DefaultdbContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdAt");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.IsTopSeller)
+                .HasDefaultValue(false)
+                .HasColumnName("isTopSeller");
+            entity.Property(e => e.Keywords)
+                .HasColumnType("character varying[]")
+                .HasColumnName("keywords");
+            entity.Property(e => e.MetaDescription).HasColumnName("metaDescription");
+            entity.Property(e => e.MetaTitle)
+                .HasMaxLength(255)
+                .HasColumnName("metaTitle");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modifiedAt");
@@ -641,6 +774,9 @@ public partial class DefaultdbContext : DbContext
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(50)
                 .HasColumnName("productCode");
+            entity.Property(e => e.Slug)
+                .HasMaxLength(255)
+                .HasColumnName("slug");
             entity.Property(e => e.SoldQuantity)
                 .HasDefaultValue(0)
                 .HasColumnName("soldQuantity");
@@ -653,6 +789,27 @@ public partial class DefaultdbContext : DbContext
                 .HasColumnName("stockQuantity");
         });
 
+        modelBuilder.Entity<ProductAttribute>(entity =>
+        {
+            entity.HasKey(e => e.Attributeid).HasName("productattributes_pk");
+
+            entity.Property(e => e.Attributeid)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("attributeid");
+            entity.Property(e => e.Attributename)
+                .HasMaxLength(100)
+                .HasColumnName("attributename");
+            entity.Property(e => e.Attributevalue)
+                .HasMaxLength(255)
+                .HasColumnName("attributevalue");
+            entity.Property(e => e.Productid).HasColumnName("productid");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductAttributes)
+                .HasForeignKey(d => d.Productid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_productproductattribute");
+        });
+
         modelBuilder.Entity<ProductCategory>(entity =>
         {
             entity.HasKey(e => e.ProductCategoryId).HasName("ProductCategories_pkey");
@@ -661,6 +818,9 @@ public partial class DefaultdbContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("productCategoryId");
             entity.Property(e => e.CategoryId).HasColumnName("categoryId");
+            entity.Property(e => e.DisplayOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("displayOrder");
             entity.Property(e => e.ProductId).HasColumnName("productId");
 
             entity.HasOne(d => d.Category).WithMany(p => p.ProductCategories)
@@ -695,27 +855,45 @@ public partial class DefaultdbContext : DbContext
                 .HasConstraintName("fk_productimage");
         });
 
-        modelBuilder.Entity<ProductAttribute>(entity =>
+        modelBuilder.Entity<ProductVariant>(entity =>
         {
-            entity.HasKey(e => e.AttributeId).HasName("productattributes_pk");
+            entity.HasKey(e => e.VariantId).HasName("productvariants_pk");
 
-            entity.ToTable("productattributes");
-
-            entity.Property(e => e.AttributeId)
+            entity.Property(e => e.VariantId)
                 .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("attributeid");
-            entity.Property(e => e.AttributeName)
+                .HasColumnName("variantId");
+            entity.Property(e => e.CreateById).HasColumnName("createById");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.ModifiedAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("modifiedAt");
+            entity.Property(e => e.ModifiedById).HasColumnName("modifiedById");
+            entity.Property(e => e.Price)
+                .HasPrecision(15)
+                .HasColumnName("price");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.Sku)
+                .HasMaxLength(50)
+                .HasColumnName("sku");
+            entity.Property(e => e.SoldQuantity)
+                .HasDefaultValue(0)
+                .HasColumnName("soldQuantity");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.StockQuantity)
+                .HasDefaultValue(0)
+                .HasColumnName("stockQuantity");
+            entity.Property(e => e.VariantName)
                 .HasMaxLength(100)
-                .HasColumnName("attributename");
-            entity.Property(e => e.AttributeValue)
-                .HasMaxLength(255)
-                .HasColumnName("attributevalue");
-            entity.Property(e => e.ProductId).HasColumnName("productid");
+                .HasColumnName("variantName");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.ProductAttributes)
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductVariants)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_productproductattribute");
+                .HasConstraintName("productvariants_products_productid_fk");
         });
 
         modelBuilder.Entity<Review>(entity =>
@@ -782,19 +960,34 @@ public partial class DefaultdbContext : DbContext
 
             entity.HasIndex(e => e.Email, "Users_email_key").IsUnique();
 
+            entity.HasIndex(e => e.Username, "Users_username_key").IsUnique();
+
             entity.Property(e => e.UserId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("userId");
+            entity.Property(e => e.Avatar)
+                .HasMaxLength(255)
+                .HasColumnName("avatar");
             entity.Property(e => e.CreateById).HasColumnName("createById");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("createdAt");
+            entity.Property(e => e.DateOfBirth).HasColumnName("dateOfBirth");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
             entity.Property(e => e.FullName)
                 .HasMaxLength(100)
                 .HasColumnName("fullName");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)
+                .HasColumnName("gender");
+            entity.Property(e => e.IsEmailVerified)
+                .HasDefaultValue(false)
+                .HasColumnName("isEmailVerified");
+            entity.Property(e => e.IsPhoneVerified)
+                .HasDefaultValue(false)
+                .HasColumnName("isPhoneVerified");
             entity.Property(e => e.LastLogin)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("lastLogin");
@@ -809,6 +1002,12 @@ public partial class DefaultdbContext : DbContext
                 .HasMaxLength(12)
                 .HasColumnName("phone");
             entity.Property(e => e.Point).HasColumnName("point");
+            entity.Property(e => e.ResetPasswordExpires)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("resetPasswordExpires");
+            entity.Property(e => e.ResetPasswordToken)
+                .HasMaxLength(255)
+                .HasColumnName("resetPasswordToken");
             entity.Property(e => e.Role)
                 .HasMaxLength(30)
                 .HasColumnName("role");
@@ -816,6 +1015,30 @@ public partial class DefaultdbContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("Values: active, inactive, suspended")
                 .HasColumnName("status");
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<VariantAttribute>(entity =>
+        {
+            entity.HasKey(e => e.AttributeId).HasName("variantattributes_pk");
+
+            entity.Property(e => e.AttributeId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("attributeId");
+            entity.Property(e => e.AttributeName)
+                .HasMaxLength(100)
+                .HasColumnName("attributeName");
+            entity.Property(e => e.AttributeValue)
+                .HasMaxLength(255)
+                .HasColumnName("attributeValue");
+            entity.Property(e => e.VariantId).HasColumnName("variantId");
+
+            entity.HasOne(d => d.Variant).WithMany(p => p.VariantAttributes)
+                .HasForeignKey(d => d.VariantId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("variantattributes_productvariants_variantid_fk");
         });
 
         OnModelCreatingPartial(modelBuilder);

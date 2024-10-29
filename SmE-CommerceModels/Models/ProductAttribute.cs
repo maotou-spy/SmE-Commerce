@@ -1,14 +1,17 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmE_CommerceModels.Models;
 
 public partial class ProductAttribute
 {
-    public Guid AttributeId { get; set; }
+    public Guid Attributeid { get; set; }
 
-    public Guid ProductId { get; set; }
+    public Guid Productid { get; set; }
 
-    public string AttributeName { get; set; } = null!;
+    public string Attributename { get; set; } = null!;
 
-    public string? AttributeValue { get; set; }
+    public string? Attributevalue { get; set; }
 
     public virtual Product Product { get; set; } = null!;
 }

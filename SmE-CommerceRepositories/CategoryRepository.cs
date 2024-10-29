@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmE_CommerceModels.DatabaseContext;
+using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
@@ -7,7 +7,7 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories
 {
-    public class CategoryRepository(DefaultdbContext dbContext) : ICategoryRepository
+    public class CategoryRepository(SmECommerceContext dbContext) : ICategoryRepository
     {
         public async Task<Return<Category>> AddCategoryAsync(Category category)
         {

@@ -17,5 +17,9 @@ public partial class Category : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
+    public string? Slug { get; set; }
+
+    public int? DisplayOrder { get; set; }
+
     public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 }

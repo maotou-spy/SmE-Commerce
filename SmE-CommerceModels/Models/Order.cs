@@ -14,12 +14,6 @@ public partial class Order : Common
 
     public Guid? DiscountCodeId { get; set; }
 
-    public decimal DiscountAmount { get; set; }
-
-    public string? Note { get; set; }
-
-    public string? Reason { get; set; }
-
     public int PointsEarned { get; set; }
 
     /// <summary>
@@ -27,11 +21,31 @@ public partial class Order : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
+    public string? Note { get; set; }
+
+    public decimal? Discountamount { get; set; }
+
+    public string? OrderCode { get; set; }
+
+    public DateTime? EstimatedDeliveryDate { get; set; }
+
+    public DateTime? ActualDeliveryDate { get; set; }
+
+    public decimal? ShippingFee { get; set; }
+
+    public decimal? SubTotal { get; set; }
+
+    public string? CancelReason { get; set; }
+
+    public string? ReturnReason { get; set; }
+
     public virtual Address? Address { get; set; }
 
     public virtual DiscountCode? DiscountCode { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } = new List<OrderStatusHistory>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 

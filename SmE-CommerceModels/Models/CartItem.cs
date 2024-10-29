@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class CartItem
+public class CartItem
 {
     public Guid CartItemId { get; set; }
 

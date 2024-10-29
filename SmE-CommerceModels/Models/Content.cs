@@ -29,6 +29,18 @@ public partial class Content : Common
 
     public DateTime? PublishedAt { get; set; }
 
+    public string? Slug { get; set; }
+
+    public string? MetaTitle { get; set; }
+
+    public string? MetaDescription { get; set; }
+
+    public List<string>? Keywords { get; set; }
+
+    public int? ViewCount { get; set; }
+
+    public string? ShortDescription { get; set; }
+
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
 
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();

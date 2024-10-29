@@ -1,18 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SmE_CommerceModels.DatabaseContext;
+using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
+using SmE_CommerceModels.ResponseDtos.Category;
+using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SmE_CommerceRepositories
 {
-    public class ProductRepository(DefaultdbContext dbContext) : IProductRepository
+    public class ProductRepository(SmECommerceContext dbContext) : IProductRepository
     {
         public async Task<Return<Product>> AddProductAsync(Product product)
         {
@@ -42,6 +39,76 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        
+        public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword,  string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+        {
+            try
+            {
+                var productsQuery = dbContext.Products
+                    .Include(x => x.ProductCategories)
+                        .ThenInclude(x => x.Category)
+                    .Include(x => x.ProductImages)
+                    .AsQueryable();
+
+                // Search by keyword
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    productsQuery = productsQuery.Where(x =>
+                        x.Name.Contains(keyword) ||
+                        x.ProductCategories.Any(pc => pc.Category != null && pc.Category.Name.Contains(keyword)));
+                }
+
+                // Sort by
+                if (!string.IsNullOrEmpty(sortBy))
+                {
+                    productsQuery = sortBy switch
+                    {
+                        ProductFilterEnum.PriceLowToHigh => productsQuery.OrderBy(x => x.Price),
+                        ProductFilterEnum.PriceHighToLow => productsQuery.OrderByDescending(x => x.Price),
+                        ProductFilterEnum.NameAscending => productsQuery.OrderBy(x => x.Name),
+                        ProductFilterEnum.NameDescending => productsQuery.OrderByDescending(x => x.Name),
+                        _ => productsQuery.OrderByDescending(x => x.CreatedAt)
+                    };
+                }
+
+                var totalRecords = await productsQuery.CountAsync();
+
+                var products = await productsQuery
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(x => new GetProductsResDto
+                    {
+                        ProductId = x.ProductId,
+                        ProductName = x.Name,
+                        ProductPrice = x.Price,
+                        ProductStock = x.StockQuantity,
+                        ProductImage = x.ProductImages.FirstOrDefault()!.Url,
+                        Categories = x.ProductCategories.Select(pc => new CategoryResDto
+                        {
+                            CategoryId = pc.Category!.CategoryId,
+                            CategoryName = pc.Category.Name
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = products,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Successfully,
+                    TotalRecord = totalRecords
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
     }
 }

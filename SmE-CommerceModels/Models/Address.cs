@@ -1,4 +1,7 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmE_CommerceModels.Models;
 
 public partial class Address : Common
 {
@@ -18,12 +21,12 @@ public partial class Address : Common
 
     public string City { get; set; } = null!;
 
-    public bool IsDefault { get; set; } = false;
-
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>
     public string Status { get; set; } = null!;
+
+    public bool IsDefault { get; set; } = false;
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

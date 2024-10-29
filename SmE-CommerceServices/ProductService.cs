@@ -1,17 +1,9 @@
 ﻿using SmE_CommerceModels.Enums;
-using SmE_CommerceModels.Models;
-using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
-using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using SmE_CommerceUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SmE_CommerceModels.ResponseDtos.Product;
 
 namespace SmE_CommerceServices
 {
@@ -20,6 +12,52 @@ namespace SmE_CommerceServices
         public async Task<Return<bool>> AddProductAsync(AddProductReqDto req)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                {
+                    return new Return<IEnumerable<GetProductsResDto>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = currentCustomer.Message
+                    };
+                }
+
+                var result = await productRepository.GetProductsForCustomerAsync(keyword, sortBy, pageNumber, pageSize);
+                if (!result.IsSuccess)
+                {
+                    return new Return<IEnumerable<GetProductsResDto>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = result.Message
+                    };
+                }
+
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Message = result.Message,
+                    TotalRecord = result.TotalRecord
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex
+                };
+            }
         }
     }
 }
