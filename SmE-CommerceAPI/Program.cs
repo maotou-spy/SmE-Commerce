@@ -5,6 +5,7 @@ using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmE_CommerceModels.DBContext;
@@ -148,7 +149,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //Hello World
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", [AllowAnonymous]() => "Hello World! Welcome to SmE-Commerce API");
 
 app.UseAuthentication();
 

@@ -11,7 +11,7 @@ public partial class ProductAttribute
 
     public string Attributename { get; set; } = null!;
 
-    public string? Attributevalue { get; set; }
+    public string Attributevalue { get; set; }
 
     public virtual Product Product { get; set; } = null!;
 }

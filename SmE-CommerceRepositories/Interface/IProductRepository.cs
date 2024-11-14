@@ -13,6 +13,16 @@ namespace SmE_CommerceRepositories.Interface
         Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
             int pageNumber = 1, int pageSize = 10);
 
-        
+        Task<Return<List<ProductCategory>>> GetProductCategoriesAsync(Guid productId);
+        Task<Return<List<ProductCategory>>> AddProductCategoriesAsync(List<ProductCategory> productCategories);
+        Task<Return<ProductCategory>> DeleteProductCategoryAsync(Guid productId, List<Guid> categoryIds);
+
+        Task<Return<List<ProductImage>>> AddProductImagesAsync(List<ProductImage> productImages);
+        Task<Return<ProductImage>> AddProductImageAsync(ProductImage productImage);
+
+        Task<Return<List<ProductAttribute>>> AddProductAttributesAsync(List<ProductAttribute> productAttributes);
+        Task<Return<ProductAttribute>> AddProductAttributeAsync(ProductAttribute productAttribute);
+        Task<Return<ProductAttribute>> UpdateProductAttributeAsync(ProductAttribute productAttributes);
+        Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid productId, Guid attributeId);
     }
 }

@@ -11,6 +11,8 @@ namespace SmE_CommerceRepositories
 {
     public class ProductRepository(SmECommerceContext dbContext) : IProductRepository
     {
+        #region Product
+
         public async Task<Return<Product>> AddProductAsync(Product product)
         {
             try
@@ -39,7 +41,12 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword,  string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+        public Task<Return<Product>> GetProductByName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         {
             try
             {
@@ -111,26 +118,29 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
-        
-        public async Task<Return<Product>> GetProductByName(string name)
+
+        #endregion
+
+        #region Product Attribute
+
+        public async Task<Return<List<ProductAttribute>>> AddProductAttributesAsync(List<ProductAttribute> productAttributes)
         {
             try
             {
-                var result = await dbContext.Products
-                .Where(x => x.Status != GeneralStatus.Deleted)
-                .FirstOrDefaultAsync(x => x.Name == name);
+                await dbContext.ProductAttributes.AddRangeAsync(productAttributes);
+                await dbContext.SaveChangesAsync();
 
-                return new Return<Product>
+                return new Return<List<ProductAttribute>>
                 {
-                    Data = result,
+                    Data = productAttributes,
                     IsSuccess = true,
-                    Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
-                    TotalRecord = result != null ? 1 : 0
+                    Message = SuccessfulMessage.Created,
+                    TotalRecord = productAttributes.Count
                 };
             }
             catch (Exception ex)
             {
-                return new Return<Product>
+                return new Return<List<ProductAttribute>>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -140,6 +150,258 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+
+        public async Task<Return<ProductAttribute>> AddProductAttributeAsync(ProductAttribute productAttribute)
+        {
+            try
+            {
+                await dbContext.ProductAttributes.AddAsync(productAttribute);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductAttribute>
+                {
+                    Data = productAttribute,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Created,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductAttribute>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductAttribute>> UpdateProductAttributeAsync(ProductAttribute productAttributes)
+        {
+            try
+            {
+                dbContext.ProductAttributes.Update(productAttributes);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductAttribute>
+                {
+                    Data = productAttributes,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Updated,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductAttribute>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid productId, Guid attributeId)
+        {
+            try
+            {
+                var productAttribute = await dbContext.ProductAttributes
+                    .FirstOrDefaultAsync(x => x.Productid == productId && x.Attributeid == attributeId);
+                if (productAttribute is null)
+                {
+                    return new Return<ProductAttribute>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                dbContext.ProductAttributes.Remove(productAttribute);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductAttribute>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Deleted,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductAttribute>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        #endregion
+
+        #region Product Category
+
+        public async Task<Return<List<ProductCategory>>> GetProductCategoriesAsync(Guid productId)
+        {
+            try
+            {
+                var productCategories = await dbContext.ProductCategories
+                    .Where(x => x.ProductId == productId)
+                    .ToListAsync();
+
+                return new Return<List<ProductCategory>>
+                {
+                    Data = productCategories,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Successfully,
+                    TotalRecord = productCategories.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<List<ProductCategory>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<List<ProductCategory>>> AddProductCategoriesAsync(List<ProductCategory> productCategories)
+        {
+            try
+            {
+                await dbContext.ProductCategories.AddRangeAsync(productCategories);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<List<ProductCategory>>
+                {
+                    Data = productCategories,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Created,
+                    TotalRecord = productCategories.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<List<ProductCategory>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductCategory>> DeleteProductCategoryAsync(Guid productId, List<Guid> categoryIds)
+        {
+            try
+            {
+                var productCategories = await dbContext.ProductCategories
+                    .Where(x => x.ProductId == productId && categoryIds.Contains(x.CategoryId))
+                    .ToListAsync();
+
+                dbContext.ProductCategories.RemoveRange(productCategories);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductCategory>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Deleted,
+                    TotalRecord = productCategories.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductCategory>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        #endregion
+
+        #region Product Image
+
+        public async Task<Return<List<ProductImage>>> AddProductImagesAsync(List<ProductImage> productImages)
+        {
+            try
+            {
+                await dbContext.ProductImages.AddRangeAsync(productImages);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<List<ProductImage>>
+                {
+                    Data = productImages,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Created,
+                    TotalRecord = productImages.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<List<ProductImage>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductImage>> AddProductImageAsync(ProductImage productImage)
+        {
+            try
+            {
+                await dbContext.ProductImages.AddAsync(productImage);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductImage>
+                {
+                    Data = productImage,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Created,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductImage>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        #endregion
 
     }
 }
