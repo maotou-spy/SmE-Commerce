@@ -65,5 +65,52 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+        
+        
+        public async Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
+            int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+        {
+            try
+            {
+                var query = dbContext.Categories.AsQueryable();
+                
+                query = query.Where(x => x.Status != GeneralStatus.Deleted);
+                
+                if (!string.IsNullOrEmpty(status))
+                {
+                    query = query.Where(x => x.Status.Equals(status));
+                }
+                
+                if (!string.IsNullOrEmpty(name))
+                {
+                    query = query.Where(x => x.Name.Contains(name));
+                }
+                
+                var totalRecords = await query.CountAsync();
+        
+                query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                
+                var result = await query.ToListAsync();
+
+                return new Return<IEnumerable<Category>>
+                {
+                    Data = result,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Successfully,
+                    TotalRecord = totalRecords
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<IEnumerable<Category>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
     }
 }

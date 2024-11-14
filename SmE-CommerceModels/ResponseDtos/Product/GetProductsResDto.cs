@@ -14,6 +14,6 @@ namespace SmE_CommerceModels.ResponseDtos.Product
 
         public string? ProductImage { get; set; }
 
-        public List<CategoryResDto>? Categories { get; set; }
+        public List<GetCategoryResDto>? Categories { get; set; }
     }
 }

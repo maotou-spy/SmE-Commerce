@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmE_CommerceModels.Enums;
 
 namespace SmE_CommerceRepositories.Interface
 {
@@ -12,5 +13,7 @@ namespace SmE_CommerceRepositories.Interface
     {
         Task<Return<Category>> AddCategoryAsync(Category category);
         Task<Return<Category>> GetCategoryByNameAsync(string name);
+        Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
+            int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize);
     }
 }
