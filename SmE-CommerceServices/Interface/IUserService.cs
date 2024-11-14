@@ -13,4 +13,5 @@ public interface IUserService
     Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid id);
     Task<Return<bool>> UpdateProfileAsync(UpdateUserProfileReqDto req);
     Task<Return<bool>> DeleteUserAsync(Guid id);
+    Task<Return<bool>> ChangeUserStatusAsync(Guid id);
 }

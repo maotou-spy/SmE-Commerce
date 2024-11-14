@@ -396,5 +396,78 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             };
         }
     }
+    
+    public async Task<Return<bool>> ChangeUserStatusAsync(Guid id)
+    {
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = currentUser.Message,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
+                };
+            }
 
+            var user = await userRepository.GetUserByIdAsync(id);
+            if (!user.IsSuccess || user.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFound,
+                    InternalErrorMessage = user.InternalErrorMessage
+                };
+            }
+
+            if (user.Data.Role.Equals(RoleEnum.Manager))
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.MANAGERCANNOTBEBANNED,
+                    InternalErrorMessage = user.InternalErrorMessage
+                };
+            }
+
+            user.Data.Status = user.Data.Status == UserStatus.Active ? UserStatus.Inactive : UserStatus.Active;
+            user.Data.ModifiedAt = DateTime.Now;
+            user.Data.ModifiedById = currentUser.Data.UserId;
+
+            var updateResult = await userRepository.UpdateUser(user.Data);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = updateResult.InternalErrorMessage
+                };
+            }
+
+            scope.Complete();
+
+            return new Return<bool>
+            {
+                IsSuccess = true,
+                Message = SuccessfulMessage.Updated,
+                Data = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
 }

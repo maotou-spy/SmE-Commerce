@@ -262,7 +262,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
     {
@@ -279,6 +279,27 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete user: {e}", ex);
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+        }
+    }
+    
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> ChangeUserStatus([FromRoute] Guid id)
+    {
+        try
+        {
+            var result = await userService.ChangeUserStatusAsync(id);
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+            {
+                logger.LogError("Error at change user status: {ex}", result.InternalErrorMessage);
+            }
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at change user status: {e}", ex);
             return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
         }
     }
