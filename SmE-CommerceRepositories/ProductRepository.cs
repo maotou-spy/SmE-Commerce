@@ -82,10 +82,11 @@ namespace SmE_CommerceRepositories
                         ProductPrice = x.Price,
                         ProductStock = x.StockQuantity,
                         ProductImage = x.ProductImages.FirstOrDefault()!.Url,
-                        Categories = x.ProductCategories.Select(pc => new CategoryResDto
+                        Categories = x.ProductCategories.Select(pc => new GetCategoryResDto
                         {
                             CategoryId = pc.Category!.CategoryId,
-                            CategoryName = pc.Category.Name
+                            CategoryName = pc.Category.Name,
+                            Description = pc.Category.Description,
                         }).ToList()
                     })
                     .ToListAsync();
@@ -110,6 +111,7 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+        
         public async Task<Return<Product>> GetProductByName(string name)
         {
             try
@@ -138,5 +140,6 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+
     }
 }

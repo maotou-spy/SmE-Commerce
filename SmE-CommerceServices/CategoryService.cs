@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmE_CommerceModels.ResponseDtos.Category;
 
 namespace SmE_CommerceServices
 {
@@ -79,6 +80,109 @@ namespace SmE_CommerceServices
                     IsSuccess = false,
                     Message = ErrorMessage.InternalServerError,
                     InternalErrorMessage = ex,
+                };
+            }
+        }
+        
+        public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                {
+                    return new Return<IEnumerable<GetCategoryResDto>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = currentCustomer.Message
+                    };
+                }
+                
+                var result = await categoryRepository.GetCategories(name, UserStatus.Active, pageNumber, pageSize);
+                if (!result.IsSuccess)
+                {
+                    return new Return<IEnumerable<GetCategoryResDto>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = result.Message
+                    };
+                }
+
+                List<GetCategoryResDto> categories = null;
+                if (result.Data != null)
+                {
+                    categories = result.Data.Select(category => new GetCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,   
+                        CategoryName = category.Name,
+                        Description = category.Description,
+                    }).ToList();
+                }
+                    
+                return new Return<IEnumerable<GetCategoryResDto>>
+                {
+                    Data = categories,
+                    IsSuccess = true,
+                    Message = result.Message,
+                    TotalRecord = result.TotalRecord
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<IEnumerable<GetCategoryResDto>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex
+                };
+            }
+        }
+        
+        public async Task<Return<IEnumerable<Category>>> GetCategoriesForManagerAsync(string? name, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                {
+                    return new Return<IEnumerable<Category>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = currentCustomer.Message
+                    };
+                }
+                
+                var result = await categoryRepository.GetCategories(name,null, pageNumber, pageSize);
+                if (!result.IsSuccess)
+                {
+                    return new Return<IEnumerable<Category>>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = result.Message
+                    };
+                }
+                    
+                return new Return<IEnumerable<Category>>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Message = result.Message,
+                    TotalRecord = result.TotalRecord
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<IEnumerable<Category>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex
                 };
             }
         }
