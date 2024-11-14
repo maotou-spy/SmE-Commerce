@@ -5,6 +5,9 @@ namespace SmE_CommerceModels.RequestDtos.Auth;
 public class RegisterWithAccountReqDto
 {
     [Required]
+    public string FullName { get; set; } = null!;
+
+    [Required]
     [EmailAddress]
     public string Email { get; set; } = null!;
 
@@ -13,9 +16,6 @@ public class RegisterWithAccountReqDto
     [StringLength(10, MinimumLength = 10, ErrorMessage = "Phone number must be exactly 10 digits.")]
     [RegularExpression(@"^0\d{9}$", ErrorMessage = "Phone number must start with 0 and be exactly 10 digits.")]
     public string Phone { get; set; } = null!;
-
-    [Required]
-    public string FullName { get; set; } = null!;
 
     [Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~\-={}[\]:;""'<>?,.\/]).{8,}$",

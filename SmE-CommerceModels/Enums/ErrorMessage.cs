@@ -17,4 +17,7 @@ public static class ErrorMessage
     public const string Duplicated = "Duplicated";
     public const string NoChanges = "No changes";
     public const string MANAGERCANNOTBEBANNED = "Manager cannot be banned";
+    public const string EmailAlreadyExists = "Email already exists";
+    public const string PhoneAlreadyExists = "Phone already exists";
+    public const string UsernameAlreadyExists = "Username already exists";
 }

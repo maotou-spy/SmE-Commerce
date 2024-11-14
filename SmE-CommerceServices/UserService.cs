@@ -7,7 +7,6 @@ using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
 using System.Transactions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SmE_CommerceServices;
 
@@ -169,7 +168,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         }
     }
 
-    public async Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid Id)
+    public async Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid id)
     {
         try
         {
@@ -185,8 +184,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            var user = await userRepository.GetUserByIdAsync(Id);
-            if (!user.IsSuccess || user == null) 
+            var user = await userRepository.GetUserByIdAsync(id);
+            if (!user.IsSuccess)
             {
                 return new Return<GetUserProfileResDto>
                 {
@@ -197,10 +196,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             var userProfileDto = new GetUserProfileResDto
             {
-                Email = user.Data.Email,
-                FullName = user.Data.FullName,
-                Phone = user.Data.Phone,
-                Point = user.Data.Point
+                Email = user.Data?.Email,
+                FullName = user.Data?.FullName,
+                Phone = user.Data?.Phone,
+                Point = user.Data?.Point
             };
 
             return new Return<GetUserProfileResDto>
@@ -252,8 +251,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            var existedPhone = await userRepository.GetUserByEmailOrPhoneAsync(req.Phone);
-            if (existedPhone.IsSuccess && existedPhone.Data != null)
+            var existedPhone = await userRepository.GetUserByPhoneAsync(req.Phone);
+            if (existedPhone is { IsSuccess: true, Data: not null })
             {
                 return new Return<bool>
                 {
@@ -307,7 +306,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         }
     }
 
-    public async Task<Return<bool>> DeleteUserAsync(Guid Id)
+    public async Task<Return<bool>> DeleteUserAsync(Guid id)
     {
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
@@ -323,7 +322,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            var user = await userRepository.GetUserByIdAsync(Id);
+            var user = await userRepository.GetUserByIdAsync(id);
             if (!user.IsSuccess || user.Data == null)
             {
                 return new Return<bool>

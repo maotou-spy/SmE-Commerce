@@ -23,8 +23,6 @@ public partial class User : Common
 
     public DateTime? LastLogin { get; set; }
 
-    public string? Username { get; set; }
-
     public string? Avatar { get; set; }
 
     public DateOnly? DateOfBirth { get; set; }

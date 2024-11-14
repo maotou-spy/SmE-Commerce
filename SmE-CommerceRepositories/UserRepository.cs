@@ -133,7 +133,36 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         }
     }
 
-    public async Task<Return<User>> GetUserByEmailOrPhoneAsync(string emailOrPhone)
+    public async Task<Return<User>> GetUserByPhoneAsync(string phone)
+    {
+        try
+        {
+            var result = await dbContext.Users
+                .Where(x => x.Status != GeneralStatus.Deleted)
+                .FirstOrDefaultAsync(x => x.Phone == phone);
+
+            return new Return<User>
+            {
+                Data = result,
+                IsSuccess = true,
+                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                TotalRecord = result != null ? 1 : 0
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<User>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+    public async Task<Return<User>> GetUserByEmailOrPhone(string emailOrPhone)
     {
         try
         {

@@ -16,7 +16,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
     {
         try
         {
-            var userResult = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.EmailOrPhone.ToLower());
+            var userResult = await userRepository.GetUserByEmailAsync(reqDto.EmailOrPhone.ToLower());
             if (!userResult.IsSuccess || userResult.Data == null)
             {
                 return new Return<LoginResDto>
@@ -87,7 +87,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
     {
         try
         {
-            var existedUser = await userRepository.GetUserByEmailOrPhoneAsync(reqDto.Email.ToLower());
+            var existedUser = await userRepository.GetUserByEmailAsync(reqDto.Email.ToLower());
             if (existedUser is { IsSuccess: true, Data: not null })
             {
                 return new Return<bool>
@@ -97,13 +97,26 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 };
             }
 
+            existedUser = await userRepository.GetUserByPhoneAsync(reqDto.Phone);
+            if (existedUser is { IsSuccess: true, Data: not null })
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.PhoneAlreadyExists
+                };
+            }
+
             User newUser = new()
             {
                 Email = reqDto.Email.ToLower(),
                 PasswordHash = HashUtil.Hash(reqDto.Password),
                 FullName = reqDto.FullName,
                 Phone = reqDto.Phone,
+                Point = 0,
                 Role = RoleEnum.Customer,
+                IsEmailVerified = false,
+                IsPhoneVerified = false,
                 Status = UserStatus.Active,
                 CreateById = Guid.Empty,
                 CreatedAt = DateTime.Now

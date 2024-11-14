@@ -10,7 +10,7 @@ public interface IUserService
     Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber, string? phone, string? email, string? name);
     Task<Return<bool>> CreateUser(CreateUserReqDto req);
     Task<Return<GetUserProfileResDto>> GetUserProfileAsync();
-    Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid Id);
+    Task<Return<GetUserProfileResDto>> GetUserProfileByManagerAsync(Guid id);
     Task<Return<bool>> UpdateProfileAsync(UpdateUserProfileReqDto req);
-    Task<Return<bool>> DeleteUserAsync(Guid Id);
+    Task<Return<bool>> DeleteUserAsync(Guid id);
 }

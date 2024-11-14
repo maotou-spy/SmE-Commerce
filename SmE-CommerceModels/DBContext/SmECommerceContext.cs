@@ -954,8 +954,6 @@ public partial class SmECommerceContext : DbContext
 
             entity.HasIndex(e => e.Email, "Users_email_key").IsUnique();
 
-            entity.HasIndex(e => e.Username, "Users_username_key").IsUnique();
-
             entity.Property(e => e.UserId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("userId");
@@ -1009,9 +1007,6 @@ public partial class SmECommerceContext : DbContext
                 .HasMaxLength(50)
                 .HasComment("Values: active, inactive, suspended")
                 .HasColumnName("status");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .HasColumnName("username");
         });
 
         modelBuilder.Entity<VariantAttribute>(entity =>
