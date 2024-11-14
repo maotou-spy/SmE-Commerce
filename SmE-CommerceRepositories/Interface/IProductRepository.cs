@@ -7,6 +7,7 @@ namespace SmE_CommerceRepositories.Interface
     public interface IProductRepository
     {
         Task<Return<Product>> AddProductAsync(Product product);
+        Task<Return<Product>> GetProductByName(string name);
 
         Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
             int pageNumber = 1, int pageSize = 10);

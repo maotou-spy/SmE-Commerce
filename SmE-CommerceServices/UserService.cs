@@ -145,7 +145,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Email = currentUser.Data.Email,
                 FullName = currentUser.Data.FullName,
                 Phone = currentUser.Data.Phone,
-                Point = currentUser.Data.Point
+                Point = currentUser.Data.Point,
+                Dob = currentUser.Data.DateOfBirth,
+                Gender = currentUser.Data.Gender,
+                Avatar = currentUser.Data.Avatar,
             };
 
             return new Return<GetUserProfileResDto>
@@ -199,7 +202,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Email = user.Data?.Email,
                 FullName = user.Data?.FullName,
                 Phone = user.Data?.Phone,
-                Point = user.Data?.Point
+                Point = user.Data?.Point,
+                Dob = user.Data?.DateOfBirth,
+                Gender = user.Data?.Gender,
+                Avatar = user.Data?.Avatar,
             };
 
             return new Return<GetUserProfileResDto>
@@ -260,6 +266,15 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                     Message = ErrorMessage.UserAlreadyExists,
                 };
             }
+            
+            if(req.Dob > DateOnly.FromDateTime(DateTime.Now))
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidInput,
+                };
+            }
 
             if(req.Phone.Equals(user.Data.Phone) && req.FullName.Equals(user.Data.FullName))
             {
@@ -272,6 +287,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             user.Data.FullName = req.FullName;
             user.Data.Phone = req.Phone;
+            user.Data.DateOfBirth = req.Dob;
+            user.Data.Gender = req.Gender;
             user.Data.CreatedAt = DateTime.Now;
             user.Data.CreateById = currentUser.Data.UserId;
 
@@ -343,10 +360,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 };
             }
 
-            user.Data.Status = user.Data.Status == UserStatus.Active
-                ? UserStatus.Inactive
-                : UserStatus.Active;
-
+            user.Data.Status = UserStatus.Deleted;
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 

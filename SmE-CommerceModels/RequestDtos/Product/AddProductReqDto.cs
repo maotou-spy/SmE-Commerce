@@ -1,6 +1,8 @@
-﻿namespace SmE_CommerceModels.RequestDtos.Product;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class AddProductReqDto
+namespace SmE_CommerceModels.RequestDtos.Product
 {
-    
+    public class AddProductReqDto
+    {
+    }
 }

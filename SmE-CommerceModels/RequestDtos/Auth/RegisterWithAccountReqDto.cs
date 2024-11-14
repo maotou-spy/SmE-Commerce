@@ -5,6 +5,7 @@ namespace SmE_CommerceModels.RequestDtos.Auth;
 public class RegisterWithAccountReqDto
 {
     [Required]
+    [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Full name can only contain letters and spaces.")]
     public string FullName { get; set; } = null!;
 
     [Required]

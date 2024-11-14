@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SmE_CommerceModels.ResponseDtos.User
+﻿namespace SmE_CommerceModels.ResponseDtos.User
 {
     public class GetUserProfileResDto
     {
@@ -15,5 +9,11 @@ namespace SmE_CommerceModels.ResponseDtos.User
         public string? Phone { get; set; }
 
         public int? Point { get; set; }
+        
+        public string? Gender { get; set; }
+        
+        public DateOnly? Dob { get; set; }
+        
+        public string? Avatar { get; set; }
     }
 }
