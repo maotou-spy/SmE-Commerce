@@ -110,5 +110,33 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
+        public async Task<Return<Product>> GetProductByName(string name)
+        {
+            try
+            {
+                var result = await dbContext.Products
+                .Where(x => x.Status != GeneralStatus.Deleted)
+                .FirstOrDefaultAsync(x => x.Name == name);
+
+                return new Return<Product>
+                {
+                    Data = result,
+                    IsSuccess = true,
+                    Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                    TotalRecord = result != null ? 1 : 0
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
     }
 }
