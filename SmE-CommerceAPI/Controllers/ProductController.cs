@@ -227,4 +227,92 @@ public class ProductController(
             return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
+
+    [HttpPut("{productId:guid}/images/{imageId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProductImageAsync([FromBody] AddProductImageReqDto req, Guid productId, Guid imageId)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+
+            var result = await productService.UpdateProductImageAsync(productId, imageId, req);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update product image user: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update product image user: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpDelete("{productId:guid}/images/{imageId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteProductImageAsync(Guid productId, Guid imageId)
+    {
+        try
+        {
+            var result = await productService.DeleteProductImageAsync(productId, imageId);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at delete product image user: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete product image user: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpPut("{productId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProductAsync([FromBody] UpdateProductReqDto req, Guid productId)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+
+            var result = await productService.UpdateProductAsync(productId, req);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update product user: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update product user: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpDelete("{productId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteProductAsync(Guid productId)
+    {
+        try
+        {
+            var result = await productService.DeleteProductAsync(productId);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at delete product user: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete product user: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
 }

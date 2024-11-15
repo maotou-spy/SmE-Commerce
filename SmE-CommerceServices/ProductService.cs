@@ -1,9 +1,7 @@
 using SmE_CommerceModels.Enums;
 using System.Transactions;
-using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
-using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -211,6 +209,144 @@ public class ProductService(IProductRepository productRepository, IHelperService
         }
     }
 
+    public async Task<Return<GetProductDetailsResDto>> UpdateProductAsync(Guid productId, UpdateProductReqDto req)
+    {
+        try
+        {
+            // Get the current user
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = currentUser.Message
+                };
+
+            // Initialize the product
+            var product = new Product
+            {
+                ProductId = productId,
+                ProductCode = req.ProductCode,
+                Name = req.Name,
+                Description = req.Description,
+                Price = req.Price,
+                StockQuantity = req.StockQuantity,
+                SoldQuantity = req.SoldQuantity,
+                IsTopSeller = req.IsTopSeller,
+                Slug = req.Slug ?? SlugUtil.GenerateSlug(req.Name),
+                MetaTitle = req.MetaTitle ?? req.Name,
+                MetaDescription = req.MetaDescription ?? req.Description,
+                Keywords = req.MetaKeywords,
+                Status = req.StockQuantity > 0 ? req.Status : ProductStatus.OutOfStock,
+                ModifiedById = currentUser.Data.UserId,
+                ModifiedAt = DateTime.Now
+            };
+
+            // Update Product in the database
+            var result = await productRepository.UpdateProductAsync(product);
+            if (!result.IsSuccess)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = new GetProductDetailsResDto
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    StockQuantity = product.StockQuantity,
+                    SoldQuantity = product.SoldQuantity,
+                    IsTopSeller = product.IsTopSeller,
+                    Attributes = product.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.Attributeid,
+                        Name = attribute.Attributename,
+                        Value = attribute.Attributevalue
+                    }).ToList(),
+                    Categories = product.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category?.Name ?? string.Empty
+                    }).ToList(),
+                    Images = product.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText
+                    }).ToList(),
+                    Slug = product.Slug,
+                    MetaTitle = product.MetaTitle,
+                    MetaDescription = product.MetaDescription,
+                    Keywords = product.Keywords,
+                    Status = product.Status
+                },
+                IsSuccess = true,
+                Message = SuccessfulMessage.Updated
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
+    public async Task<Return<bool>> DeleteProductAsync(Guid productId)
+    {
+        try
+        {
+            // Get the current user
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = currentUser.Message
+                };
+
+            // Delete Product from the database
+            var result = await productRepository.DeleteProductAsync(productId);
+            if (!result.IsSuccess)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                Message = result.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            // Log exception details here as appropriate for debugging
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
     #endregion
 
     #region Product Category
@@ -370,6 +506,103 @@ public class ProductService(IProductRepository productRepository, IHelperService
         }
     }
 
+    public async Task<Return<GetProductImageResDto>> UpdateProductImageAsync(Guid productId, Guid imageId,
+        AddProductImageReqDto req)
+    {
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<GetProductImageResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = currentUser.Message
+                };
+
+            var productImage = new ProductImage
+            {
+                ProductId = productId,
+                ImageId = imageId,
+                Url = req.Url,
+                ImageHash = HashUtil.Hash(req.Url),
+                AltText = req.AltText
+            };
+
+            var result = await productRepository.UpdateProductImageAsync(productImage);
+            if (!result.IsSuccess || result.Data == null)
+                return new Return<GetProductImageResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            return new Return<GetProductImageResDto>
+            {
+                Data = new GetProductImageResDto
+                {
+                    ImageId = result.Data.ImageId,
+                    Url = result.Data.Url,
+                    AltText = result.Data.AltText
+                },
+                IsSuccess = true,
+                Message = result.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<GetProductImageResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
+    public async Task<Return<bool>> DeleteProductImageAsync(Guid productId, Guid imageId)
+    {
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = currentUser.Message
+                };
+
+            var result = await productRepository.DeleteProductImageAsync(productId, imageId);
+            if (!result.IsSuccess)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                Message = result.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
     #endregion
 
     #region Product Attribute
@@ -428,7 +661,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
         }
     }
 
-    public async Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(Guid productId, Guid AttributeId,
+    public async Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(Guid productId, Guid attributeId,
         AddProductAttributeReqDto req)
     {
         try
@@ -445,7 +678,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
             var productAttribute = new ProductAttribute
             {
                 Productid = productId,
-                Attributeid = AttributeId,
+                Attributeid = attributeId,
                 Attributename = req.AttributeName,
                 Attributevalue = req.AttributeValue
             };

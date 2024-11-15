@@ -8,15 +8,19 @@ namespace SmE_CommerceServices.Interface
     public interface IProductService
     {
         Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req);
-
         Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
             int pageNumber, int pageSize);
-        Task<Return<GetProductAttributeResDto>> AddProductAttributeAsync(Guid productId, AddProductAttributeReqDto req);
+        Task<Return<GetProductDetailsResDto>> UpdateProductAsync(Guid productId, UpdateProductReqDto req);
+        Task<Return<bool>> DeleteProductAsync(Guid productId);
 
+        Task<Return<GetProductAttributeResDto>> AddProductAttributeAsync(Guid productId, AddProductAttributeReqDto req);
         Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(Guid productId, Guid AttributeId, AddProductAttributeReqDto req);
         Task<Return<bool>> DeleteProductAttributeAsync(Guid productId, Guid attributeId);
 
         Task<Return<GetProductImageResDto>> AddProductImageAsync(Guid productId, AddProductImageReqDto req);
+        Task<Return<GetProductImageResDto>> UpdateProductImageAsync(Guid productId, Guid imageId, AddProductImageReqDto req);
+        Task<Return<bool>> DeleteProductImageAsync(Guid productId, Guid imageId);
+
         Task<Return<List<GetProductCategoryResDto>>> UpdateProductCategoryAsync(Guid productId, List<Guid> categoryIds);
     }
 }

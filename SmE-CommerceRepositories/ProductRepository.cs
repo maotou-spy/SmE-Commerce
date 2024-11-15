@@ -41,11 +41,6 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public Task<Return<Product>> GetProductByName(string name)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         {
             try
@@ -109,6 +104,75 @@ namespace SmE_CommerceRepositories
             catch (Exception ex)
             {
                 return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<Product>> UpdateProductAsync(Product product)
+        {
+            try
+            {
+                dbContext.Products.Update(product);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<Product>
+                {
+                    Data = product,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Updated,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<Product>> DeleteProductAsync(Guid productId)
+        {
+            try
+            {
+                var product = await dbContext.Products
+                    .FirstOrDefaultAsync(x => x.ProductId == productId);
+                if (product is null)
+                {
+                    return new Return<Product>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                dbContext.Products.Remove(product);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Deleted,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Product>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -385,6 +449,75 @@ namespace SmE_CommerceRepositories
                     Data = productImage,
                     IsSuccess = true,
                     Message = SuccessfulMessage.Created,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductImage>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductImage>> UpdateProductImageAsync(ProductImage productImage)
+        {
+            try
+            {
+                dbContext.ProductImages.Update(productImage);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductImage>
+                {
+                    Data = productImage,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Updated,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<ProductImage>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<ProductImage>> DeleteProductImageAsync(Guid productId, Guid imageId)
+        {
+            try
+            {
+                var productImage = await dbContext.ProductImages
+                    .FirstOrDefaultAsync(x => x.ProductId == productId && x.ImageId == imageId);
+                if (productImage is null)
+                {
+                    return new Return<ProductImage>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                dbContext.ProductImages.Remove(productImage);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<ProductImage>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Deleted,
                     TotalRecord = 1
                 };
             }

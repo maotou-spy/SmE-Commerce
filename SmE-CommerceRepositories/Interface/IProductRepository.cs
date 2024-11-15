@@ -8,10 +8,10 @@ namespace SmE_CommerceRepositories.Interface
     public interface IProductRepository
     {
         Task<Return<Product>> AddProductAsync(Product product);
-        Task<Return<Product>> GetProductByName(string name);
-
         Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
             int pageNumber = 1, int pageSize = 10);
+        Task<Return<Product>> UpdateProductAsync(Product product);
+        Task<Return<Product>> DeleteProductAsync(Guid productId);
 
         Task<Return<List<ProductCategory>>> GetProductCategoriesAsync(Guid productId);
         Task<Return<List<ProductCategory>>> AddProductCategoriesAsync(List<ProductCategory> productCategories);
@@ -19,6 +19,8 @@ namespace SmE_CommerceRepositories.Interface
 
         Task<Return<List<ProductImage>>> AddProductImagesAsync(List<ProductImage> productImages);
         Task<Return<ProductImage>> AddProductImageAsync(ProductImage productImage);
+        Task<Return<ProductImage>> UpdateProductImageAsync(ProductImage productImage);
+        Task<Return<ProductImage>> DeleteProductImageAsync(Guid productId, Guid imageId);
 
         Task<Return<List<ProductAttribute>>> AddProductAttributesAsync(List<ProductAttribute> productAttributes);
         Task<Return<ProductAttribute>> AddProductAttributeAsync(ProductAttribute productAttribute);
