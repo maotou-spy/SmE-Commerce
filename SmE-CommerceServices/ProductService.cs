@@ -14,21 +14,123 @@ public class ProductService(IProductRepository productRepository, IHelperService
 {
     #region Product
 
-    public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword,
+    public async Task<Return<GetProductDetailsResDto>> CustomerGetProductDetailsAsync(Guid productId)
+    {
+        try
+        {
+            var result = await productRepository.GetProductByIdAsync(productId);
+            if (!result.IsSuccess || result.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+            if(result.Data.Status == ProductStatus.Inactive)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
+
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = new GetProductDetailsResDto
+                {
+                    ProductId = result.Data.ProductId,
+                    Name = result.Data.Name,
+                    Description = result.Data.Description,
+                    Price = result.Data.Price,
+                    StockQuantity = result.Data.StockQuantity,
+                    SoldQuantity = result.Data.SoldQuantity,
+                    IsTopSeller = result.Data.IsTopSeller,
+                    Slug = result.Data.Slug,
+                    MetaTitle = result.Data.MetaTitle,
+                    MetaDescription = result.Data.MetaDescription,
+                    Keywords = result.Data.Keywords,
+                    Status = result.Data.Status,
+                    Images = result.Data.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText
+                    }).ToList(),
+                    Categories = result.Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category?.Name ?? string.Empty
+                    }).ToList(),
+                    Attributes = result.Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.Attributeid,
+                        Name = attribute.Attributename,
+                        Value = attribute.Attributevalue
+                    }).ToList()
+                },
+                IsSuccess = true,
+                Message = result.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
+    public async Task<Return<Product>> ManagerGetProductDetailsAsync(Guid productId)
+    {
+        try
+        {
+            var currentManager = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            if (!currentManager.IsSuccess || currentManager.Data == null)
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = currentManager.Message
+                };
+
+            var result = await productRepository.GetProductByIdAsync(productId);
+            if (!result.IsSuccess || result.Data == null)
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            return new Return<Product>
+            {
+                Data = result.Data,
+                IsSuccess = true,
+                Message = result.Message
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<Product>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+
+    public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword,
         string? sortBy, int pageNumber, int pageSize)
     {
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
-            if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
-                return new Return<IEnumerable<GetProductsResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = currentCustomer.Message
-                };
-
-            var result = await productRepository.GetProductsForCustomerAsync(keyword, sortBy, pageNumber, pageSize);
+            var result = await productRepository.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
             if (!result.IsSuccess)
                 return new Return<IEnumerable<GetProductsResDto>>
                 {

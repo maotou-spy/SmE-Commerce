@@ -8,8 +8,6 @@ public partial class Category : Common
 
     public string? CategoryImage { get; set; }
 
-    public string? CategoryImageHash { get; set; }
-
     public string? Description { get; set; }
 
     /// <summary>

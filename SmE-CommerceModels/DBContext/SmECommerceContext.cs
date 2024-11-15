@@ -272,9 +272,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.CategoryImage)
                 .HasColumnType("character varying")
                 .HasColumnName("categoryImage");
-            entity.Property(e => e.CategoryImageHash)
-                .HasColumnType("character varying")
-                .HasColumnName("categoryImageHash");
             entity.Property(e => e.CreateById).HasColumnName("createById");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("timestamp without time zone")

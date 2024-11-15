@@ -13,6 +13,50 @@ namespace SmE_CommerceRepositories
     {
         #region Product
 
+        public async Task<Return<Product>> GetProductByIdAsync(Guid productId)
+        {
+            try
+            {
+                var product = await dbContext.Products
+                    .Where(x => x.Status != ProductStatus.Deleted)
+                    .Include(x => x.ProductCategories)
+                        .ThenInclude(x => x.Category)
+                    .Include(x => x.ProductImages)
+                    .Include(x => x.ProductAttributes)
+                    .FirstOrDefaultAsync(x => x.ProductId == productId);
+
+                if (product is null)
+                {
+                    return new Return<Product>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                return new Return<Product>
+                {
+                    Data = product,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Successfully,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
         public async Task<Return<Product>> AddProductAsync(Product product)
         {
             try
@@ -41,11 +85,12 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+        public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         {
             try
             {
                 var productsQuery = dbContext.Products
+                    .Where(x => x.Status != ProductStatus.Deleted)
                     .Include(x => x.ProductCategories)
                         .ThenInclude(x => x.Category)
                     .Include(x => x.ProductImages)
@@ -147,6 +192,7 @@ namespace SmE_CommerceRepositories
             try
             {
                 var product = await dbContext.Products
+                    .Where(x => x.Status != ProductStatus.Deleted)
                     .FirstOrDefaultAsync(x => x.ProductId == productId);
                 if (product is null)
                 {

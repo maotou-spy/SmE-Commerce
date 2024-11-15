@@ -1,5 +1,4 @@
-﻿using SmE_CommerceModels.Enums;
-using SmE_CommerceModels.Models;
+﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceModels.ResponseDtos.Product;
 
@@ -7,8 +6,9 @@ namespace SmE_CommerceRepositories.Interface
 {
     public interface IProductRepository
     {
+        Task<Return<Product>> GetProductByIdAsync(Guid productId);
         Task<Return<Product>> AddProductAsync(Product product);
-        Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
+        Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy,
             int pageNumber = 1, int pageSize = 10);
         Task<Return<Product>> UpdateProductAsync(Product product);
         Task<Return<Product>> DeleteProductAsync(Guid productId);

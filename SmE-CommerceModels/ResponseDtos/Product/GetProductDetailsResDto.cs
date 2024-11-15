@@ -10,7 +10,7 @@ public class GetProductDetailsResDto
     public int StockQuantity { get; set; }
     public int SoldQuantity { get; set; }
     public string Status { get; set; } = null!;
-    public string Slug { get; set; } = null!;
+    public string? Slug { get; set; } = null!;
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
     public List<string>? Keywords { get; set; }

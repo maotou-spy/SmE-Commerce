@@ -7,8 +7,10 @@ namespace SmE_CommerceServices.Interface
 {
     public interface IProductService
     {
+        Task<Return<GetProductDetailsResDto>> CustomerGetProductDetailsAsync(Guid productId);
+        Task<Return<Product>> ManagerGetProductDetailsAsync(Guid productId);
         Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req);
-        Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
+        Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy,
             int pageNumber, int pageSize);
         Task<Return<GetProductDetailsResDto>> UpdateProductAsync(Guid productId, UpdateProductReqDto req);
         Task<Return<bool>> DeleteProductAsync(Guid productId);

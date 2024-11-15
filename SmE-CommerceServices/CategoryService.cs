@@ -2,15 +2,8 @@
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ReturnResult;
-using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using SmE_CommerceUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SmE_CommerceModels.ResponseDtos.Category;
 
 namespace SmE_CommerceServices
@@ -48,7 +41,6 @@ namespace SmE_CommerceServices
                 {
                     Name = req.Name,
                     CategoryImage = req.CategoryImage,
-                    CategoryImageHash = HashUtil.Hash(req.CategoryImage),
                     Description = req.Description,
                     Status = req.Status ?? GeneralStatus.Active,
                     CreateById = currentUser.Data.UserId,
@@ -83,7 +75,7 @@ namespace SmE_CommerceServices
                 };
             }
         }
-        
+
         public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber, int pageSize)
         {
             try
@@ -98,7 +90,7 @@ namespace SmE_CommerceServices
                         Message = currentCustomer.Message
                     };
                 }
-                
+
                 var result = await categoryRepository.GetCategories(name, UserStatus.Active, pageNumber, pageSize);
                 if (!result.IsSuccess)
                 {
@@ -110,17 +102,17 @@ namespace SmE_CommerceServices
                     };
                 }
 
-                List<GetCategoryResDto> categories = null;
+                List<GetCategoryResDto>? categories = null;
                 if (result.Data != null)
                 {
                     categories = result.Data.Select(category => new GetCategoryResDto
                     {
-                        CategoryId = category.CategoryId,   
+                        CategoryId = category.CategoryId,
                         CategoryName = category.Name,
                         Description = category.Description,
                     }).ToList();
                 }
-                    
+
                 return new Return<IEnumerable<GetCategoryResDto>>
                 {
                     Data = categories,
@@ -140,7 +132,7 @@ namespace SmE_CommerceServices
                 };
             }
         }
-        
+
         public async Task<Return<IEnumerable<Category>>> GetCategoriesForManagerAsync(string? name, int pageNumber, int pageSize)
         {
             try
@@ -155,7 +147,7 @@ namespace SmE_CommerceServices
                         Message = currentCustomer.Message
                     };
                 }
-                
+
                 var result = await categoryRepository.GetCategories(name,null, pageNumber, pageSize);
                 if (!result.IsSuccess)
                 {
@@ -166,7 +158,7 @@ namespace SmE_CommerceServices
                         Message = result.Message
                     };
                 }
-                    
+
                 return new Return<IEnumerable<Category>>
                 {
                     Data = result.Data,

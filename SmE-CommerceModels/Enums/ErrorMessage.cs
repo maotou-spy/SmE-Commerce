@@ -20,4 +20,5 @@ public static class ErrorMessage
     public const string EmailAlreadyExists = "Email already exists";
     public const string PhoneAlreadyExists = "Phone already exists";
     public const string UsernameAlreadyExists = "Username already exists";
+    public const string NotAvailable = "Not available";
 }

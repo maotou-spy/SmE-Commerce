@@ -39,12 +39,12 @@ public class ProductController(
     }
 
     [HttpGet("active")]
-    public async Task<IActionResult> GetProductsForCustomerAsync(string? keyword, string? sortBy,
+    public async Task<IActionResult> CustomerGetProductsAsync(string? keyword, string? sortBy,
         int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
     {
         try
         {
-            var result = await productService.GetProductsForCustomerAsync(keyword, sortBy, pageNumber, pageSize);
+            var result = await productService.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at get products for customer: {ex}", result.InternalErrorMessage);
@@ -312,6 +312,43 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product user: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpGet("{productId:guid}/active")]
+    public async Task<IActionResult> CustomerGetProductDetailsAsync(Guid productId)
+    {
+        try
+        {
+            var result = await productService.CustomerGetProductDetailsAsync(productId);
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get product by id: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get product by id: {e}", ex);
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+        }
+    }
+
+    [HttpGet("{productId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> ManagerGetProductDetailsAsync(Guid productId)
+    {
+        try
+        {
+            var result = await productService.ManagerGetProductDetailsAsync(productId);
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get product by id: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get product by id: {e}", ex);
             return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
         }
     }
