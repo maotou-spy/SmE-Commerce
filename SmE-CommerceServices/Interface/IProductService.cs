@@ -10,8 +10,8 @@ namespace SmE_CommerceServices.Interface
         Task<Return<GetProductDetailsResDto>> CustomerGetProductDetailsAsync(Guid productId);
         Task<Return<Product>> ManagerGetProductDetailsAsync(Guid productId);
         Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req);
-        Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy,
-            int pageNumber, int pageSize);
+        // Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy,
+        //     int pageNumber, int pageSize);
         Task<Return<GetProductDetailsResDto>> UpdateProductAsync(Guid productId, UpdateProductReqDto req);
         Task<Return<bool>> DeleteProductAsync(Guid productId);
 

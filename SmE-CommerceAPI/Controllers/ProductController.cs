@@ -38,24 +38,24 @@ public class ProductController(
         }
     }
 
-    [HttpGet("active")]
-    public async Task<IActionResult> CustomerGetProductsAsync(string? keyword, string? sortBy,
-        int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
-    {
-        try
-        {
-            var result = await productService.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get products for customer: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get products for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
-        }
-    }
+    // [HttpGet("active")]
+    // public async Task<IActionResult> CustomerGetProductsAsync(string? keyword, string? sortBy,
+    //     int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+    // {
+    //     try
+    //     {
+    //         var result = await productService.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
+    //         if (result.IsSuccess) return StatusCode(200, result);
+    //         if (result.InternalErrorMessage is not null)
+    //             logger.LogError("Error at get products for customer: {ex}", result.InternalErrorMessage);
+    //         return Helper.GetErrorResponse(result.Message);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         logger.LogInformation("Error at get products for customer: {e}", ex);
+    //         return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+    //     }
+    // }
 
     [HttpGet("categories/active")]
     public async Task<IActionResult> GetCategoriesForCustomerAsync(string? name, int pageNumber = PagingEnum.PageNumber,
