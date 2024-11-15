@@ -4,6 +4,7 @@ using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities;
 using SmE_CommerceModels.ResponseDtos.Category;
 
 namespace SmE_CommerceServices
@@ -109,7 +110,6 @@ namespace SmE_CommerceServices
                     {
                         CategoryId = category.CategoryId,
                         CategoryName = category.Name,
-                        Description = category.Description,
                     }).ToList();
                 }
 
@@ -170,6 +170,105 @@ namespace SmE_CommerceServices
             catch (Exception ex)
             {
                 return new Return<IEnumerable<Category>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex
+                };
+            }
+        }
+
+        public async Task<Return<GetCategoryDetailResDto?>> GetCategoryDetailForCustomerAsync(Guid id)
+        {
+            try
+            {
+                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                {
+                    return new Return<GetCategoryDetailResDto?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = currentCustomer.Message
+                    };
+                }
+
+                var result = await categoryRepository.GetCategoryByIdAsync(id, GeneralStatus.Active);
+                if (!result.IsSuccess & result.Data == null)
+                {
+                    return new Return<GetCategoryDetailResDto?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = result.Message
+                    };
+                }
+                
+                var categories = new GetCategoryDetailResDto
+                {
+                    CategoryId = result.Data!.CategoryId,
+                    CategoryName = result.Data.Name,
+                    CategoryImage = result.Data.CategoryImage,
+                    Description = result.Data.Description
+                };
+                    
+                return new Return<GetCategoryDetailResDto?>
+                {
+                    Data = categories,
+                    IsSuccess = true,
+                    Message = result.Message,
+                    TotalRecord = result.TotalRecord
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<GetCategoryDetailResDto?>
+                {
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    Data = null
+                };
+            }
+        }
+        
+        public async Task<Return<Category>> GetCategoryDetailForManagerAsync(Guid id)
+        {
+            try
+            {
+                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                {
+                    return new Return<Category>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = currentCustomer.Message
+                    };
+                }
+
+                var result = await categoryRepository.GetCategoryByIdAsync(id, null);
+                if (!result.IsSuccess)
+                {
+                    return new Return<Category>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = result.Message
+                    };
+                }
+                    
+                return new Return<Category>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Message = result.Message,
+                    TotalRecord = result.TotalRecord
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Category>
                 {
                     Data = null,
                     IsSuccess = false,

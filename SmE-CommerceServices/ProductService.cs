@@ -125,39 +125,39 @@ public class ProductService(IProductRepository productRepository, IHelperService
         }
     }
 
-    public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword,
-        string? sortBy, int pageNumber, int pageSize)
-    {
-        try
-        {
-            var result = await productRepository.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
-            if (!result.IsSuccess)
-                return new Return<IEnumerable<GetProductsResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = result.Message
-                };
-
-            return new Return<IEnumerable<GetProductsResDto>>
-            {
-                Data = result.Data,
-                IsSuccess = true,
-                Message = result.Message,
-                TotalRecord = result.TotalRecord
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<IEnumerable<GetProductsResDto>>
-            {
-                Data = null,
-                IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                InternalErrorMessage = ex
-            };
-        }
-    }
+    // public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword,
+    //     string? sortBy, int pageNumber, int pageSize)
+    // {
+    //     try
+    //     {
+    //         var result = await productRepository.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
+    //         if (!result.IsSuccess)
+    //             return new Return<IEnumerable<GetProductsResDto>>
+    //             {
+    //                 Data = null,
+    //                 IsSuccess = false,
+    //                 Message = result.Message
+    //             };
+    //
+    //         return new Return<IEnumerable<GetProductsResDto>>
+    //         {
+    //             Data = result.Data,
+    //             IsSuccess = true,
+    //             Message = result.Message,
+    //             TotalRecord = result.TotalRecord
+    //         };
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return new Return<IEnumerable<GetProductsResDto>>
+    //         {
+    //             Data = null,
+    //             IsSuccess = false,
+    //             Message = ErrorMessage.InternalServerError,
+    //             InternalErrorMessage = ex
+    //         };
+    //     }
+    // }
 
     public async Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req)
     {

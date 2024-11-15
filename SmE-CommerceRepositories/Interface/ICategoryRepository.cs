@@ -15,5 +15,7 @@ namespace SmE_CommerceRepositories.Interface
         Task<Return<Category>> GetCategoryByNameAsync(string name);
         Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
             int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize);
+
+        Task<Return<Category>> GetCategoryByIdAsync(Guid id, string? status);
     }
 }
