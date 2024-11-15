@@ -85,80 +85,84 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
-        {
-            try
-            {
-                var productsQuery = dbContext.Products
-                    .Where(x => x.Status != ProductStatus.Deleted)
-                    .Include(x => x.ProductCategories)
-                        .ThenInclude(x => x.Category)
-                    .Include(x => x.ProductImages)
-                    .AsQueryable();
+        // public Task<Return<Product>> GetProductByName(string name)
+        // {
+        //     throw new NotImplementedException();
+        // }
 
-                // Search by keyword
-                if (!string.IsNullOrEmpty(keyword))
-                {
-                    productsQuery = productsQuery.Where(x =>
-                        x.Name.Contains(keyword) ||
-                        x.ProductCategories.Any(pc => pc.Category != null && pc.Category.Name.Contains(keyword)));
-                }
-
-                // Sort by
-                if (!string.IsNullOrEmpty(sortBy))
-                {
-                    productsQuery = sortBy switch
-                    {
-                        ProductFilterEnum.PriceLowToHigh => productsQuery.OrderBy(x => x.Price),
-                        ProductFilterEnum.PriceHighToLow => productsQuery.OrderByDescending(x => x.Price),
-                        ProductFilterEnum.NameAscending => productsQuery.OrderBy(x => x.Name),
-                        ProductFilterEnum.NameDescending => productsQuery.OrderByDescending(x => x.Name),
-                        _ => productsQuery.OrderByDescending(x => x.CreatedAt)
-                    };
-                }
-
-                var totalRecords = await productsQuery.CountAsync();
-
-                var products = await productsQuery
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .Select(x => new GetProductsResDto
-                    {
-                        ProductId = x.ProductId,
-                        ProductName = x.Name,
-                        ProductPrice = x.Price,
-                        ProductStock = x.StockQuantity,
-                        ProductImage = x.ProductImages.FirstOrDefault()!.Url,
-                        Categories = x.ProductCategories.Select(pc => new GetCategoryResDto
-                        {
-                            CategoryId = pc.Category!.CategoryId,
-                            CategoryName = pc.Category.Name,
-                            Description = pc.Category.Description,
-                        }).ToList()
-                    })
-                    .ToListAsync();
-
-                return new Return<IEnumerable<GetProductsResDto>>
-                {
-                    Data = products,
-                    IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
-                    TotalRecord = totalRecords
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Return<IEnumerable<GetProductsResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = ex,
-                    TotalRecord = 0
-                };
-            }
-        }
-
+        // public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
+        // {
+        //     try
+        //     {
+        //         var productsQuery = dbContext.Products
+        //             .Include(x => x.ProductCategories)
+        //                 .ThenInclude(x => x.Category)
+        //             .Include(x => x.ProductImages)
+        //             .AsQueryable();
+        //
+        //         // Search by keyword
+        //         if (!string.IsNullOrEmpty(keyword))
+        //         {
+        //             productsQuery = productsQuery.Where(x =>
+        //                 x.Name.Contains(keyword) ||
+        //                 x.ProductCategories.Any(pc => pc.Category != null && pc.Category.Name.Contains(keyword)));
+        //         }
+        //
+        //         // Sort by
+        //         if (!string.IsNullOrEmpty(sortBy))
+        //         {
+        //             productsQuery = sortBy switch
+        //             {
+        //                 ProductFilterEnum.PriceLowToHigh => productsQuery.OrderBy(x => x.Price),
+        //                 ProductFilterEnum.PriceHighToLow => productsQuery.OrderByDescending(x => x.Price),
+        //                 ProductFilterEnum.NameAscending => productsQuery.OrderBy(x => x.Name),
+        //                 ProductFilterEnum.NameDescending => productsQuery.OrderByDescending(x => x.Name),
+        //                 _ => productsQuery.OrderByDescending(x => x.CreatedAt)
+        //             };
+        //         }
+        //
+        //         var totalRecords = await productsQuery.CountAsync();
+        //
+        //         var products = await productsQuery
+        //             .Skip((pageNumber - 1) * pageSize)
+        //             .Take(pageSize)
+        //             .Select(x => new GetProductsResDto
+        //             {
+        //                 ProductId = x.ProductId,
+        //                 ProductName = x.Name,
+        //                 ProductPrice = x.Price,
+        //                 ProductStock = x.StockQuantity,
+        //                 ProductImage = x.ProductImages.FirstOrDefault()!.Url,
+        //                 Categories = x.ProductCategories.Select(pc => new GetCategoryDetailResDto
+        //                 {
+        //                     CategoryId = pc.Category!.CategoryId,
+        //                     CategoryName = pc.Category.Name,
+        //                     Description = pc.Category.Description,
+        //                 }).ToList()
+        //             })
+        //             .ToListAsync();
+        //
+        //         return new Return<IEnumerable<GetProductsResDto>>
+        //         {
+        //             Data = products,
+        //             IsSuccess = true,
+        //             Message = SuccessfulMessage.Successfully,
+        //             TotalRecord = totalRecords
+        //         };
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return new Return<IEnumerable<GetProductsResDto>>
+        //         {
+        //             Data = null,
+        //             IsSuccess = false,
+        //             Message = ErrorMessage.InternalServerError,
+        //             InternalErrorMessage = ex,
+        //             TotalRecord = 0
+        //         };
+        //     }
+        // }
+        
         public async Task<Return<Product>> UpdateProductAsync(Product product)
         {
             try

@@ -66,7 +66,6 @@ namespace SmE_CommerceRepositories
             }
         }
         
-        
         public async Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
             int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         {
@@ -103,6 +102,42 @@ namespace SmE_CommerceRepositories
             catch (Exception ex)
             {
                 return new Return<IEnumerable<Category>>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+        
+        public async Task<Return<Category>> GetCategoryByIdAsync(Guid id, string? status)
+        {
+            try
+            {
+                var query = dbContext.Categories
+                    .Where(x => x.Status != GeneralStatus.Deleted)
+                    .AsQueryable(); 
+
+                if (!string.IsNullOrEmpty(status))
+                {
+                    query = query.Where(x => x.Status.Equals(status));
+                }
+
+                var result = await query.FirstOrDefaultAsync(x => x.CategoryId == id);
+
+                return new Return<Category>
+                {
+                    Data = result,
+                    IsSuccess = true,
+                    Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                    TotalRecord = result != null ? 1 : 0
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Category>
                 {
                     Data = null,
                     IsSuccess = false,

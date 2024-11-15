@@ -8,11 +8,11 @@ namespace SmE_CommerceServices.Interface
     public interface ICategoryService
     {
         Task<Return<bool>> AddCategoryAsync(AddCategoryReqDto req);
-
         Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber,
             int pageSize);
-
         Task<Return<IEnumerable<Category>>> GetCategoriesForManagerAsync(string? name, int pageNumber,
             int pageSize);
+        Task<Return<GetCategoryDetailResDto?>> GetCategoryDetailForCustomerAsync(Guid id);
+        Task<Return<Category>> GetCategoryDetailForManagerAsync(Guid id);
     }
 }
