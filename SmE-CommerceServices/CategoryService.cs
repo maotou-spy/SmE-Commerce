@@ -4,7 +4,6 @@ using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using SmE_CommerceUtilities;
 using SmE_CommerceModels.ResponseDtos.Category;
 
 namespace SmE_CommerceServices

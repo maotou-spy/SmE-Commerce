@@ -1,10 +1,5 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SmE_CommerceModels.Enums;
 
 namespace SmE_CommerceRepositories.Interface
