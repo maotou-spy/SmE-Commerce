@@ -2,8 +2,6 @@
 using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
-using SmE_CommerceModels.ResponseDtos.Category;
-using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 
@@ -18,7 +16,7 @@ namespace SmE_CommerceRepositories
             try
             {
                 var product = await dbContext.Products
-                    .Where(x => x.Status != ProductStatus.Deleted)
+                    // .Where(x => x.Status != ProductStatus.Deleted)
                     .Include(x => x.ProductCategories)
                         .ThenInclude(x => x.Category)
                     .Include(x => x.ProductImages)
@@ -84,11 +82,6 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
-
-        // public Task<Return<Product>> GetProductByName(string name)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         // public async Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy, int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         // {
@@ -162,7 +155,7 @@ namespace SmE_CommerceRepositories
         //         };
         //     }
         // }
-        
+
         public async Task<Return<Product>> UpdateProductAsync(Product product)
         {
             try
@@ -191,16 +184,20 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<Product>> DeleteProductAsync(Guid productId)
+        #endregion
+
+        #region Product Attribute
+
+        public async Task<Return<ProductAttribute>> GetProductAttributeByIdAsync(Guid attributeId)
         {
             try
             {
-                var product = await dbContext.Products
-                    .Where(x => x.Status != ProductStatus.Deleted)
-                    .FirstOrDefaultAsync(x => x.ProductId == productId);
-                if (product is null)
+                var productAttribute = await dbContext.ProductAttributes
+                    .FirstOrDefaultAsync(x => x.Attributeid == attributeId);
+
+                if (productAttribute is null)
                 {
-                    return new Return<Product>
+                    return new Return<ProductAttribute>
                     {
                         Data = null,
                         IsSuccess = false,
@@ -209,52 +206,17 @@ namespace SmE_CommerceRepositories
                     };
                 }
 
-                dbContext.Products.Remove(product);
-                await dbContext.SaveChangesAsync();
-
-                return new Return<Product>
+                return new Return<ProductAttribute>
                 {
-                    Data = null,
+                    Data = productAttribute,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Deleted,
+                    Message = SuccessfulMessage.Successfully,
                     TotalRecord = 1
                 };
             }
             catch (Exception ex)
             {
-                return new Return<Product>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = ex,
-                    TotalRecord = 0
-                };
-            }
-        }
-
-        #endregion
-
-        #region Product Attribute
-
-        public async Task<Return<List<ProductAttribute>>> AddProductAttributesAsync(List<ProductAttribute> productAttributes)
-        {
-            try
-            {
-                await dbContext.ProductAttributes.AddRangeAsync(productAttributes);
-                await dbContext.SaveChangesAsync();
-
-                return new Return<List<ProductAttribute>>
-                {
-                    Data = productAttributes,
-                    IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
-                    TotalRecord = productAttributes.Count
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Return<List<ProductAttribute>>
+                return new Return<ProductAttribute>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -321,12 +283,12 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid productId, Guid attributeId)
+        public async Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid attributeId)
         {
             try
             {
                 var productAttribute = await dbContext.ProductAttributes
-                    .FirstOrDefaultAsync(x => x.Productid == productId && x.Attributeid == attributeId);
+                    .FirstOrDefaultAsync(x => x.Attributeid == attributeId);
                 if (productAttribute is null)
                 {
                     return new Return<ProductAttribute>
@@ -459,24 +421,35 @@ namespace SmE_CommerceRepositories
 
         #region Product Image
 
-        public async Task<Return<List<ProductImage>>> AddProductImagesAsync(List<ProductImage> productImages)
+        public async Task<Return<ProductImage>> GetProductImageByIdAsync(Guid productImageId)
         {
             try
             {
-                await dbContext.ProductImages.AddRangeAsync(productImages);
-                await dbContext.SaveChangesAsync();
+                var productImage = await dbContext.ProductImages
+                    .FirstOrDefaultAsync(x => x.ImageId == productImageId);
 
-                return new Return<List<ProductImage>>
+                if (productImage is null)
                 {
-                    Data = productImages,
+                    return new Return<ProductImage>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                return new Return<ProductImage>
+                {
+                    Data = productImage,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
-                    TotalRecord = productImages.Count
+                    Message = SuccessfulMessage.Successfully,
+                    TotalRecord = 1
                 };
             }
             catch (Exception ex)
             {
-                return new Return<List<ProductImage>>
+                return new Return<ProductImage>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -543,12 +516,12 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<ProductImage>> DeleteProductImageAsync(Guid productId, Guid imageId)
+        public async Task<Return<ProductImage>> DeleteProductImageAsync(Guid productImageId)
         {
             try
             {
                 var productImage = await dbContext.ProductImages
-                    .FirstOrDefaultAsync(x => x.ProductId == productId && x.ImageId == imageId);
+                    .FirstOrDefaultAsync(x =>x.ImageId == productImageId);
                 if (productImage is null)
                 {
                     return new Return<ProductImage>

@@ -161,7 +161,6 @@ public class ProductService(IProductRepository productRepository, IHelperService
 
     public async Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req)
     {
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
             // Get the current user
@@ -175,127 +174,20 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 };
 
             // Initialize the product
-            var product = new Product
-            {
-                ProductCode = req.ProductCode,
-                Name = req.Name,
-                Description = req.Description,
-                Price = req.Price,
-                StockQuantity = req.StockQuantity,
-                SoldQuantity = req.SoldQuantity,
-                IsTopSeller = req.IsTopSeller,
-                Slug = req.Slug ?? SlugUtil.GenerateSlug(req.Name),
-                MetaTitle = req.MetaTitle ?? req.Name,
-                MetaDescription = req.MetaDescription ?? req.Description,
-                Keywords = req.MetaKeywords,
-                Status = req.StockQuantity > 0 ? req.Status : ProductStatus.OutOfStock,
-                CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.Now
-            };
-
-            // Add Product to the database
-            var result = await productRepository.AddProductAsync(product);
-            if (!result.IsSuccess)
+            var prdResult = await AddProductPrivateAsync(req, currentUser.Data.UserId);
+            if (!prdResult.IsSuccess || prdResult.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = result.Message
+                    Message = prdResult.Message
                 };
-
-            // Add Product Categories
-            var productCategories = req.CategoryIds.Select(categoryId => new ProductCategory
-            {
-                ProductId = product.ProductId,
-                CategoryId = categoryId
-            }).ToList();
-
-            var prdCategories = await productRepository.AddProductCategoriesAsync(productCategories);
-            if (!prdCategories.IsSuccess)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = prdCategories.Message
-                };
-
-            // Add Product Images
-            var productImages = req.Images.Select(image => new ProductImage
-            {
-                ProductId = product.ProductId,
-                Url = image.Url,
-                ImageHash = HashUtil.Hash(image.Url),
-                AltText = image.AltText
-            }).ToList();
-
-            var prdImages = await productRepository.AddProductImagesAsync(productImages);
-            if (!prdImages.IsSuccess)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = prdImages.Message
-                };
-
-            // Add Product Attributes
-            Return<List<ProductAttribute>>? prdAttributes = null;
-            if (req.Attributes != null)
-            {
-                var productAttributes = req.Attributes.Select(attribute => new ProductAttribute
-                {
-                    Productid = product.ProductId,
-                    Attributename = attribute.AttributeName,
-                    Attributevalue = attribute.AttributeValue
-                }).ToList();
-
-                prdAttributes = await productRepository.AddProductAttributesAsync(productAttributes);
-                if (!prdAttributes.IsSuccess)
-                    return new Return<GetProductDetailsResDto>
-                    {
-                        Data = null,
-                        IsSuccess = false,
-                        Message = prdAttributes.Message
-                    };
-            }
-
-            transaction.Complete();
 
             return new Return<GetProductDetailsResDto>
             {
-                Data = new GetProductDetailsResDto
-                {
-                    ProductId = product.ProductId,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    StockQuantity = product.StockQuantity,
-                    SoldQuantity = product.SoldQuantity,
-                    IsTopSeller = product.IsTopSeller,
-                    Slug = product.Slug,
-                    MetaTitle = product.MetaTitle,
-                    MetaDescription = product.MetaDescription,
-                    Keywords = product.Keywords,
-                    Status = product.Status,
-                    Images = prdImages.Data?.Select(image => new GetProductImageResDto
-                    {
-                        ImageId = image.ImageId,
-                        Url = image.Url,
-                        AltText = image.AltText
-                    }).ToList(),
-                    Categories = prdCategories.Data?.Select(category => new GetProductCategoryResDto
-                    {
-                        CategoryId = category.CategoryId,
-                        Name = category.Category?.Name ?? string.Empty
-                    }).ToList(),
-                    Attributes = prdAttributes?.Data?.Select(attribute => new GetProductAttributeResDto
-                    {
-                        AttributeId = attribute.Attributeid,
-                        Name = attribute.Attributename,
-                        Value = attribute.Attributevalue
-                    }).ToList()
-                },
+                Data = prdResult.Data,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created
+                Message = prdResult.Message
             };
         }
         catch (Exception ex)
@@ -325,29 +217,56 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = currentUser.Message
                 };
 
-            // Initialize the product
-            var product = new Product
+            var productResult = await productRepository.GetProductByIdAsync(productId);
+            if (!productResult.IsSuccess || productResult.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = productResult.Message
+                };
+            // Check if the product is deleted
+            if (productResult.Data.Status == ProductStatus.Deleted)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
+
+            // Check if the product data is valid
+            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
             {
-                ProductId = productId,
-                ProductCode = req.ProductCode,
-                Name = req.Name,
-                Description = req.Description,
-                Price = req.Price,
-                StockQuantity = req.StockQuantity,
-                SoldQuantity = req.SoldQuantity,
-                IsTopSeller = req.IsTopSeller,
-                Slug = req.Slug ?? SlugUtil.GenerateSlug(req.Name),
-                MetaTitle = req.MetaTitle ?? req.Name,
-                MetaDescription = req.MetaDescription ?? req.Description,
-                Keywords = req.MetaKeywords,
-                Status = req.StockQuantity > 0 ? req.Status : ProductStatus.OutOfStock,
-                ModifiedById = currentUser.Data.UserId,
-                ModifiedAt = DateTime.Now
-            };
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidData
+                };
+            }
+
+            productResult.Data.Name = req.Name.Trim();
+            productResult.Data.Description = req.Description.Trim();
+            productResult.Data.Price = req.Price < 0 ? 0 : req.Price;
+            productResult.Data.StockQuantity = req.StockQuantity;
+            productResult.Data.SoldQuantity = req.SoldQuantity;
+            productResult.Data.IsTopSeller = req.IsTopSeller;
+            productResult.Data.Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim();
+            productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
+            productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
+            if(req.MetaKeywords != null)
+                productResult.Data.Keywords = req.MetaKeywords;
+            productResult.Data.Status = req.StockQuantity > 0
+                ? (req.Status != ProductStatus.Inactive)
+                    ? ProductStatus.Active
+                    : ProductStatus.Inactive
+                : ProductStatus.OutOfStock;
+            productResult.Data.ModifiedById = currentUser.Data.UserId;
+            productResult.Data.ModifiedAt = DateTime.Now;
 
             // Update Product in the database
-            var result = await productRepository.UpdateProductAsync(product);
-            if (!result.IsSuccess)
+            var result = await productRepository.UpdateProductAsync(productResult.Data);
+            if (!result.IsSuccess || result.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
@@ -359,35 +278,35 @@ public class ProductService(IProductRepository productRepository, IHelperService
             {
                 Data = new GetProductDetailsResDto
                 {
-                    ProductId = product.ProductId,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    StockQuantity = product.StockQuantity,
-                    SoldQuantity = product.SoldQuantity,
-                    IsTopSeller = product.IsTopSeller,
-                    Attributes = product.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    ProductId = result.Data.ProductId,
+                    Name = result.Data.Name,
+                    Description = result.Data.Description,
+                    Price = result.Data.Price,
+                    StockQuantity = result.Data.StockQuantity,
+                    SoldQuantity = result.Data.SoldQuantity,
+                    IsTopSeller = result.Data.IsTopSeller,
+                    Attributes = result.Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
                     {
                         AttributeId = attribute.Attributeid,
                         Name = attribute.Attributename,
                         Value = attribute.Attributevalue
                     }).ToList(),
-                    Categories = product.ProductCategories.Select(category => new GetProductCategoryResDto
+                    Categories = result.Data.ProductCategories.Select(category => new GetProductCategoryResDto
                     {
                         CategoryId = category.CategoryId,
                         Name = category.Category?.Name ?? string.Empty
                     }).ToList(),
-                    Images = product.ProductImages.Select(image => new GetProductImageResDto
+                    Images = result.Data.ProductImages.Select(image => new GetProductImageResDto
                     {
                         ImageId = image.ImageId,
                         Url = image.Url,
                         AltText = image.AltText
                     }).ToList(),
-                    Slug = product.Slug,
-                    MetaTitle = product.MetaTitle,
-                    MetaDescription = product.MetaDescription,
-                    Keywords = product.Keywords,
-                    Status = product.Status
+                    Slug = result.Data.Slug,
+                    MetaTitle = result.Data.MetaTitle,
+                    MetaDescription = result.Data.MetaDescription,
+                    Keywords = result.Data.Keywords,
+                    Status = result.Data.Status
                 },
                 IsSuccess = true,
                 Message = SuccessfulMessage.Updated
@@ -419,8 +338,30 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = currentUser.Message
                 };
 
-            // Delete Product from the database
-            var result = await productRepository.DeleteProductAsync(productId);
+            // Get the product
+            var product = await productRepository.GetProductByIdAsync(productId);
+            if (!product.IsSuccess || product.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = product.Message
+                };
+            // Check if the product is deleted
+            if (product.Data.Status == ProductStatus.Deleted)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
+
+            // Update product status to deleted
+            product.Data.Status = ProductStatus.Deleted;
+            product.Data.ModifiedById = currentUser.Data.UserId;
+            product.Data.ModifiedAt = DateTime.Now;
+
+            var result = await productRepository.UpdateProductAsync(product.Data);
             if (!result.IsSuccess)
                 return new Return<bool>
                 {
@@ -571,7 +512,6 @@ public class ProductService(IProductRepository productRepository, IHelperService
             {
                 ProductId = productId,
                 Url = req.Url,
-                ImageHash = HashUtil.Hash(req.Url),
                 AltText = req.AltText
             };
 
@@ -622,16 +562,27 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = currentUser.Message
                 };
 
-            var productImage = new ProductImage
-            {
-                ProductId = productId,
-                ImageId = imageId,
-                Url = req.Url,
-                ImageHash = HashUtil.Hash(req.Url),
-                AltText = req.AltText
-            };
+            var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
+            if (!productImageResult.IsSuccess || productImageResult.Data == null)
+                return new Return<GetProductImageResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = productImageResult.Message
+                };
+            // Check if the image belongs to the product
+            if(productImageResult.Data.ProductId != productId)
+                return new Return<GetProductImageResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
 
-            var result = await productRepository.UpdateProductImageAsync(productImage);
+            productImageResult.Data.Url = req.Url;
+            productImageResult.Data.AltText = req.AltText;
+
+            var result = await productRepository.UpdateProductImageAsync(productImageResult.Data);
             if (!result.IsSuccess || result.Data == null)
                 return new Return<GetProductImageResDto>
                 {
@@ -677,7 +628,24 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = currentUser.Message
                 };
 
-            var result = await productRepository.DeleteProductImageAsync(productId, imageId);
+            var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
+            if (!productImageResult.IsSuccess || productImageResult.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = productImageResult.Message
+                };
+            // Check if the image belongs to the product
+            if(productImageResult.Data.ProductId != productId)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
+
+            var result = await productRepository.DeleteProductImageAsync(imageId);
             if (!result.IsSuccess)
                 return new Return<bool>
                 {
@@ -831,7 +799,25 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = currentUser.Message
                 };
 
-            var result = await productRepository.DeleteProductAttributeAsync(productId, attributeId);
+            var productAttributeResult = await productRepository.GetProductAttributeByIdAsync(attributeId);
+            if (!productAttributeResult.IsSuccess || productAttributeResult.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = productAttributeResult.Message
+                };
+
+            // Check if the attribute belongs to the product
+            if(productAttributeResult.Data.Productid != productId)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotAvailable
+                };
+
+            var result = await productRepository.DeleteProductAttributeAsync(attributeId);
             if (!result.IsSuccess)
                 return new Return<bool>
                 {
@@ -855,6 +841,145 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 IsSuccess = false,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
+            };
+        }
+    }
+
+    #endregion
+
+    #region private methods
+
+    private async Task<Return<GetProductDetailsResDto>> AddProductPrivateAsync(AddProductReqDto req, Guid currentUserId)
+    {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Check if the product data is valid
+            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
+            {
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidData
+                };
+            }
+
+            var product = new Product
+            {
+                Name = req.Name.Trim(),
+                Description = req.Description.Trim(),
+                Price = req.Price < 0 ? 0 : req.Price,
+                StockQuantity = req.StockQuantity,
+                SoldQuantity = req.SoldQuantity,
+                IsTopSeller = req.IsTopSeller,
+                Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim(),
+                MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
+                MetaDescription = (req.MetaDescription ?? req.Description).Trim(),
+                Keywords = req.MetaKeywords,
+                Status = req.StockQuantity > 0
+                    ? (req.Status != ProductStatus.Inactive)
+                        ? ProductStatus.Active
+                        : ProductStatus.Inactive
+                    : ProductStatus.OutOfStock,
+                CreateById = currentUserId,
+                CreatedAt = DateTime.Now,
+            };
+
+            // Add Product to the database
+            var result = await productRepository.AddProductAsync(product);
+            if (!result.IsSuccess || result.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = result.Message
+                };
+
+            // Product Categories
+            var productCategories = req.CategoryIds.Select(categoryId => new ProductCategory
+            {
+                ProductId = result.Data.ProductId,
+                CategoryId = categoryId
+            }).ToList();
+            result.Data.ProductCategories = productCategories;
+
+            // Product Images
+            var productImages = req.Images.Select(image => new ProductImage
+            {
+                ProductId = result.Data.ProductId,
+                Url = image.Url,
+                AltText = image.AltText
+            }).ToList();
+            result.Data.ProductImages = productImages;
+
+            // Product Attributes
+            var productAttributes = req.Attributes?.Select(attribute => new ProductAttribute
+            {
+                Productid = result.Data.ProductId,
+                Attributename = attribute.AttributeName,
+                Attributevalue = attribute.AttributeValue
+            }).ToList();
+            result.Data.ProductAttributes = productAttributes ?? [];
+
+            // Update Product with Categories, Images and Attributes
+            var productResult = await productRepository.UpdateProductAsync(result.Data);
+            if (!productResult.IsSuccess)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = productResult.Message
+                };
+
+            transaction.Complete();
+
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = new GetProductDetailsResDto
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    StockQuantity = product.StockQuantity,
+                    SoldQuantity = product.SoldQuantity,
+                    IsTopSeller = product.IsTopSeller,
+                    Slug = product.Slug,
+                    MetaTitle = product.MetaTitle,
+                    MetaDescription = product.MetaDescription,
+                    Keywords = product.Keywords,
+                    Status = product.Status,
+                    Images = result.Data.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText
+                    }).ToList(),
+                    Categories = result.Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category?.Name ?? string.Empty
+                    }).ToList(),
+                    Attributes = result.Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.Attributeid,
+                        Name = attribute.Attributename,
+                        Value = attribute.Attributevalue
+                    }).ToList()
+                },
+                IsSuccess = true,
+                Message = SuccessfulMessage.Created
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e
             };
         }
     }

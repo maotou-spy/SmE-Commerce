@@ -7,7 +7,7 @@
         public const string Deleted = "Deleted";
     }
 
-    public class ContentStatus
+    public static class ContentStatus
     {
         public const string Draft = "Draft";
         public const string Pending = "Pending";
@@ -16,7 +16,7 @@
         public const string Deleted = "Deleted";
     }
 
-    public class DiscountCodeStatus
+    public static class DiscountCodeStatus
     {
         public const string Active = "Active";
         public const string Inactive = "Inactive";
@@ -24,7 +24,7 @@
         public const string Deleted = "Deleted";
     }
 
-    public class PaymentStatus
+    public static class PaymentStatus
     {
         public const string Pending = "Pending";
         public const string Paid = "Paid";
@@ -39,7 +39,7 @@
         public const string Deleted = "Deleted";
     }
 
-    public class OrderStatus
+    public static class OrderStatus
     {
         public const string Pending = "Pending";
         public const string Processing = "Processing";
@@ -49,7 +49,7 @@
         public const string Returned = "Returned";
     }
 
-    public class ProductStatus
+    public static class ProductStatus
     {
         public const string Active = "Active";
         public const string Inactive = "Inactive";

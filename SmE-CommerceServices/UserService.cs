@@ -355,7 +355,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.MANAGERCANNOTBEBANNED,
+                    Message = ErrorMessage.ManagerCannotBeBanned,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }
@@ -429,7 +429,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.MANAGERCANNOTBEBANNED,
+                    Message = ErrorMessage.ManagerCannotBeBanned,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }

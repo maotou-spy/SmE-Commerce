@@ -833,9 +833,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.AltText)
                 .HasMaxLength(255)
                 .HasColumnName("altText");
-            entity.Property(e => e.ImageHash)
-                .HasColumnType("character varying")
-                .HasColumnName("imageHash");
             entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.Url)
                 .HasMaxLength(255)

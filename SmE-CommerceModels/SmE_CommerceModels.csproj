@@ -22,10 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SmE-CommerceUtilities\SmE_CommerceUtilities.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="ResponseDtos\Product\Manager\" />
     </ItemGroup>
 
