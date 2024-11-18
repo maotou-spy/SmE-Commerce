@@ -112,20 +112,11 @@ namespace SmE_CommerceRepositories
             }
         }
         
-        public async Task<Return<Category>> GetCategoryByIdAsync(Guid id, string? status)
+        public async Task<Return<Category>> GetCategoryByIdAsync(Guid id)
         {
             try
             {
-                var query = dbContext.Categories
-                    .Where(x => x.Status != GeneralStatus.Deleted)
-                    .AsQueryable(); 
-
-                if (!string.IsNullOrEmpty(status))
-                {
-                    query = query.Where(x => x.Status.Equals(status));
-                }
-
-                var result = await query.FirstOrDefaultAsync(x => x.CategoryId == id);
+                var result = await dbContext.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
 
                 return new Return<Category>
                 {
@@ -133,6 +124,34 @@ namespace SmE_CommerceRepositories
                     IsSuccess = true,
                     Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
                     TotalRecord = result != null ? 1 : 0
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<Category>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<Category>> UpdateCategoryAsync(Category category)
+        {
+            try
+            {
+                dbContext.Categories.Update(category);
+                await dbContext.SaveChangesAsync();
+
+                return new Return<Category>
+                {
+                    Data = category,
+                    IsSuccess = true,
+                    Message = SuccessfulMessage.Updated,
+                    TotalRecord = 1
                 };
             }
             catch (Exception ex)

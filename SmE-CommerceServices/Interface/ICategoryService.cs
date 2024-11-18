@@ -14,5 +14,7 @@ namespace SmE_CommerceServices.Interface
             int pageSize);
         Task<Return<GetCategoryDetailResDto?>> GetCategoryDetailForCustomerAsync(Guid id);
         Task<Return<Category>> GetCategoryDetailForManagerAsync(Guid id);
+        Task<Return<bool>> UpdateCategoryDetailAsync(Guid id, AddCategoryReqDto req);
+        Task<Return<bool>> DeleteCategoryAsync(Guid id);
     }
 }
