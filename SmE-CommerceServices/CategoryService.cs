@@ -1,10 +1,10 @@
 ﻿using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
+using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using SmE_CommerceModels.ResponseDtos.Category;
 
 namespace SmE_CommerceServices
 {
@@ -42,7 +42,7 @@ namespace SmE_CommerceServices
                     Name = req.Name,
                     CategoryImage = req.CategoryImage,
                     Description = req.Description,
-                    Status = req.Status ?? GeneralStatus.Active,
+                    Status = GeneralStatus.Active,
                     CreateById = currentUser.Data.UserId,
                     CreatedAt = DateTime.Now,
                 };

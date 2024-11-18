@@ -1,4 +1,5 @@
-﻿using SmE_CommerceModels.Enums;
+﻿using System.Transactions;
+using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
 using SmE_CommerceModels.ResponseDtos.User;
@@ -6,7 +7,6 @@ using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
-using System.Transactions;
 
 namespace SmE_CommerceServices;
 

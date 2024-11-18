@@ -37,7 +37,7 @@ public class UserController(IUserService userService, IAddressService addressSer
     //     catch (Exception ex)
     //     {
     //         logger.LogInformation("Error at create manager user: {e}", ex);
-    //         return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+    //         return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
     //     }
     // }
 
@@ -60,7 +60,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -83,7 +83,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile by manager: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -106,7 +106,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user addresses: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -134,7 +134,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at add address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -162,7 +162,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at update address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -185,7 +185,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -208,7 +208,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at set default address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -235,7 +235,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at update user profile: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -258,7 +258,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get all users: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -279,7 +279,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete user: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
         }
     }
     
@@ -300,7 +300,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at change user status: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
         }
     }
 }

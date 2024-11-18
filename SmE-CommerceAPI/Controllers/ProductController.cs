@@ -17,27 +17,6 @@ public class ProductController(
     IProductService productService,
     ILogger<AuthController> logger) : ControllerBase
 {
-    [HttpPost("categories")]
-    [Authorize]
-    public async Task<IActionResult> AddCategoryAsync([FromBody] AddCategoryReqDto req)
-    {
-        try
-        {
-            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            var result = await categoryService.AddCategoryAsync(req);
-
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at create category user: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at create category user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
-        }
-    }
-
     // [HttpGet("active")]
     // public async Task<IActionResult> CustomerGetProductsAsync(string? keyword, string? sortBy,
     //     int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
@@ -53,7 +32,7 @@ public class ProductController(
     //     catch (Exception ex)
     //     {
     //         logger.LogInformation("Error at get products for customer: {e}", ex);
-    //         return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+    //         return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
     //     }
     // }
 
@@ -72,7 +51,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get categories for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -93,7 +72,7 @@ public class ProductController(
         {
             logger.LogInformation("Error at get categories for manager: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -114,7 +93,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -135,7 +114,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -156,7 +135,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -179,7 +158,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product category user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -203,7 +182,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -224,7 +203,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -247,7 +226,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -268,7 +247,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -291,7 +270,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -312,7 +291,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -330,7 +309,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -349,7 +328,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
 }
