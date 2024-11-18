@@ -117,4 +117,46 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
                 new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
         }
     }
+    
+    [HttpPut("{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateCategoryDetailAsync([FromRoute] Guid id, [FromBody] AddCategoryReqDto req)
+    {
+        try
+        {
+            var result = await categoryService.UpdateCategoryDetailAsync(id, req);
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update category detail: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update category detail: {e}", ex);
+            return StatusCode(500,
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+        }
+    }
+    
+    [HttpDelete("{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteCategoryAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            var result = await categoryService.DeleteCategoryAsync(id);
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at delete category: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete category: {e}", ex);
+            return StatusCode(500,
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+        }
+    }
 }

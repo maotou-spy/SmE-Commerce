@@ -194,9 +194,9 @@ namespace SmE_CommerceServices
                     };
                 }
 
-                var result = await categoryRepository.GetCategoryByIdAsync(id, GeneralStatus.Active);
-                if (!result.IsSuccess & result.Data == null)
-                {
+                var result = await categoryRepository.GetCategoryByIdAsync(id);
+                if (!result.IsSuccess || result.Data == null)
+                { 
                     return new Return<GetCategoryDetailResDto?>
                     {
                         Data = null,
@@ -204,6 +204,14 @@ namespace SmE_CommerceServices
                         Message = result.Message
                     };
                 }
+                
+                if (result.Data.Status != GeneralStatus.Active)
+                    return new Return<GetCategoryDetailResDto?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotAvailable
+                    };
                 
                 var categories = new GetCategoryDetailResDto
                 {
@@ -236,19 +244,19 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
-                if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                var currentManager = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                if (!currentManager.IsSuccess || currentManager.Data == null)
                 {
                     return new Return<Category>
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = currentCustomer.Message
+                        Message = currentManager.Message
                     };
                 }
 
-                var result = await categoryRepository.GetCategoryByIdAsync(id, null);
-                if (!result.IsSuccess)
+                var result = await categoryRepository.GetCategoryByIdAsync(id);
+                if (!result.IsSuccess || result.Data == null)
                 {
                     return new Return<Category>
                     {
@@ -257,6 +265,14 @@ namespace SmE_CommerceServices
                         Message = result.Message
                     };
                 }
+                
+                if (result.Data.Status == GeneralStatus.Deleted)
+                    return new Return<Category>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotAvailable
+                    };
                     
                 return new Return<Category>
                 {
@@ -274,6 +290,140 @@ namespace SmE_CommerceServices
                     IsSuccess = false,
                     Message = ErrorMessage.InternalServerError,
                     InternalErrorMessage = ex
+                };
+            }
+        }
+
+        public async Task<Return<bool>> UpdateCategoryDetailAsync(Guid id, AddCategoryReqDto req)
+        {
+            try
+            {
+                var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                if (!currentUser.IsSuccess || currentUser.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = currentUser.Message,
+                    };
+                }
+                
+                var oldCategory = await categoryRepository.GetCategoryByIdAsync(id);
+                if (oldCategory.Data == null || !oldCategory.IsSuccess)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = currentUser.Message,
+                    };
+                }
+                
+                if (oldCategory.Data.Status != GeneralStatus.Active)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = ErrorMessage.NotAvailable
+                    };
+
+                oldCategory.Data.Description = req.Description;
+                oldCategory.Data.CategoryImage = req.CategoryImage;
+                oldCategory.Data.Name = req.Name;
+                oldCategory.Data.Status = GeneralStatus.Active;
+                oldCategory.Data.ModifiedAt = DateTime.Now;
+                oldCategory.Data.ModifiedById = currentUser.Data.UserId;
+                
+                var result = await categoryRepository.UpdateCategoryAsync(oldCategory.Data);
+                if (!result.IsSuccess)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = result.Message
+                    };
+
+                return new Return<bool>
+                {
+                    IsSuccess = true,
+                    Data = true,
+                    Message = SuccessfulMessage.Updated
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                };
+            }
+        }
+
+        public async Task<Return<bool>> DeleteCategoryAsync(Guid id)
+        {
+            try
+            {
+                var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                if (!currentUser.IsSuccess || currentUser.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = currentUser.Message,
+                    };
+                }
+                var category = await categoryRepository.GetCategoryByIdAsync(id);
+                if (category.Data == null || !category.IsSuccess)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = currentUser.Message,
+                    };
+                }
+                
+                if (category.Data.Status == GeneralStatus.Deleted)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = ErrorMessage.NotAvailable
+                    };
+                
+                category.Data.Status = GeneralStatus.Deleted;
+                category.Data.ModifiedAt = DateTime.Now;
+                category.Data.ModifiedById = currentUser.Data.UserId;
+                
+                var result = await categoryRepository.UpdateCategoryAsync(category.Data);
+                if (result.Data == null || !result.IsSuccess)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Data = false,
+                        Message = currentUser.Message,
+                    };
+                }
+
+                return new Return<bool>
+                {
+                    IsSuccess = true,
+                    Data = true,
+                    Message = SuccessfulMessage.Deleted
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
                 };
             }
         }
