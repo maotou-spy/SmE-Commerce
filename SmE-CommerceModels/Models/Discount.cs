@@ -16,9 +16,9 @@ public partial class Discount : Common
 
     public decimal? MaximumDiscount { get; set; }
 
-    public DateTime FromDate { get; set; }
+    public DateTime? FromDate { get; set; }
 
-    public DateTime ToDate { get; set; }
+    public DateTime? ToDate { get; set; }
 
     /// <summary>
     /// Values: active, inactive, deleted

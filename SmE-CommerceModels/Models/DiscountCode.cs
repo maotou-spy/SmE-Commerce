@@ -11,9 +11,9 @@ public partial class DiscountCode : Common
     /// </summary>
     public Guid? UserId { get; set; }
 
-    public DateTime FromDate { get; set; }
+    public DateTime? FromDate { get; set; }
 
-    public DateTime ToDate { get; set; }
+    public DateTime? ToDate { get; set; }
 
     /// <summary>
     /// Values: active, inactive, used, deleted

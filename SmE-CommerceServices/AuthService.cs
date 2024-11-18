@@ -54,7 +54,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.ServerError
+                    Message = ErrorMessage.InternalServerError
                 };
             }
 
@@ -128,7 +128,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.ServerError
+                    Message = ErrorMessage.InternalServerError
                 };
             }
 

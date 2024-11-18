@@ -30,7 +30,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at create category user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
         }
     }
     
@@ -50,7 +50,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at get categories for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -72,7 +72,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get categories for manager: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
 
@@ -93,7 +93,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get category detail for customer: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
     
@@ -114,7 +114,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get category detail for manager: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
     
@@ -135,7 +135,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at update category detail: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
     
@@ -156,7 +156,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at delete category: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.ServerError });
+                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
         }
     }
 }

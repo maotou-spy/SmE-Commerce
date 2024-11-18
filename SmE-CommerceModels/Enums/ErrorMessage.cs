@@ -13,13 +13,14 @@ public static class ErrorMessage
     public const string NotAuthentication = "Not authentication";
     public const string NotAuthority = "You are not authority to use this function";
     public const string UserAlreadyExists = "User already exists";
-    public const string ServerError = "Server error";
     public const string Duplicated = "Duplicated";
     public const string NoChanges = "No changes";
     public const string ManagerCannotBeBanned = "Manager cannot be banned";
     public const string EmailAlreadyExists = "Email already exists";
     public const string PhoneAlreadyExists = "Phone already exists";
-    public const string UsernameAlreadyExists = "Username already exists";
     public const string NotAvailable = "Not available";
     public const string InvalidData = "Invalid data";
+    public const string InvalidPercentage = "Discount value must be a percentage between 0 and 100";
+    public const string InvalidNumber = "Must be a positive number";
+    public const string InvalidDate = "Invalid date";
 }
