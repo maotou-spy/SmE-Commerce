@@ -3,7 +3,7 @@
 public class GetProductDetailsResDto
 {
     public Guid ProductId { get; set; }
-    public string ProductCode { get; set; } = null!;
+    public required string ProductCode { get; set; }
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public decimal Price { get; set; }

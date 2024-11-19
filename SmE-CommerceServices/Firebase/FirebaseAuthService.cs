@@ -19,7 +19,7 @@ namespace SmE_CommerceServices.Firebase
                 {
                     Data = decodedToken,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.ValidToken,
+                    Message = SuccessMessage.ValidToken,
                     InternalErrorMessage = null,
                     TotalRecord = 1,
                 };

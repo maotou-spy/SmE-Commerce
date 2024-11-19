@@ -24,29 +24,40 @@ namespace SmE_CommerceAPI.HelperClass
 
         public static IActionResult GetErrorResponse(string error)
         {
-            var result = new Return<dynamic> { Message = error };
-
-            return error switch
+            var result = new Return<dynamic>
             {
-                ErrorMessage.NotAuthentication => new ObjectResult(result) { StatusCode = 401 },
-                ErrorMessage.NotAuthority => new ObjectResult(result) { StatusCode = 403 },
-                ErrorMessage.Duplicated => new ObjectResult(result) { StatusCode = 409 },
-                ErrorMessage.InvalidInput => new ObjectResult(result) { StatusCode = 400 },
-                ErrorMessage.InvalidPercentage => new ObjectResult(result) { StatusCode = 400 },
-                ErrorMessage.InvalidDate => new ObjectResult(result) { StatusCode = 400 },
-                ErrorMessage.NotFound => new ObjectResult(result) { StatusCode = 404 },
-                ErrorMessage.InvalidPassword => new ObjectResult(result) { StatusCode = 400 },
-                ErrorMessage.InvalidEmail => new ObjectResult(result) { StatusCode = 400 },
-                ErrorMessage.InvalidToken => new ObjectResult(result) { StatusCode = 401 },
-                ErrorMessage.InvalidCredentials => new ObjectResult(result) { StatusCode = 401 },
-                ErrorMessage.ManagerCannotBeBanned => new ObjectResult(result) { StatusCode = 403 },
-                ErrorMessage.NotAvailable => new ObjectResult(result) { StatusCode = 404 },
-                ErrorMessage.UserAlreadyExists => new ObjectResult(result) { StatusCode = 409 },
-                ErrorMessage.EmailAlreadyExists => new ObjectResult(result) { StatusCode = 409 },
-                ErrorMessage.PhoneAlreadyExists => new ObjectResult(result) { StatusCode = 409 },
-                ErrorMessage.AccountIsInactive => new ObjectResult(result) { StatusCode = 401 },
-                _ => new ObjectResult(result) { StatusCode = 500 },
+                Message = error
+            };
+
+            var statusCode = GetStatusCode(error);
+            return new ObjectResult(result)
+            {
+                StatusCode = statusCode
             };
         }
+
+        private static int GetStatusCode(string error)
+            => error switch
+                {
+                    ErrorMessage.NotAuthentication => 401,
+                    ErrorMessage.NotAuthority => 403,
+                    ErrorMessage.Duplicated => 409,
+                    ErrorMessage.InvalidInput => 400,
+                    ErrorMessage.InvalidPercentage => 400,
+                    ErrorMessage.InvalidDate => 400,
+                    ErrorMessage.NotFound => 404,
+                    ErrorMessage.InvalidPassword => 400,
+                    ErrorMessage.InvalidEmail => 400,
+                    ErrorMessage.InvalidToken => 401,
+                    ErrorMessage.InvalidCredentials => 401,
+                    ErrorMessage.ManagerCannotBeBanned => 403,
+                    ErrorMessage.NotAvailable => 404,
+                    ErrorMessage.UserAlreadyExists => 409,
+                    ErrorMessage.EmailAlreadyExists => 409,
+                    ErrorMessage.PhoneAlreadyExists => 409,
+                    ErrorMessage.AccountIsInactive => 403,
+                    ErrorMessage.SlugExisted => 409,
+                    _ => 500,
+                };
     }
 }

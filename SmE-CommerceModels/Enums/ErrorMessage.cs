@@ -23,4 +23,5 @@ public static class ErrorMessage
     public const string InvalidPercentage = "Discount value must be a percentage between 0 and 100";
     public const string InvalidNumber = "Must be a positive number";
     public const string InvalidDate = "Invalid date";
+    public const string SlugExisted = "Slug already existed";
 }

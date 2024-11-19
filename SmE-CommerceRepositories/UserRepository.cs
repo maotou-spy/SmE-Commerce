@@ -58,7 +58,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Any() ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result.Any() ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = totalRecord
             };
         }
@@ -87,7 +87,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -116,7 +116,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -145,7 +145,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -174,7 +174,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -202,7 +202,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created,
+                Message = SuccessMessage.Created,
                 TotalRecord = 1
             };
         }
@@ -230,7 +230,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
+                Message = SuccessMessage.Updated,
                 TotalRecord = 1
             };
         }
@@ -258,7 +258,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
+                Message = SuccessMessage.Updated,
                 TotalRecord = 1
             };
         }

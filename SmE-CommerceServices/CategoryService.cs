@@ -61,7 +61,7 @@ namespace SmE_CommerceServices
                 return new Return<bool>
                 {
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     Data = true
                 };
             }
@@ -347,7 +347,7 @@ namespace SmE_CommerceServices
                 {
                     IsSuccess = true,
                     Data = true,
-                    Message = SuccessfulMessage.Updated
+                    Message = SuccessMessage.Updated
                 };
             }
             catch (Exception ex)
@@ -413,7 +413,7 @@ namespace SmE_CommerceServices
                 {
                     IsSuccess = true,
                     Data = true,
-                    Message = SuccessfulMessage.Deleted
+                    Message = SuccessMessage.Deleted
                 };
             }
             catch (Exception ex)

@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Enums;
 
-public static class SuccessfulMessage
+public static class SuccessMessage
 {
     public const string Found = "Found Successfully";
     public const string Created = "Created Successfully";

@@ -18,7 +18,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created
+                Message = SuccessMessage.Created
             };
         }
         catch (Exception ex)

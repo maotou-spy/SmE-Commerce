@@ -41,7 +41,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<IEnumerable<User>>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created,
+                Message = SuccessMessage.Created,
                 Data = users.Data,
                 TotalRecord = users.TotalRecord
             };
@@ -108,7 +108,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created,
+                Message = SuccessMessage.Created,
                 Data = true
             };
         }
@@ -155,7 +155,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = user,
-                Message = SuccessfulMessage.Successfully
+                Message = SuccessMessage.Successfully
             };
         }
         catch (Exception ex)
@@ -212,7 +212,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = userProfileDto,
-                Message = SuccessfulMessage.Successfully,
+                Message = SuccessMessage.Successfully,
                 TotalRecord = user.TotalRecord
             };
         }
@@ -266,7 +266,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                     Message = ErrorMessage.UserAlreadyExists,
                 };
             }
-            
+
             if(req.Dob > DateOnly.FromDateTime(DateTime.Now))
             {
                 return new Return<bool>
@@ -308,7 +308,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
+                Message = SuccessMessage.Updated,
                 Data = true
             };
         }
@@ -380,7 +380,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
+                Message = SuccessMessage.Updated,
                 Data = true
             };
         }
@@ -396,7 +396,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             };
         }
     }
-    
+
     public async Task<Return<bool>> ChangeUserStatusAsync(Guid id)
     {
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -454,7 +454,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated,
+                Message = SuccessMessage.Updated,
                 Data = true
             };
         }

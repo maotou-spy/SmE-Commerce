@@ -62,7 +62,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            Message = SuccessfulMessage.Successfully
+            Message = SuccessMessage.Successfully
         };
     }
 
@@ -92,7 +92,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            Message = SuccessfulMessage.Successfully
+            Message = SuccessMessage.Successfully
         };
     }
 

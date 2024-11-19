@@ -11,7 +11,6 @@ namespace SmE_CommerceAPI.Controllers;
 [Route("api/products")]
 [Authorize(AuthenticationSchemes = "Defaut")]
 public class ProductController(
-    ICategoryService categoryService,
     IProductService productService,
     ILogger<AuthController> logger) : ControllerBase
 {

@@ -281,7 +281,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = addressDto,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated
+                Message = SuccessMessage.Updated
             };
         }
         catch (Exception ex)
@@ -385,7 +385,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = true,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated
+                    Message = SuccessMessage.Updated
                 };
 
             defaultAddress.Data.IsDefault = false;
@@ -408,7 +408,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated
+                Message = SuccessMessage.Updated
             };
         }
         catch (Exception ex)
@@ -444,7 +444,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         {
             Data = isDuplicate,
             IsSuccess = true,
-            Message = isDuplicate ? ErrorMessage.Duplicated : SuccessfulMessage.NotDuplicate
+            Message = isDuplicate ? ErrorMessage.Duplicated : SuccessMessage.NotDuplicate
         };
     }
 

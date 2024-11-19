@@ -20,7 +20,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = category,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = 1
                 };
             }
@@ -49,7 +49,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = result,
                     IsSuccess = true,
-                    Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                    Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                     TotalRecord = result != null ? 1 : 0
                 };
             }
@@ -65,37 +65,37 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
-        
+
         public async Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
             int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
         {
             try
             {
                 var query = dbContext.Categories.AsQueryable();
-                
+
                 query = query.Where(x => x.Status != GeneralStatus.Deleted);
-                
+
                 if (!string.IsNullOrEmpty(status))
                 {
                     query = query.Where(x => x.Status.Equals(status));
                 }
-                
+
                 if (!string.IsNullOrEmpty(name))
                 {
                     query = query.Where(x => x.Name.Contains(name));
                 }
-                
+
                 var totalRecords = await query.CountAsync();
-        
+
                 query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-                
+
                 var result = await query.ToListAsync();
 
                 return new Return<IEnumerable<Category>>
                 {
                     Data = result,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
+                    Message = SuccessMessage.Successfully,
                     TotalRecord = totalRecords
                 };
             }
@@ -111,7 +111,7 @@ namespace SmE_CommerceRepositories
                 };
             }
         }
-        
+
         public async Task<Return<Category>> GetCategoryByIdAsync(Guid id)
         {
             try
@@ -122,7 +122,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = result,
                     IsSuccess = true,
-                    Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                    Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
                     TotalRecord = result != null ? 1 : 0
                 };
             }
@@ -150,7 +150,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = category,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated,
+                    Message = SuccessMessage.Updated,
                     TotalRecord = 1
                 };
             }

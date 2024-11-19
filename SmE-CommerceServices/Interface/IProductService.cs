@@ -1,14 +1,14 @@
-﻿using SmE_CommerceModels.Models;
-using SmE_CommerceModels.RequestDtos.Product;
+﻿using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
+using SmE_CommerceModels.ResponseDtos.Product.Manager;
 
 namespace SmE_CommerceServices.Interface
 {
     public interface IProductService
     {
         Task<Return<GetProductDetailsResDto>> CustomerGetProductDetailsAsync(Guid productId);
-        Task<Return<Product>> ManagerGetProductDetailsAsync(Guid productId);
+        Task<Return<ManagerGetProductDetailResDto>> ManagerGetProductDetailsAsync(Guid productId);
         Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req);
         // Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword, string? sortBy,
         //     int pageNumber, int pageSize);

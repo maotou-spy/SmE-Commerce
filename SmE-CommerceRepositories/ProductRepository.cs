@@ -38,7 +38,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
+                    Message = SuccessMessage.Successfully,
                     TotalRecord = 1
                 };
             }
@@ -66,13 +66,53 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = 1
                 };
             }
             catch (Exception ex)
             {
                 return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = ex,
+                    TotalRecord = 0
+                };
+            }
+        }
+
+        public async Task<Return<string>> GetProductSlugAsync(string slug)
+        {
+            try
+            {
+                var product = await dbContext.Products
+                    .Where(x => x.Status != ProductStatus.Deleted)
+                    .FirstOrDefaultAsync(x => x.Slug == slug);
+
+                if (product is null)
+                {
+                    return new Return<string>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.NotFound,
+                        TotalRecord = 0
+                    };
+                }
+
+                return new Return<string>
+                {
+                    Data = product.Slug,
+                    IsSuccess = true,
+                    Message = SuccessMessage.Successfully,
+                    TotalRecord = 1
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Return<string>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -139,7 +179,7 @@ namespace SmE_CommerceRepositories
         //         {
         //             Data = products,
         //             IsSuccess = true,
-        //             Message = SuccessfulMessage.Successfully,
+        //             Message = SuccessMessage.Successfully,
         //             TotalRecord = totalRecords
         //         };
         //     }
@@ -167,7 +207,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated,
+                    Message = SuccessMessage.Updated,
                     TotalRecord = 1
                 };
             }
@@ -210,7 +250,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttribute,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
+                    Message = SuccessMessage.Successfully,
                     TotalRecord = 1
                 };
             }
@@ -238,7 +278,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttribute,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = 1
                 };
             }
@@ -266,7 +306,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttributes,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated,
+                    Message = SuccessMessage.Updated,
                     TotalRecord = 1
                 };
             }
@@ -307,7 +347,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Deleted,
+                    Message = SuccessMessage.Deleted,
                     TotalRecord = 1
                 };
             }
@@ -340,7 +380,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productCategories,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
+                    Message = SuccessMessage.Successfully,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -368,7 +408,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productCategories,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -400,7 +440,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Deleted,
+                    Message = SuccessMessage.Deleted,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -443,7 +483,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Successfully,
+                    Message = SuccessMessage.Successfully,
                     TotalRecord = 1
                 };
             }
@@ -471,7 +511,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = 1
                 };
             }
@@ -499,7 +539,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated,
+                    Message = SuccessMessage.Updated,
                     TotalRecord = 1
                 };
             }
@@ -540,7 +580,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Deleted,
+                    Message = SuccessMessage.Deleted,
                     TotalRecord = 1
                 };
             }

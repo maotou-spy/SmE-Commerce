@@ -20,7 +20,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = discount,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                     TotalRecord = 1
                 };
             }
@@ -47,7 +47,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = discount,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Found,
+                    Message = SuccessMessage.Found,
                     TotalRecord = discount == null ? 0 : 1
                 };
             }
@@ -74,7 +74,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = discount,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Updated,
+                    Message = SuccessMessage.Updated,
                     TotalRecord = 1
                 };
             } catch (Exception e)

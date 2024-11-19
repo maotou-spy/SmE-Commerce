@@ -3,6 +3,7 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ResponseDtos.Product;
+using SmE_CommerceModels.ResponseDtos.Product.Manager;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -39,6 +40,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = result.Data.ProductId,
+                    ProductCode = result.Data.ProductCode ?? string.Empty,
                     Name = result.Data.Name,
                     Description = result.Data.Description,
                     Price = result.Data.Price,
@@ -84,13 +86,13 @@ public class ProductService(IProductRepository productRepository, IHelperService
         }
     }
 
-    public async Task<Return<Product>> ManagerGetProductDetailsAsync(Guid productId)
+    public async Task<Return<ManagerGetProductDetailResDto>> ManagerGetProductDetailsAsync(Guid productId)
     {
         try
         {
             var currentManager = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
             if (!currentManager.IsSuccess || currentManager.Data == null)
-                return new Return<Product>
+                return new Return<ManagerGetProductDetailResDto>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -99,23 +101,59 @@ public class ProductService(IProductRepository productRepository, IHelperService
 
             var result = await productRepository.GetProductByIdAsync(productId);
             if (!result.IsSuccess || result.Data == null)
-                return new Return<Product>
+                return new Return<ManagerGetProductDetailResDto>
                 {
                     Data = null,
                     IsSuccess = false,
                     Message = result.Message
                 };
 
-            return new Return<Product>
+            return new Return<ManagerGetProductDetailResDto>
             {
-                Data = result.Data,
+                Data = new ManagerGetProductDetailResDto()
+                {
+                    ProductId = result.Data.ProductId,
+                    ProductCode = result.Data.ProductCode ?? string.Empty,
+                    Name = result.Data.Name,
+                    Description = result.Data.Description,
+                    Price = result.Data.Price,
+                    StockQuantity = result.Data.StockQuantity,
+                    SoldQuantity = result.Data.SoldQuantity,
+                    IsTopSeller = result.Data.IsTopSeller,
+                    Slug = result.Data.Slug,
+                    MetaTitle = result.Data.MetaTitle,
+                    MetaDescription = result.Data.MetaDescription,
+                    Keywords = result.Data.Keywords,
+                    Status = result.Data.Status,
+                    Images = result.Data.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText
+                    }).ToList(),
+                    Categories = result.Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category?.Name ?? string.Empty
+                    }).ToList(),
+                    Attributes = result.Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.Attributeid,
+                        Name = attribute.Attributename,
+                        Value = attribute.Attributevalue
+                    }).ToList(),
+                    CreatedAt = result.Data.CreatedAt,
+                    CreatedBy = result.Data.CreateUser?.FullName ?? string.Empty,
+                    ModifiedAt = result.Data.ModifiedAt,
+                    ModifiedBy = result.Data.ModifiedByUser?.FullName ?? string.Empty
+                },
                 IsSuccess = true,
                 Message = result.Message
             };
         }
         catch (Exception ex)
         {
-            return new Return<Product>
+            return new Return<ManagerGetProductDetailResDto>
             {
                 Data = null,
                 IsSuccess = false,
@@ -279,6 +317,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = result.Data.ProductId,
+                    ProductCode = result.Data.ProductCode ?? string.Empty,
                     Name = result.Data.Name,
                     Description = result.Data.Description,
                     Price = result.Data.Price,
@@ -309,7 +348,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Status = result.Data.Status
                 },
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated
+                Message = SuccessMessage.Updated
             };
         }
         catch (Exception ex)
@@ -476,7 +515,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Name = category.Category?.Name ?? string.Empty
                 }).ToList(),
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated
+                Message = SuccessMessage.Updated
             };
         }
         catch (Exception ex)
@@ -865,6 +904,26 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 };
             }
 
+            if(req.CategoryIds.Count == 0)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidData
+                };
+
+            if (req.Slug != null)
+            {
+                var productSlug = await productRepository.GetProductSlugAsync(req.Slug);
+                if (productSlug.IsSuccess)
+                    return new Return<GetProductDetailsResDto>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.SlugExisted
+                    };
+            }
+
             var product = new Product
             {
                 Name = req.Name.Trim(),
@@ -914,13 +973,13 @@ public class ProductService(IProductRepository productRepository, IHelperService
             result.Data.ProductImages = productImages;
 
             // Product Attributes
-            var productAttributes = req.Attributes?.Select(attribute => new ProductAttribute
+            var productAttributes = req.Attributes.Select(attribute => new ProductAttribute
             {
                 Productid = result.Data.ProductId,
                 Attributename = attribute.AttributeName,
                 Attributevalue = attribute.AttributeValue
             }).ToList();
-            result.Data.ProductAttributes = productAttributes ?? [];
+            result.Data.ProductAttributes = productAttributes;
 
             // Update Product with Categories, Images and Attributes
             var productResult = await productRepository.UpdateProductAsync(result.Data);
@@ -939,6 +998,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = product.ProductId,
+                    ProductCode = product.ProductCode ?? string.Empty,
                     Name = product.Name,
                     Description = product.Description,
                     Price = product.Price,
@@ -969,7 +1029,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     }).ToList()
                 },
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created
+                Message = SuccessMessage.Created
             };
         }
         catch (Exception e)

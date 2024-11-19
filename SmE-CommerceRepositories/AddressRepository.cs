@@ -21,7 +21,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Count > 0 ? SuccessfulMessage.Found : ErrorMessage.NotFound,
+                Message = result.Count > 0 ? SuccessMessage.Found : ErrorMessage.NotFound,
                 TotalRecord = result.Count
             };
         }
@@ -50,7 +50,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessfulMessage.Found : ErrorMessage.NotFound
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
             };
         }
         catch (Exception ex)
@@ -76,7 +76,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Created
+                Message = SuccessMessage.Created
             };
         }
         catch (Exception ex)
@@ -102,7 +102,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = address,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Updated
+                Message = SuccessMessage.Updated
             };
         }
         catch (Exception ex)
@@ -131,7 +131,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = false,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound
+                    Message = ErrorMessage.NotFound,
                 };
             }
 
@@ -143,7 +143,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Deleted
+                Message = SuccessMessage.Deleted
             };
         }
         catch (Exception ex)
@@ -177,7 +177,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Successfully
+                Message = SuccessMessage.Successfully
             };
         }
         catch (Exception ex)
@@ -206,7 +206,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound
+                    Message = ErrorMessage.NotFound,
                 };
             }
 
@@ -214,7 +214,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = address,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Found
+                Message = SuccessMessage.Found
             };
         } catch (Exception ex)
         {

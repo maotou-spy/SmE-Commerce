@@ -69,7 +69,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                     Phone = user.Phone,
                 },
                 IsSuccess = true,
-                Message = SuccessfulMessage.Successfully
+                Message = SuccessMessage.Successfully
             };
         }
         catch (Exception ex)
@@ -136,7 +136,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessfulMessage.Successfully
+                Message = SuccessMessage.Successfully
             };
         }
         catch (Exception ex)

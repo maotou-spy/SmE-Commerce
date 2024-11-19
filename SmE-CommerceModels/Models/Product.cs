@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SmE_CommerceModels.Models;
+﻿namespace SmE_CommerceModels.Models;
 
 public partial class Product : Common
 {

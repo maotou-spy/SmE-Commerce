@@ -23,7 +23,7 @@ namespace SmE_CommerceServices
                         Message = currentUser.Message,
                     };
                 }
-                
+
                 // Check ten co bi trung hay khong
                 var existedName = await discountRepository.GetDiscountByNameAsync(discount.DiscountName);
                 if (existedName.IsSuccess && existedName.Data != null)
@@ -34,7 +34,7 @@ namespace SmE_CommerceServices
                         Message = ErrorMessage.Duplicated
                     };
                 }
-                
+
                 // Check if DiscountValue is valid based on IsPercentage
                 if (discount.IsPercentage)
                 {
@@ -45,7 +45,7 @@ namespace SmE_CommerceServices
                             IsSuccess = false,
                             Message = ErrorMessage.InvalidPercentage,
                         };
-                    } 
+                    }
                     if (discount.MaximumDiscount is <= 0)
                     {
                         return new Return<bool>
@@ -66,7 +66,7 @@ namespace SmE_CommerceServices
                         };
                     }
                 }
-                
+
                 if(discount is { FromDate: not null, ToDate: not null } || discount.FromDate != null || discount.ToDate != null)
                 {
                     if (discount.FromDate > discount.ToDate)
@@ -87,7 +87,7 @@ namespace SmE_CommerceServices
                         };
                     }
                 }
-                
+
                 if(discount.MinimumOrderAmount is < 0)
                 {
                     return new Return<bool>
@@ -96,7 +96,7 @@ namespace SmE_CommerceServices
                         Message = ErrorMessage.InvalidNumber,
                     };
                 }
-                
+
                 if (discount.UsageLimit is < 0)
                 {
                     return new Return<bool>
@@ -105,7 +105,7 @@ namespace SmE_CommerceServices
                         Message = ErrorMessage.InvalidNumber,
                     };
                 }
-                
+
                 if (discount is { MinQuantity: not null, MaxQuantity: not null } || discount.MinQuantity != null || discount.MaxQuantity != null)
                 {
                     if (discount.MinQuantity > discount.MaxQuantity)
@@ -115,7 +115,7 @@ namespace SmE_CommerceServices
                             IsSuccess = false,
                             Message = ErrorMessage.InvalidInput,
                         };
-                    } 
+                    }
                     if (discount.MinQuantity < 0 || discount.MaxQuantity < 0)
                     {
                         return new Return<bool>
@@ -125,7 +125,7 @@ namespace SmE_CommerceServices
                         };
                     }
                 }
-                
+
                 foreach (var productId in discount.ProductIds)
                 {
                     var productExists = await productRepository.GetProductByIdAsync(productId);
@@ -134,10 +134,10 @@ namespace SmE_CommerceServices
                         return new Return<bool>
                         {
                             IsSuccess = false,
-                            Message = ErrorMessage.NotFound,
+                            Message = ErrorMessage.NotFound
                         };
                     }
-                    
+
                     if (productExists.Data?.Status == GeneralStatus.Inactive)
                     {
                         return new Return<bool>
@@ -147,7 +147,7 @@ namespace SmE_CommerceServices
                         };
                     }
                 }
-                
+
                 var discountModel = new Discount
                 {
                     DiscountName = discount.DiscountName,
@@ -158,9 +158,9 @@ namespace SmE_CommerceServices
                     MaximumDiscount = discount.MaximumDiscount,
                     FromDate = discount.FromDate ?? DateTime.Today,
                     ToDate = discount.ToDate ?? DateTime.MaxValue,
-                    Status = discount.Status != GeneralStatus.Inactive 
-                        ? GeneralStatus.Active 
-                        : GeneralStatus.Inactive, 
+                    Status = discount.Status != GeneralStatus.Inactive
+                        ? GeneralStatus.Active
+                        : GeneralStatus.Inactive,
                     UsageLimit = discount.UsageLimit,
                     UsedCount = 0,
                     MinQuantity = discount.MinQuantity,
@@ -180,7 +180,7 @@ namespace SmE_CommerceServices
                         InternalErrorMessage = result.InternalErrorMessage
                     };
                 }
-                
+
                 // Add products for discount
                 if (discount.ProductIds.Count <= 0)
                     return new Return<bool>
@@ -190,13 +190,13 @@ namespace SmE_CommerceServices
                         Message = result.Message,
                         InternalErrorMessage = result.InternalErrorMessage
                     };
-                
+
                 result.Data.DiscountProducts = discount.ProductIds.Select(x => new DiscountProduct()
                 {
                     DiscountId = result.Data.DiscountId,
                     ProductId = x
                 }).ToList();
-                    
+
                 var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
                 if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
                 {
@@ -212,7 +212,7 @@ namespace SmE_CommerceServices
                 {
                     Data = true,
                     IsSuccess = true,
-                    Message = SuccessfulMessage.Created,
+                    Message = SuccessMessage.Created,
                 };
             }
             catch (Exception e)

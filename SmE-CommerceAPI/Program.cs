@@ -151,7 +151,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //Hello World
-app.MapGet("/", [AllowAnonymous]() => "Hello World! Welcome to SmE-Commerce API");
+app.MapGet("/", [AllowAnonymous] () => "Hello World! Welcome to SmE-Commerce API");
 
 app.UseAuthentication();
 

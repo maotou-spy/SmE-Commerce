@@ -11,7 +11,7 @@ public class AddProductReqDto
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "Product price is required")]
-    [RegularExpression(@"^\d+\.\d{0,2}$", ErrorMessage = "Invalid price")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price")]
     public decimal Price { get; set; }
 
     [RegularExpression(@"^\d+$", ErrorMessage = "Invalid stock quantity")]
@@ -22,12 +22,10 @@ public class AddProductReqDto
 
     public bool IsTopSeller { get; set; } = false;
 
-    [Required(ErrorMessage = "At least one product image is required")]
     public List<AddProductImageReqDto> Images { get; set; } = [];
 
-    public List<AddProductAttributeReqDto>? Attributes { get; set; }
+    public List<AddProductAttributeReqDto> Attributes { get; set; } = [];
 
-    [Required(ErrorMessage = "At least one category is required")]
     public List<Guid> CategoryIds { get; set; } = [];
 
     public string Status { get; set; } = ProductStatus.Active;
@@ -38,5 +36,5 @@ public class AddProductReqDto
 
     public string? MetaDescription { get; set; }
 
-    public List<string>? MetaKeywords { get; set; }
+    public List<string> MetaKeywords { get; set; } = [];
 }
