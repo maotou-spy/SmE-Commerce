@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
-using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.RequestDtos.Product;
-using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 
@@ -17,65 +15,6 @@ public class ProductController(
     IProductService productService,
     ILogger<AuthController> logger) : ControllerBase
 {
-    // [HttpGet("active")]
-    // public async Task<IActionResult> CustomerGetProductsAsync(string? keyword, string? sortBy,
-    //     int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
-    // {
-    //     try
-    //     {
-    //         var result = await productService.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
-    //         if (result.IsSuccess) return StatusCode(200, result);
-    //         if (result.InternalErrorMessage is not null)
-    //             logger.LogError("Error at get products for customer: {ex}", result.InternalErrorMessage);
-    //         return Helper.GetErrorResponse(result.Message);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         logger.LogInformation("Error at get products for customer: {e}", ex);
-    //         return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
-    //     }
-    // }
-
-    [HttpGet("categories/active")]
-    public async Task<IActionResult> GetCategoriesForCustomerAsync(string? name, int pageNumber = PagingEnum.PageNumber,
-        int pageSize = PagingEnum.PageSize)
-    {
-        try
-        {
-            var result = await categoryService.GetCategoriesForCustomerAsync(name, pageNumber, pageSize);
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get categories for customer: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get categories for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
-        }
-    }
-
-    [HttpGet("categories")]
-    public async Task<IActionResult> GetCategoriesForManagerAsync(string? name,
-        int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize)
-    {
-        try
-        {
-            var result = await categoryService.GetCategoriesForManagerAsync(name, pageNumber, pageSize);
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get categories for manager: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.Message);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get categories for manager: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
-        }
-    }
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> AddProductAsync([FromBody] AddProductReqDto req)
