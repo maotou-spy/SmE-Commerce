@@ -27,12 +27,12 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     IsSuccess = false,
                     Message = result.Message
                 };
-            if(result.Data.Status == ProductStatus.Inactive)
+            if(result.Data.Status != ProductStatus.Active)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    Message = ErrorMessage.NotFound
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -210,6 +210,37 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     IsSuccess = false,
                     Message = currentUser.Message
                 };
+
+            // Check if the product data is valid
+            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
+            {
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidData
+                };
+            }
+
+            if(req.CategoryIds.Count == 0)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InvalidData
+                };
+
+            if (req.Slug != null)
+            {
+                var productSlug = await productRepository.GetProductSlugAsync(req.Slug);
+                if (productSlug.IsSuccess)
+                    return new Return<GetProductDetailsResDto>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        Message = ErrorMessage.SlugExisted
+                    };
+            }
 
             // Initialize the product
             var prdResult = await AddProductPrivateAsync(req, currentUser.Data.UserId);
@@ -413,7 +444,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
             {
                 Data = true,
                 IsSuccess = true,
-                Message = result.Message
+                Message = SuccessMessage.Deleted
             };
         }
         catch (Exception ex)
@@ -893,48 +924,18 @@ public class ProductService(IProductRepository productRepository, IHelperService
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // Check if the product data is valid
-            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-            {
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InvalidData
-                };
-            }
-
-            if(req.CategoryIds.Count == 0)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InvalidData
-                };
-
-            if (req.Slug != null)
-            {
-                var productSlug = await productRepository.GetProductSlugAsync(req.Slug);
-                if (productSlug.IsSuccess)
-                    return new Return<GetProductDetailsResDto>
-                    {
-                        Data = null,
-                        IsSuccess = false,
-                        Message = ErrorMessage.SlugExisted
-                    };
-            }
-
+            // Initialize the product
             var product = new Product
             {
                 Name = req.Name.Trim(),
-                Description = req.Description.Trim(),
+                Description = req.Description?.Trim(),
                 Price = req.Price < 0 ? 0 : req.Price,
                 StockQuantity = req.StockQuantity,
                 SoldQuantity = req.SoldQuantity,
                 IsTopSeller = req.IsTopSeller,
                 Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim(),
                 MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
-                MetaDescription = (req.MetaDescription ?? req.Description).Trim(),
+                MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
                 Keywords = req.MetaKeywords,
                 Status = req.StockQuantity > 0
                     ? req.Status != ProductStatus.Inactive
