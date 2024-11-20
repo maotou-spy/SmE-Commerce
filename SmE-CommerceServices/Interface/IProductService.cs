@@ -16,7 +16,7 @@ namespace SmE_CommerceServices.Interface
         Task<Return<bool>> DeleteProductAsync(Guid productId);
 
         Task<Return<GetProductAttributeResDto>> AddProductAttributeAsync(Guid productId, AddProductAttributeReqDto req);
-        Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(Guid productId, Guid AttributeId, AddProductAttributeReqDto req);
+        Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(Guid productId, Guid attributeId, AddProductAttributeReqDto req);
         Task<Return<bool>> DeleteProductAttributeAsync(Guid productId, Guid attributeId);
 
         Task<Return<GetProductImageResDto>> AddProductImageAsync(Guid productId, AddProductImageReqDto req);

@@ -1,4 +1,5 @@
-﻿using SmE_CommerceModels.Enums;
+﻿using System.Text.RegularExpressions;
+using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.ReturnResult;
@@ -7,8 +8,9 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceServices
 {
-    public class DiscountService(IDiscountRepository discountRepository, IHelperService helperService, IProductRepository productRepository) : IDiscountService
+    public class DiscountService(IDiscountRepository discountRepository, IHelperService helperService, IProductRepository productRepository, IUserRepository userRepository) : IDiscountService
     {
+        #region Discount
         public async Task<Return<bool>> AddDiscountAsync(AddDiscountReqDto discount)
         {
             try
@@ -207,6 +209,8 @@ namespace SmE_CommerceServices
                         InternalErrorMessage = addProductsResult.InternalErrorMessage
                     };
                 }
+                
+                
 
                 return new Return<bool>
                 {
@@ -226,5 +230,123 @@ namespace SmE_CommerceServices
                 };
             }
         }
+        #endregion
+
+        #region DiscountCode
+        public async Task<Return<bool>> AddDiscountCodeAsync(AddDiscountCodeReqDto req)
+        {
+            try
+            {
+                // Validate user
+                var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
+                if (!currentUser.IsSuccess || currentUser.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Message = currentUser.Message,
+                    };
+                }
+                
+                // Check if DiscountCode is valid
+                if (req.DiscountCode.Length is < 4 or > 20 || !Regex.IsMatch(req.DiscountCode, @"^[a-zA-Z0-9]+$"))
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Message = ErrorMessage.InvalidInput,
+                    };
+                }
+                
+                // Check if DiscountId is valid
+                var discount = await discountRepository.GetDiscountByIdAsync(req.DiscountId);
+                if (!discount.IsSuccess || discount.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Message = discount.Message,
+                    };
+                }
+                
+                // Check if UserId is valid
+                if(req.UserId.HasValue)
+                {
+                    var existedUser = await userRepository.GetUserByIdAsync(req.UserId.Value);
+                    if (!existedUser.IsSuccess || existedUser.Data == null)
+                    {
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            Message = existedUser.Message,
+                        };
+                    }
+                }
+                
+                if(req.FromDate.HasValue && req.ToDate.HasValue|| req.FromDate != null || req.ToDate != null)
+                {
+                    if (req.FromDate > req.ToDate)
+                    {
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            Message = ErrorMessage.InvalidDate,
+                        };
+                    }
+
+                    if (req.FromDate < DateTime.Now)
+                    {
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            Message = ErrorMessage.InvalidDate,
+                        };
+                    }
+                }
+
+                var newCode = new DiscountCode
+                {
+                    DiscountId = req.DiscountId,
+                    UserId = req.UserId,
+                    Code = req.DiscountCode,
+                    FromDate = req.FromDate ?? DateTime.Today,
+                    ToDate = req.ToDate ?? DateTime.MaxValue,
+                    Status = req.Status != DiscountCodeStatus.Inactive
+                        ? DiscountCodeStatus.Active
+                        : DiscountCodeStatus.Inactive,
+                    CreatedAt = DateTime.Now,
+                    CreateById = currentUser.Data.UserId
+                };
+                
+                var result = await discountRepository.AddDiscountCodeAsync(newCode);
+                if (!result.IsSuccess || result.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        Message = result.Message,
+                        InternalErrorMessage = result.InternalErrorMessage
+                    };
+                }
+                
+                return new Return<bool>
+                {
+                    Data = true,
+                    IsSuccess = true,
+                    Message = SuccessMessage.Created,
+                };
+            }
+            catch (Exception e)
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    Message = ErrorMessage.InternalServerError,
+                    InternalErrorMessage = e
+                };
+            }
+        }
+        #endregion
     }
 }
