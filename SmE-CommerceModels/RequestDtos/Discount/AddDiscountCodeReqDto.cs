@@ -5,8 +5,6 @@ namespace SmE_CommerceModels.RequestDtos.Discount;
 
 public class AddDiscountCodeReqDto
 {
-    public required Guid DiscountId { get; set; }
-    
     public Guid? UserId { get; set; }
     
     [Required]

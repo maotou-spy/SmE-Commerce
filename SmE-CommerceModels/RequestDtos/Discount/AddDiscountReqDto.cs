@@ -37,4 +37,6 @@ public class AddDiscountReqDto
     public bool IsFirstOrder { get; set; } = false;
 
     public List<Guid> ProductIds { get; set; } = [];
+    
+    public List<AddDiscountCodeReqDto>? DiscountCodes { get; set; }
 }

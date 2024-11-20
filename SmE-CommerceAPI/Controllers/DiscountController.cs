@@ -39,14 +39,14 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
 
     #region DiscountCode
 
-    [HttpPost("codes")]
+    [HttpPost("{id:guid}/codes")]
     [Authorize]
-    public async Task<IActionResult> AddDiscountCodeAsync([FromBody] AddDiscountCodeReqDto req)
+    public async Task<IActionResult> AddDiscountCodeAsync([FromRoute] Guid id, [FromBody] AddDiscountCodeReqDto req)
     {
         try
         {
             if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            var result = await discountService.AddDiscountCodeAsync(req);
+            var result = await discountService.AddDiscountCodeAsync(id, req);
 
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)

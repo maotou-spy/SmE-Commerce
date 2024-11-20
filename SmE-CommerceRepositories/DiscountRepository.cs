@@ -5,174 +5,199 @@ using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 
-namespace SmE_CommerceRepositories
+namespace SmE_CommerceRepositories;
+
+public class DiscountRepository(SmECommerceContext dbContext) : IDiscountRepository
 {
-    public class DiscountRepository(SmECommerceContext dbContext) : IDiscountRepository
+    #region Discount
+    public async Task<Return<Discount>> AddDiscountAsync(Discount discount)
     {
-        #region Discount
-        public async Task<Return<Discount>> AddDiscountAsync(Discount discount)
+        try
         {
-            try
-            {
-                await dbContext.Discounts.AddAsync(discount);
-                await dbContext.SaveChangesAsync();
+            await dbContext.Discounts.AddAsync(discount);
+            await dbContext.SaveChangesAsync();
 
-                return new Return<Discount>
-                {
-                    Data = discount,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Created,
-                    TotalRecord = 1
-                };
-            }
-            catch (Exception ex)
+            return new Return<Discount>
             {
-                return new Return<Discount>()
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = ex,
-                    TotalRecord = 0
-                };
-            }
+                Data = discount,
+                IsSuccess = true,
+                Message = SuccessMessage.Created,
+                TotalRecord = 1
+            };
         }
-
-        public async Task<Return<Discount>> GetDiscountByNameAsync(string name)
+        catch (Exception ex)
         {
-            try
+            return new Return<Discount>
             {
-                var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountName == name);
-
-                return new Return<Discount>
-                {
-                    Data = discount,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Found,
-                    TotalRecord = discount == null ? 0 : 1
-                };
-            }
-            catch (Exception e)
-            {
-                return new Return<Discount>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = e
-                };
-            }
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
         }
-
-        public async Task<Return<Discount>> UpdateDiscountAsync(Discount discount)
-        {
-            try
-            {
-                dbContext.Discounts.Update(discount);
-                await dbContext.SaveChangesAsync();
-
-                return new Return<Discount>
-                {
-                    Data = discount,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Updated,
-                    TotalRecord = 1
-                };
-            } catch (Exception e)
-            {
-                return new Return<Discount>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = e
-                };
-            }
-        }
-
-        public async Task<Return<Discount>> GetDiscountByIdAsync(Guid id)
-        {
-            try
-            {
-                var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountId == id);
-
-                return new Return<Discount>
-                {
-                    Data = discount,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Found,
-                    TotalRecord = discount == null ? 0 : 1
-                };
-            }
-            catch (Exception e)
-            {
-                return new Return<Discount>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = e
-                };
-            }
-        }
-        #endregion
-
-        #region DiscountCode
-        public async Task<Return<DiscountCode>> AddDiscountCodeAsync(DiscountCode discountCode)
-        {
-            try
-            {
-                await dbContext.DiscountCodes.AddAsync(discountCode);
-                await dbContext.SaveChangesAsync();
-
-                return new Return<DiscountCode>
-                {
-                    Data = discountCode,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Created,
-                    TotalRecord = 1
-                };
-            }
-            catch (Exception ex)
-            {
-                return new Return<DiscountCode>()
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = ex,
-                    TotalRecord = 0
-                };
-            }
-        }
-
-        public async Task<Return<DiscountCode>> UpdateDiscountCodeAsync(DiscountCode discountCode)
-        {
-            try
-            {
-                dbContext.DiscountCodes.Update(discountCode);
-                await dbContext.SaveChangesAsync();
-
-                return new Return<DiscountCode>
-                {
-                    Data = discountCode,
-                    IsSuccess = true,
-                    Message = SuccessMessage.Updated,
-                    TotalRecord = 1
-                };
-            }
-            catch (Exception e)
-            {
-                return new Return<DiscountCode>()
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
-                    InternalErrorMessage = e,
-                    TotalRecord = 0
-                };
-            }
-        }
-        #endregion
     }
+
+    public async Task<Return<Discount>> GetDiscountByNameAsync(string name)
+    {
+        try
+        {
+            var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountName == name);
+
+            return new Return<Discount>
+            {
+                Data = discount,
+                IsSuccess = true,
+                Message = SuccessMessage.Found,
+                TotalRecord = discount == null ? 0 : 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<Discount>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
+
+    public async Task<Return<Discount>> UpdateDiscountAsync(Discount discount)
+    {
+        try
+        {
+            dbContext.Discounts.Update(discount);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<Discount>
+            {
+                Data = discount,
+                IsSuccess = true,
+                Message = SuccessMessage.Updated,
+                TotalRecord = 1
+            };
+        } catch (Exception e)
+        {
+            return new Return<Discount>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
+
+    public async Task<Return<Discount>> GetDiscountByIdAsync(Guid id)
+    {
+        try
+        {
+            var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountId == id);
+
+            return new Return<Discount>
+            {
+                Data = discount,
+                IsSuccess = true,
+                Message = SuccessMessage.Found,
+                TotalRecord = discount == null ? 0 : 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<Discount>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
+    #endregion
+
+    #region DiscountCode
+    public async Task<Return<DiscountCode>> AddDiscountCodeAsync(DiscountCode discountCode)
+    {
+        try
+        {
+            await dbContext.DiscountCodes.AddAsync(discountCode);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<DiscountCode>
+            {
+                Data = discountCode,
+                IsSuccess = true,
+                Message = SuccessMessage.Created,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+    public async Task<Return<DiscountCode>> UpdateDiscountCodeAsync(DiscountCode discountCode)
+    {
+        try
+        {
+            dbContext.DiscountCodes.Update(discountCode);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<DiscountCode>
+            {
+                Data = discountCode,
+                IsSuccess = true,
+                Message = SuccessMessage.Updated,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0
+            };
+        }
+    }
+    
+    public async Task<Return<DiscountCode>> GetDiscountCodeByCodeAsync(string code)
+    {
+        try
+        {
+            var discountCode = await dbContext.DiscountCodes.FirstOrDefaultAsync(x => x.Code == code);
+
+            return new Return<DiscountCode>
+            {
+                Data = discountCode,
+                IsSuccess = true,
+                Message = SuccessMessage.Found,
+                TotalRecord = discountCode == null ? 0 : 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
+                Message = ErrorMessage.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
+    #endregion
 }
