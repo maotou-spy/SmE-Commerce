@@ -110,7 +110,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
 
             return new Return<ManagerGetProductDetailResDto>
             {
-                Data = new ManagerGetProductDetailResDto()
+                Data = new ManagerGetProductDetailResDto
                 {
                     ProductId = result.Data.ProductId,
                     ProductCode = result.Data.ProductCode ?? string.Empty,
@@ -295,7 +295,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
             if(req.MetaKeywords != null)
                 productResult.Data.Keywords = req.MetaKeywords;
             productResult.Data.Status = req.StockQuantity > 0
-                ? (req.Status != ProductStatus.Inactive)
+                ? req.Status != ProductStatus.Inactive
                     ? ProductStatus.Active
                     : ProductStatus.Inactive
                 : ProductStatus.OutOfStock;
@@ -937,7 +937,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 MetaDescription = (req.MetaDescription ?? req.Description).Trim(),
                 Keywords = req.MetaKeywords,
                 Status = req.StockQuantity > 0
-                    ? (req.Status != ProductStatus.Inactive)
+                    ? req.Status != ProductStatus.Inactive
                         ? ProductStatus.Active
                         : ProductStatus.Inactive
                     : ProductStatus.OutOfStock,
