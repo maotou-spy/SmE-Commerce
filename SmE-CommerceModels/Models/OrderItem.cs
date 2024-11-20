@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class OrderItem
+public class OrderItem
 {
     public Guid OrderItemId { get; set; }
 

@@ -14,8 +14,4 @@
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\SmE-CommerceModels\SmE_CommerceModels.csproj" />
-    </ItemGroup>
-
 </Project>

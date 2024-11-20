@@ -4,9 +4,9 @@ public class ManagerGetProductDetailResDto : GetProductDetailsResDto
 {
     public DateTime? CreatedAt { get; set; }
 
-    public string  CreatedBy { get; set; } = null!;
+    public string?  CreatedBy { get; set; } = null!;
 
     public DateTime? ModifiedAt { get; set; }
 
-    public string ModifiedBy { get; set; } = null!;
+    public string? ModifiedBy { get; set; } = null!;
 }

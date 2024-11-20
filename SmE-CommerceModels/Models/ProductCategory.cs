@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class ProductCategory
+public class ProductCategory
 {
     public Guid ProductCategoryId { get; set; }
 

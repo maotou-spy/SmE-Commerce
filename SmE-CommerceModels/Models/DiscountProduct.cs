@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class DiscountProduct
+public class DiscountProduct
 {
     public Guid DiscountProductId { get; set; }
 

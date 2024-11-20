@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class ContentImage
+public class ContentImage
 {
     public Guid ContentImageId { get; set; }
 

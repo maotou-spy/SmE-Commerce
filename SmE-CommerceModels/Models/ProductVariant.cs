@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class ProductVariant : Common
+public class ProductVariant
 {
     public Guid VariantId { get; set; }
 
@@ -17,6 +17,18 @@ public partial class ProductVariant : Common
     public int SoldQuantity { get; set; }
 
     public string Status { get; set; } = null!;
+
+    public DateTime? CreatedAt { get; set; }
+
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
+    public virtual User? CreateBy { get; set; }
+
+    public virtual User? ModifiedBy { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

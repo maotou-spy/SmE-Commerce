@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class Content : Common
+public class Content
 {
     public Guid ContentId { get; set; }
 
@@ -29,6 +29,14 @@ public partial class Content : Common
 
     public DateTime? PublishedAt { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
+
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
     public string? Slug { get; set; }
 
     public string? MetaTitle { get; set; }
@@ -46,4 +54,8 @@ public partial class Content : Common
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();
 
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
+
+    public virtual User? CreateBy { get; set; }
+
+    public virtual User? ModifiedBy { get; set; }
 }

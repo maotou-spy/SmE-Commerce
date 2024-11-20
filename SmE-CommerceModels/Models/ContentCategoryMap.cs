@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class ContentCategoryMap
+public class ContentCategoryMap
 {
     public Guid ContentCategoryMapId { get; set; }
 

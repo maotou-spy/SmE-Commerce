@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class PaymentMethod
+public class PaymentMethod
 {
     public Guid PaymentMethodId { get; set; }
 

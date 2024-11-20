@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class OrderStatusHistory
+public class OrderStatusHistory
 {
     public Guid HistoryId { get; set; }
 

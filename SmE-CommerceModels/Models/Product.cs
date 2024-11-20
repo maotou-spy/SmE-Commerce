@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class Product : Common
+public class Product
 {
     public Guid ProductId { get; set; }
 
@@ -21,6 +21,14 @@ public partial class Product : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
     public string? Slug { get; set; }
 
     public string? MetaTitle { get; set; }
@@ -29,13 +37,17 @@ public partial class Product : Common
 
     public List<string>? Keywords { get; set; }
 
-    public bool IsTopSeller { get; set; } = false;
+    public bool IsTopSeller { get; set; }
 
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
 
+    public virtual User? CreateBy { get; set; }
+
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
+
+    public virtual User? ModifiedBy { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

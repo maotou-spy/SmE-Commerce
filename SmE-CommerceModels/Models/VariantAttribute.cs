@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class VariantAttribute
+public class VariantAttribute
 {
     public Guid AttributeId { get; set; }
 

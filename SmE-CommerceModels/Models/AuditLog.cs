@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class AuditLog
+public class AuditLog
 {
     public Guid LogId { get; set; }
 

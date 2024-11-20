@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class Review
+public class Review
 {
     public Guid ReviewId { get; set; }
 

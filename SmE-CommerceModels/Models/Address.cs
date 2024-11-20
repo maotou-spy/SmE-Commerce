@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class Address : Common
+public class Address
 {
     public Guid AddressId { get; set; }
 
@@ -26,9 +23,21 @@ public partial class Address : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
-    public bool IsDefault { get; set; } = false;
+    public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
+    public bool IsDefault { get; set; }
+
+    public virtual User? CreateBy { get; set; }
+
+    public virtual User? ModifiedBy { get; set; }
+
+    public virtual ICollection<Order> Orders { get; set; } = [];
 
     public virtual User? User { get; set; }
 }

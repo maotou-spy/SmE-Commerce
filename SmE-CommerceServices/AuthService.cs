@@ -118,7 +118,6 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 IsEmailVerified = false,
                 IsPhoneVerified = false,
                 Status = UserStatus.Active,
-                CreateById = Guid.Empty,
                 CreatedAt = DateTime.Now
             };
 

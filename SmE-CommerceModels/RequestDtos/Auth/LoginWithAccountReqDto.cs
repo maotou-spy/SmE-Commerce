@@ -2,7 +2,7 @@
 
 namespace SmE_CommerceModels.RequestDtos.Auth;
 
-public partial class LoginWithAccountReqDto
+public  class LoginWithAccountReqDto
 {
     [Required(ErrorMessage = "Email or phone is required")]
     public required string EmailOrPhone { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class BankInfo : Common
+public class BankInfo
 {
     public Guid BankInfoId { get; set; }
 
@@ -18,4 +18,16 @@ public partial class BankInfo : Common
     /// Values: active, inactive, deleted
     /// </summary>
     public string Status { get; set; } = null!;
+
+    public DateTime? CreatedAt { get; set; }
+
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
+    public virtual User? CreateBy { get; set; }
+
+    public virtual User? ModifiedBy { get; set; }
 }

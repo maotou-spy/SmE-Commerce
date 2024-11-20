@@ -143,9 +143,9 @@ public class ProductService(IProductRepository productRepository, IHelperService
                         Value = attribute.Attributevalue
                     }).ToList(),
                     CreatedAt = result.Data.CreatedAt,
-                    CreatedBy = result.Data.CreateUser?.FullName ?? string.Empty,
+                    CreatedBy = result.Data.CreateBy?.FullName,
                     ModifiedAt = result.Data.ModifiedAt,
-                    ModifiedBy = result.Data.ModifiedByUser?.FullName ?? string.Empty
+                    ModifiedBy = result.Data.ModifiedBy?.FullName
                 },
                 IsSuccess = true,
                 Message = result.Message

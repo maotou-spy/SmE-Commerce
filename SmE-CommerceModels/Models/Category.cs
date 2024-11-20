@@ -1,6 +1,6 @@
 ﻿namespace SmE_CommerceModels.Models;
 
-public partial class Category : Common
+public class Category
 {
     public Guid CategoryId { get; set; }
 
@@ -15,7 +15,19 @@ public partial class Category : Common
     /// </summary>
     public string Status { get; set; } = null!;
 
+    public DateTime? CreatedAt { get; set; }
+
+    public Guid? CreateById { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedById { get; set; }
+
     public string? Slug { get; set; }
+
+    public virtual User? CreateBy { get; set; }
+
+    public virtual User? ModifiedBy { get; set; }
 
     public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 }

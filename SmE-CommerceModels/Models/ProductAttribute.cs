@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace SmE_CommerceModels.Models;
 
-namespace SmE_CommerceModels.Models;
-
-public partial class ProductAttribute
+public class ProductAttribute
 {
     public Guid Attributeid { get; set; }
 
