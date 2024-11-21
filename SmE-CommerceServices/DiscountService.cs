@@ -33,7 +33,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.Duplicated
+                    Message = ErrorMessage.DiscountNameAlreadyExists
                 };
             }
 
@@ -136,7 +136,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound
+                        Message = ErrorMessage.NotFoundDiscount
                     };
                 }
 
@@ -182,10 +182,10 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     InternalErrorMessage = result.InternalErrorMessage
                 };
             }
-            
+
             // Kiểm tra xem có cần update không
             var needUpdate = false;
-            
+
             // Add products for discount
             if (discount.ProductIds.Count > 0)
             {
@@ -196,21 +196,21 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                 }).ToList();
                 needUpdate = true;
             }
-            
+
             if (discount.DiscountCodes != null && discount.DiscountCodes.Any())
             {
                 foreach (var discountCode in discount.DiscountCodes)
                 {
                     var existingCode = await discountRepository.GetDiscountCodeByCodeAsync(discountCode.DiscountCode.ToUpper());
-                    if (existingCode is { IsSuccess: true, Data: not null }) 
+                    if (existingCode is { IsSuccess: true, Data: not null })
                         return new Return<bool>
                         {
                             IsSuccess = false,
-                            Message = ErrorMessage.Duplicated
+                            Message = ErrorMessage.DiscountCodeAlreadyExists
                         };
                 }
             }
-            
+
             // Add Discount Code
             if (discount.DiscountCodes != null && discount.DiscountCodes.Any())
             {
@@ -283,7 +283,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     Message = currentUser.Message
                 };
             }
-                
+
             // Check if DiscountCode is valid
             if (req.DiscountCode.Length is < 4 or > 20 || !Regex.IsMatch(req.DiscountCode, "^[a-zA-Z0-9]+$"))
             {
@@ -293,7 +293,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     Message = ErrorMessage.InvalidInput
                 };
             }
-                
+
             // Check if DiscountId is valid
             var discount = await discountRepository.GetDiscountByIdAsync(id);
             if (!discount.IsSuccess || discount.Data == null)
@@ -304,7 +304,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     Message = discount.Message
                 };
             }
-                
+
             // Check if UserId is valid
             if(req.UserId.HasValue)
             {
@@ -318,7 +318,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     };
                 }
             }
-                
+
             if(req is { FromDate: not null, ToDate: not null }|| req.FromDate != null || req.ToDate != null)
             {
                 if (req.FromDate > req.ToDate)
@@ -339,14 +339,14 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     };
                 }
             }
-            
+
             var existedCode = await discountRepository.GetDiscountCodeByCodeAsync(req.DiscountCode.ToUpper());
             if (existedCode is { IsSuccess: true, Data: not null })
             {
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.Duplicated
+                    Message = ErrorMessage.DiscountCodeAlreadyExists
                 };
             }
 
@@ -363,7 +363,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                 CreatedAt = DateTime.Now,
                 CreateById = currentUser.Data.UserId
             };
-                
+
             var result = await discountRepository.AddDiscountCodeAsync(newCode);
             if (!result.IsSuccess || result.Data == null)
             {
@@ -374,7 +374,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
                     InternalErrorMessage = result.InternalErrorMessage
                 };
             }
-                
+
             return new Return<bool>
             {
                 Data = true,
@@ -393,7 +393,7 @@ public class DiscountService(IDiscountRepository discountRepository, IHelperServ
             };
         }
     }
-    
+
     public async Task<Return<DiscountCode>> GetDiscounCodeByCodeAsync(string code)
     {
         try

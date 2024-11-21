@@ -91,7 +91,7 @@ namespace SmE_CommerceServices
                     };
                 }
 
-                var result = await categoryRepository.GetCategories(name, UserStatus.Active, pageNumber, pageSize);
+                var result = await categoryRepository.GetCategoriesAsync(name, UserStatus.Active, pageNumber, pageSize);
                 if (!result.IsSuccess)
                 {
                     return new Return<IEnumerable<GetCategoryResDto>>
@@ -147,7 +147,7 @@ namespace SmE_CommerceServices
                     };
                 }
 
-                var result = await categoryRepository.GetCategories(name,null, pageNumber, pageSize);
+                var result = await categoryRepository.GetCategoriesAsync(name,null, pageNumber, pageSize);
                 if (!result.IsSuccess)
                 {
                     return new Return<IEnumerable<Category>>

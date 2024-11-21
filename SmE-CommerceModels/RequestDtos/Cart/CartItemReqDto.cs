@@ -5,8 +5,10 @@ namespace SmE_CommerceModels.RequestDtos.Cart;
 public class CartItemReqDto
 {
     [Required]
-    public string ProductId { get; set; } = null!;
+    public Guid ProductId { get; set; }
+
+    [Required] public int Quantity { get; set; } = 1;
 
     [Required]
-    public int Quantity { get; set; }
+    public decimal Price { get; set; }
 }

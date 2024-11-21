@@ -21,7 +21,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Count > 0 ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result.Count > 0 ? SuccessMessage.Found : ErrorMessage.NotFoundAddress,
                 TotalRecord = result.Count
             };
         }
@@ -50,7 +50,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundAddress,
             };
         }
         catch (Exception ex)
@@ -131,7 +131,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = false,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundAddress,
                 };
             }
 
@@ -206,7 +206,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundAddress,
                 };
             }
 

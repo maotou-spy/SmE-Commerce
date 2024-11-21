@@ -190,7 +190,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound
+                    Message = string.Format(ErrorMessage.NotFound, "Address")
                 };
             }
 
@@ -444,7 +444,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         {
             Data = isDuplicate,
             IsSuccess = true,
-            Message = isDuplicate ? ErrorMessage.Duplicated : SuccessMessage.NotDuplicate
+            Message = isDuplicate ? ErrorMessage.AddressAlreadyExists : SuccessMessage.Successfully
         };
     }
 

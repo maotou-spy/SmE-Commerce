@@ -58,7 +58,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Any() ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result.Any() ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
                 TotalRecord = totalRecord
             };
         }
@@ -87,7 +87,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -116,7 +116,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -145,7 +145,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -174,7 +174,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
                 TotalRecord = result != null ? 1 : 0
             };
         }

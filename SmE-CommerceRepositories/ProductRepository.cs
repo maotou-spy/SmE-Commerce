@@ -29,7 +29,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }
@@ -97,7 +97,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }
@@ -241,7 +241,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }
@@ -335,7 +335,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }
@@ -474,7 +474,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }
@@ -568,7 +568,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotFound,
+                        Message = ErrorMessage.NotFoundProduct,
                         TotalRecord = 0
                     };
                 }

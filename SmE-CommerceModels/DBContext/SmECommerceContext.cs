@@ -274,6 +274,9 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
             entity.Property(e => e.UserId).HasColumnName("userId");
+            entity.Property(e => e.Price)
+                .HasPrecision(15)
+                .HasColumnName("price");
 
             entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.ProductId)

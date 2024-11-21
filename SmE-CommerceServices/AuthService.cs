@@ -22,7 +22,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound
+                    Message = ErrorMessage.NotFoundUser
                 };
             }
 

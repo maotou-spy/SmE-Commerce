@@ -1,6 +1,5 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
-using SmE_CommerceModels.Enums;
 
 namespace SmE_CommerceRepositories.Interface
 {
@@ -8,8 +7,8 @@ namespace SmE_CommerceRepositories.Interface
     {
         Task<Return<Category>> AddCategoryAsync(Category category);
         Task<Return<Category>> GetCategoryByNameAsync(string name);
-        Task<Return<IEnumerable<Category>>> GetCategories(string? name, string? status,
-            int pageNumber = PagingEnum.PageNumber, int pageSize = PagingEnum.PageSize);
+        Task<Return<IEnumerable<Category>>> GetCategoriesAsync(string? name, string? status,
+            int? pageNumber, int? pageSize);
         Task<Return<Category>> GetCategoryByIdAsync(Guid id);
         Task<Return<Category>> UpdateCategoryAsync(Category category);
     }

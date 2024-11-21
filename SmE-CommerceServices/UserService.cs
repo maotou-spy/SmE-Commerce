@@ -193,7 +193,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundUser,
                 };
             }
 
@@ -252,7 +252,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundUser,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }
@@ -345,7 +345,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundUser,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }
@@ -419,7 +419,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound,
+                    Message = ErrorMessage.NotFoundUser,
                     InternalErrorMessage = user.InternalErrorMessage
                 };
             }

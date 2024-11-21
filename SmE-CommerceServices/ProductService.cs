@@ -11,7 +11,7 @@ using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class ProductService(IProductRepository productRepository, IHelperService helperService) : IProductService
+public class ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IHelperService helperService) : IProductService
 {
     #region Product
 
@@ -32,7 +32,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFound
+                    Message = ErrorMessage.NotFoundProduct
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -956,13 +956,30 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     Message = result.Message
                 };
 
-            // Product Categories
-            var productCategories = req.CategoryIds.Select(categoryId => new ProductCategory
+            // Only add active categories
+            var categoryResult = await categoryRepository.GetCategoriesAsync(status: GeneralStatus.Active, name: null, pageNumber:null, pageSize: null);
+            if (!categoryResult.IsSuccess)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = categoryResult.Message
+                };
+
+            var categories = categoryResult.Data?.Where(c => req.CategoryIds.Contains(c.CategoryId)).ToList();
+            if (categories == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.NotFoundCategory
+                };
+
+            result.Data.ProductCategories = categories.Select(category => new ProductCategory
             {
                 ProductId = result.Data.ProductId,
-                CategoryId = categoryId
+                CategoryId = category.CategoryId
             }).ToList();
-            result.Data.ProductCategories = productCategories;
 
             // Product Images
             var productImages = req.Images.Select(image => new ProductImage
