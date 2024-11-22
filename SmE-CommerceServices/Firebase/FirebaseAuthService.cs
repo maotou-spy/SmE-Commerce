@@ -19,6 +19,7 @@ namespace SmE_CommerceServices.Firebase
                 {
                     Data = decodedToken,
                     IsSuccess = true,
+                    ErrorCode = ErrorCodes.Ok,
                     Message = SuccessMessage.ValidToken,
                     InternalErrorMessage = null,
                     TotalRecord = 1,
@@ -32,6 +33,7 @@ namespace SmE_CommerceServices.Firebase
                     {
                         Data = null,
                         IsSuccess = false,
+                        ErrorCode = ErrorCodes.InvalidToken,
                         Message = ErrorMessage.InvalidToken,
                         InternalErrorMessage = null,
                         TotalRecord = 0,
@@ -42,6 +44,7 @@ namespace SmE_CommerceServices.Firebase
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.InvalidToken,
                     Message = ErrorMessage.InvalidToken,
                     InternalErrorMessage = ex,
                     TotalRecord = 0,

@@ -7,10 +7,14 @@
 
         // Not found error messages
         public const string NotFound = "not found";
+        public const string AddressNotFound = $"Address {NotFound}";
         public const string ProductNotFound = $"Product {NotFound}";
         public const string CategoryNotFound = $"Category {NotFound}";
         public const string UserNotFound = $"User {NotFound}";
         public const string OrderNotFound = $"Order {NotFound}";
+        public const string CartNotFound = $"Cart {NotFound}";
+        public const string ProductImageNotFound = $"Product image {NotFound}";
+        public const string ProductAttributeNotFound = $"Product attribute {NotFound}";
 
         // Already exists error messages
         public const string AlreadyExists = "already exists";

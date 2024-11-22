@@ -39,26 +39,23 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
 
             var totalRecord = await query.CountAsync();
 
-            List<User> result;
             if (pageSize is > 0)
             {
                 pageNumber ??= 1;
-                result = await query
+                query = query
                     .Skip((pageNumber.Value - 1) * pageSize.Value)
-                    .Take(pageSize.Value)
-                    .ToListAsync();
+                    .Take(pageSize.Value);
             }
-            else
-            {
-                result = await query.ToListAsync();
-            }
+
+            var result = await query.ToListAsync();
 
             // Trả về kết quả
             return new Return<IEnumerable<User>>
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result.Any() ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
+                ErrorCode = result.Count != 0 ? ErrorCodes.Ok : ErrorCodes.UserNotFound,
+                Message = result.Count != 0 ? SuccessMessage.Found : ErrorMessage.UserNotFound,
                 TotalRecord = totalRecord
             };
         }
@@ -68,6 +65,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -87,7 +85,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
+                ErrorCode = result != null ? ErrorCodes.Ok : ErrorCodes.UserNotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.UserNotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -97,6 +96,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -116,7 +116,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
+                ErrorCode = result != null ? ErrorCodes.Ok : ErrorCodes.UserNotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.UserNotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -126,6 +127,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -145,7 +147,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
+                ErrorCode = result != null ? ErrorCodes.Ok : ErrorCodes.UserNotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.UserNotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -155,6 +158,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -174,7 +178,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = result,
                 IsSuccess = true,
-                Message = result != null ? SuccessMessage.Found : ErrorMessage.NotFoundUser,
+                ErrorCode = result != null ? ErrorCodes.Ok : ErrorCodes.UserNotFound,
+                Message = result != null ? SuccessMessage.Found : ErrorMessage.UserNotFound,
                 TotalRecord = result != null ? 1 : 0
             };
         }
@@ -184,6 +189,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -202,6 +208,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Created,
                 TotalRecord = 1
             };
@@ -212,6 +219,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -230,6 +238,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated,
                 TotalRecord = 1
             };
@@ -240,6 +249,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -258,6 +268,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = user,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated,
                 TotalRecord = 1
             };
@@ -268,6 +279,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0

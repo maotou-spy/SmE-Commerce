@@ -2,7 +2,7 @@
 {
     public class Return<T>
     {
-        public required int ErrorCode { get; set; }
+        public required int ErrorCode { get; set; } = 999;
         public T? Data { get; set; }
         public required string Message { get; set; }
         public int? TotalRecord { get; set; }

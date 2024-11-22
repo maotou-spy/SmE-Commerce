@@ -13,10 +13,14 @@
 
         // Not found
         public const int NotFound = 101;
-        public const int ProductNotFound = 102;
-        public const int CategoryNotFound = 103;
-        public const int UserNotFound = 104;
-        public const int OrderNotFound = 105;
+        public const int AddressNotFound = 102;
+        public const int ProductNotFound = 103;
+        public const int CategoryNotFound = 104;
+        public const int UserNotFound = 105;
+        public const int OrderNotFound = 106;
+        public const int CartNotFound = 107;
+        public const int ProductImageNotFound = 108;
+        public const int ProductAttributeNotFound = 109;
 
         // Already exists
         public const int AlreadyExists = 201;
