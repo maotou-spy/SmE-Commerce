@@ -30,6 +30,10 @@
         // Out of stock
         public const int OutOfStock = 301;
 
+        // Authorization
+        public const int NotAuthority = 401;
+        public const int AccountIsInactive = 402;
+
         // Internal server error
         public const int InternalServerError = 999;
     }

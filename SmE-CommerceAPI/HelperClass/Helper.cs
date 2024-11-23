@@ -50,9 +50,8 @@ namespace SmE_CommerceAPI.HelperClass
                     ErrorMessage.InvalidEmail => 400,
                     ErrorMessage.InvalidToken => 401,
                     ErrorMessage.InvalidCredentials => 401,
-                    ErrorMessage.ManagerCannotBeBanned => 403,
-                    ErrorMessage.NotAvailable => 404,
                     ErrorMessage.AccountIsInactive => 403,
+                    ErrorMessage.OutOfStock => 400,
                     _ => 500,
                 };
     }
