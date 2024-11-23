@@ -25,6 +25,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.NotAuthority,
                 Message = ErrorMessage.NotAuthority
             };
         }
@@ -35,6 +36,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.NotAuthority,
                 Message = ErrorMessage.NotAuthority
             };
         }
@@ -45,6 +47,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.NotAuthority,
                 Message = ErrorMessage.NotAuthority
             };
         }
@@ -54,6 +57,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.AccountIsInactive,
                 Message = ErrorMessage.AccountIsInactive
             };
         }
@@ -62,13 +66,19 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
+            ErrorCode = ErrorCodes.Ok,
             Message = SuccessMessage.Successfully
         };
     }
 
-    public async Task<Return<User>> GetCurrentUserWithRole(string role)
+    public async Task<Return<User>> GetCurrentUserWithRoleAsync(string role)
     {
         var user = await GetCurrentUser();
+
+        if (!user.IsSuccess || user.Data == null)
+        {
+            return user;
+        }
 
         // Improved role check
         var isAuthorized = role switch
@@ -84,6 +94,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.NotAuthority,
                 Message = ErrorMessage.NotAuthority
             };
         }
@@ -92,6 +103,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
+            ErrorCode = ErrorCodes.Ok,
             Message = SuccessMessage.Successfully
         };
     }

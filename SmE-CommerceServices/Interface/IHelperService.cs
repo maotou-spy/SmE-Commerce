@@ -5,6 +5,6 @@ namespace SmE_CommerceServices.Interface;
 
 public interface IHelperService
 {
-    Task<Return<User>> GetCurrentUserWithRole(string role);
+    Task<Return<User>> GetCurrentUserWithRoleAsync(string role);
     Task<Return<User>> GetCurrentUser();
 }

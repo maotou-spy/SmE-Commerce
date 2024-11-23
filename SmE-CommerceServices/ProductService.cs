@@ -20,19 +20,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
         try
         {
             var result = await productRepository.GetProductByIdAsync(productId);
-            if (!result.IsSuccess || result.Data == null)
+            if (!result.IsSuccess || result.Data == null || result.Data.Status != ProductStatus.Active)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.ProductNotFound,
                     Message = result.Message
-                };
-            if(result.Data.Status != ProductStatus.Active)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    Message = ErrorMessage.NotFoundProduct
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -71,6 +65,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     }).ToList()
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -80,6 +75,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -90,12 +86,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentManager = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentManager.IsSuccess || currentManager.Data == null)
                 return new Return<ManagerGetProductDetailResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentManager.ErrorCode,
                     Message = currentManager.Message
                 };
 
@@ -105,6 +102,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.ProductNotFound,
                     Message = result.Message
                 };
 
@@ -148,6 +146,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     ModifiedBy = result.Data.ModifiedBy?.FullName
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -157,6 +156,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -202,12 +202,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
         try
         {
             // Get the current user
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -218,7 +219,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidData
+                    ErrorCode = ErrorCodes.InvalidInput,
+                    Message = ErrorMessage.InvalidInput
                 };
             }
 
@@ -227,7 +229,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidData
+                    ErrorCode = ErrorCodes.InvalidInput,
+                    Message = ErrorMessage.InvalidInput
                 };
 
             if (req.Slug != null)
@@ -238,7 +241,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.SlugExisted
+                        ErrorCode = ErrorCodes.SlugAlreadyExists,
+                        Message = ErrorMessage.SlugAlreadyExists
                     };
             }
 
@@ -249,6 +253,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = prdResult.ErrorCode,
                     Message = prdResult.Message
                 };
 
@@ -256,6 +261,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = prdResult.Data,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = prdResult.Message
             };
         }
@@ -266,6 +272,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -277,12 +284,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
         try
         {
             // Get the current user
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -292,6 +300,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = productResult.ErrorCode,
                     Message = productResult.Message
                 };
             // Check if the product is deleted
@@ -300,7 +309,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    ErrorCode = ErrorCodes.ProductNotFound,
+                    Message = ErrorMessage.ProductNotFound
                 };
 
             // Check if the product data is valid
@@ -310,7 +320,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidData
+                    ErrorCode = ErrorCodes.InvalidInput,
+                    Message = ErrorMessage.InvalidInput
                 };
             }
 
@@ -340,6 +351,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -379,6 +391,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Status = result.Data.Status
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated
             };
         }
@@ -388,6 +401,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -399,12 +413,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
         try
         {
             // Get the current user
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -415,6 +430,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = product.ErrorCode,
                     Message = product.Message
                 };
             // Check if the product is deleted
@@ -423,7 +439,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    ErrorCode = ErrorCodes.ProductNotFound,
+                    Message = ErrorMessage.ProductNotFound
                 };
 
             // Update product status to deleted
@@ -437,6 +454,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -444,6 +462,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = true,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Deleted
             };
         }
@@ -454,6 +473,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -470,12 +490,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<List<GetProductCategoryResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -486,6 +507,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentCategories.ErrorCode,
                     Message = currentCategories.Message
                 };
 
@@ -511,6 +533,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     {
                         Data = null,
                         IsSuccess = false,
+                        ErrorCode = addResult.ErrorCode,
                         Message = addResult.Message
                     };
             }
@@ -524,6 +547,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     {
                         Data = null,
                         IsSuccess = false,
+                        ErrorCode = deleteResult.ErrorCode,
                         Message = deleteResult.Message
                     };
             }
@@ -535,6 +559,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = updatedCategories.ErrorCode,
                     Message = updatedCategories.Message
                 };
 
@@ -546,6 +571,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Name = category.Category?.Name ?? string.Empty
                 }).ToList(),
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated
             };
         }
@@ -555,6 +581,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -569,12 +596,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductImageResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -591,6 +619,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -603,6 +632,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     AltText = result.Data.AltText
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -612,6 +642,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -623,12 +654,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductImageResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -638,6 +670,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = productImageResult.ErrorCode,
                     Message = productImageResult.Message
                 };
             // Check if the image belongs to the product
@@ -646,7 +679,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    ErrorCode = ErrorCodes.ProductImageNotFound,
+                    Message = ErrorMessage.ProductImageNotFound
                 };
 
             productImageResult.Data.Url = req.Url;
@@ -658,6 +692,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -670,6 +705,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     AltText = result.Data.AltText
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -679,6 +715,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -689,12 +726,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -704,6 +742,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = productImageResult.ErrorCode,
                     Message = productImageResult.Message
                 };
             // Check if the image belongs to the product
@@ -712,7 +751,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    ErrorCode = ErrorCodes.ProductImageNotFound,
+                    Message = ErrorMessage.ProductImageNotFound
                 };
 
             var result = await productRepository.DeleteProductImageAsync(imageId);
@@ -721,6 +761,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -728,6 +769,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = true,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -737,6 +779,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -752,12 +795,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductAttributeResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -774,6 +818,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -786,6 +831,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Value = result.Data.Attributevalue
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -795,6 +841,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -806,12 +853,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<GetProductAttributeResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -829,6 +877,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -841,6 +890,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Value = result.Data.Attributevalue
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -850,6 +900,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -860,12 +911,13 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
     {
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentUser.ErrorCode,
                     Message = currentUser.Message
                 };
 
@@ -875,6 +927,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = productAttributeResult.ErrorCode,
                     Message = productAttributeResult.Message
                 };
 
@@ -884,7 +937,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotAvailable
+                    ErrorCode = ErrorCodes.ProductAttributeNotFound,
+                    Message = ErrorMessage.ProductAttributeNotFound
                 };
 
             var result = await productRepository.DeleteProductAttributeAsync(attributeId);
@@ -893,6 +947,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -900,6 +955,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = true,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = result.Message
             };
         }
@@ -909,6 +965,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -953,6 +1010,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
 
@@ -963,6 +1021,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = categoryResult.ErrorCode,
                     Message = categoryResult.Message
                 };
 
@@ -972,7 +1031,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFoundCategory
+                    ErrorCode = ErrorCodes.CategoryNotFound,
+                    Message = ErrorMessage.CategoryNotFound
                 };
 
             result.Data.ProductCategories = categories.Select(category => new ProductCategory
@@ -1006,6 +1066,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = productResult.ErrorCode,
                     Message = productResult.Message
                 };
 
@@ -1047,6 +1108,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     }).ToList()
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Created
             };
         }
@@ -1056,6 +1118,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = e
             };

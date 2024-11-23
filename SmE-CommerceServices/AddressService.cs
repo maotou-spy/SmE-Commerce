@@ -15,13 +15,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
     {
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
             {
                 return new Return<IEnumerable<GetUserAddressesResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentCustomer.ErrorCode,
                     Message = currentCustomer.Message,
                     TotalRecord = 0
                 };
@@ -35,6 +36,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message,
                     TotalRecord = 0
                 };
@@ -56,6 +58,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = addresses,
                 IsSuccess = true,
+                ErrorCode = result.ErrorCode,
                 Message = result.Message,
                 TotalRecord = result.TotalRecord
             };
@@ -66,6 +69,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -78,13 +82,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
             {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentCustomer.ErrorCode,
                     Message = currentCustomer.Message,
                     TotalRecord = 0
                 };
@@ -97,6 +102,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = isDuplicate.ErrorCode,
                     Message = isDuplicate.Message,
                     TotalRecord = 0
                 };
@@ -111,6 +117,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     {
                         Data = false,
                         IsSuccess = false,
+                        ErrorCode = removeDefault.ErrorCode,
                         Message = removeDefault.Message
                     };
                 }
@@ -139,6 +146,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message,
                     TotalRecord = 0
                 };
@@ -150,6 +158,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
+                ErrorCode = result.ErrorCode,
                 Message = result.Message,
                 TotalRecord = result.TotalRecord
             };
@@ -160,6 +169,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -172,13 +182,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
             {
                 return new Return<GetUserAddressesResDto>
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = currentCustomer.ErrorCode,
                     Message = currentCustomer.Message
                 };
             }
@@ -190,7 +201,8 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = string.Format(ErrorMessage.NotFound, "Address")
+                    ErrorCode = existingAddress.ErrorCode,
+                    Message = existingAddress.Message
                 };
             }
 
@@ -211,7 +223,8 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                         IsDefault = existingAddress.Data.IsDefault
                     },
                     IsSuccess = true,
-                    Message = ErrorMessage.NoChanges
+                    ErrorCode = ErrorCodes.Ok,
+                    Message = SuccessMessage.Updated
                 };
             }
 
@@ -223,6 +236,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = isDuplicate.ErrorCode,
                     Message = isDuplicate.Message,
                     TotalRecord = 0
                 };
@@ -237,6 +251,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     {
                         Data = null,
                         IsSuccess = false,
+                        ErrorCode = removeDefault.ErrorCode,
                         Message = removeDefault.Message
                     };
                 }
@@ -260,6 +275,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
+                    ErrorCode = result.ErrorCode,
                     Message = result.Message
                 };
             }
@@ -281,6 +297,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = addressDto,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated
             };
         }
@@ -290,6 +307,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = null,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -300,13 +318,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
     {
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
             {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentCustomer.ErrorCode,
                     Message = currentCustomer.Message,
                     TotalRecord = 0
                 };
@@ -318,6 +337,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
+                ErrorCode = result.ErrorCode,
                 Message = result.Message,
                 TotalRecord = result.TotalRecord
             };
@@ -328,6 +348,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -339,13 +360,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
     {
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
             {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = currentCustomer.ErrorCode,
                     Message = currentCustomer.Message,
                     TotalRecord = 0
                 };
@@ -357,6 +379,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
+                ErrorCode = result.ErrorCode,
                 Message = result.Message,
                 TotalRecord = result.TotalRecord
             };
@@ -367,6 +390,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
@@ -385,6 +409,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = true,
                     IsSuccess = true,
+                    ErrorCode = ErrorCodes.Ok,
                     Message = SuccessMessage.Updated
                 };
 
@@ -400,6 +425,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = false,
                     IsSuccess = false,
+                    ErrorCode = updateAddress.ErrorCode,
                     Message = updateAddress.Message
                 };
             }
@@ -408,6 +434,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = true,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Updated
             };
         }
@@ -417,6 +444,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = false,
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -429,7 +457,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
 
         if (!existingAddresses.IsSuccess || existingAddresses.Data == null)
         {
-            return new Return<bool> { Data = false, IsSuccess = true, Message = existingAddresses.Message };
+            return new Return<bool> { Data = false, IsSuccess = true, ErrorCode = ErrorCodes.AddressAlreadyExists, Message = ErrorMessage.AddressAlreadyExists };
         }
 
         var isDuplicate = existingAddresses.Data != null && existingAddresses.Data.Any(addr =>
@@ -444,6 +472,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         {
             Data = isDuplicate,
             IsSuccess = true,
+            ErrorCode = isDuplicate ? ErrorCodes.AddressAlreadyExists : ErrorCodes.Ok,
             Message = isDuplicate ? ErrorMessage.AddressAlreadyExists : SuccessMessage.Successfully
         };
     }

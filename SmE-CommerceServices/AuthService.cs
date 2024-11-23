@@ -22,7 +22,8 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NotFoundUser
+                    ErrorCode = ErrorCodes.UserNotFound,
+                    Message = ErrorMessage.UserNotFound
                 };
             }
 
@@ -32,6 +33,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.AccountIsInactive,
                     Message = ErrorMessage.AccountIsInactive
                 };
             }
@@ -41,6 +43,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.InvalidCredentials,
                     Message = ErrorMessage.InvalidCredentials
                 };
             }
@@ -54,7 +57,8 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError
+                    ErrorCode = updateResult.ErrorCode,
+                    Message = updateResult.Message
                 };
             }
 
@@ -69,6 +73,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                     Phone = user.Phone,
                 },
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Successfully
             };
         }
@@ -77,6 +82,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             return new Return<LoginResDto>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };
@@ -93,7 +99,8 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.UserAlreadyExists
+                    ErrorCode = ErrorCodes.EmailAlreadyExists,
+                    Message = ErrorMessage.EmailAlreadyExists
                 };
             }
 
@@ -103,6 +110,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
+                    ErrorCode = ErrorCodes.PhoneAlreadyExists,
                     Message = ErrorMessage.PhoneAlreadyExists
                 };
             }
@@ -127,7 +135,8 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError
+                    ErrorCode = userResult.ErrorCode,
+                    Message = userResult.Message
                 };
             }
 
@@ -135,6 +144,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             {
                 Data = true,
                 IsSuccess = true,
+                ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Successfully
             };
         }
@@ -143,6 +153,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             return new Return<bool>
             {
                 IsSuccess = false,
+                ErrorCode = ErrorCodes.InternalServerError,
                 Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex
             };

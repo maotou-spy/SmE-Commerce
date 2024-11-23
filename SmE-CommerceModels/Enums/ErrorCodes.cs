@@ -26,6 +26,8 @@
         public const int AlreadyExists = 201;
         public const int EmailAlreadyExists = 202;
         public const int PhoneAlreadyExists = 203;
+        public const int AddressAlreadyExists = 204;
+        public const int SlugAlreadyExists = 205;
 
         // Out of stock
         public const int OutOfStock = 301;
@@ -33,6 +35,7 @@
         // Authorization
         public const int NotAuthority = 401;
         public const int AccountIsInactive = 402;
+        public const int InvalidCredentials = 403;
 
         // Internal server error
         public const int InternalServerError = 999;

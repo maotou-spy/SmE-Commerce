@@ -15,7 +15,7 @@ namespace SmE_CommerceServices
             try
             {
                 // Validate user
-                var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
+                var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
                 if (!currentUser.IsSuccess || currentUser.Data == null)
                 {
                     return new Return<bool>
@@ -80,7 +80,7 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+                var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
                 if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
                 {
                     return new Return<IEnumerable<GetCategoryResDto>>
@@ -136,7 +136,7 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
                 if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
                 {
                     return new Return<IEnumerable<Category>>
@@ -182,7 +182,7 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+                var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
                 if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
                 {
                     return new Return<GetCategoryDetailResDto?>
@@ -195,7 +195,7 @@ namespace SmE_CommerceServices
 
                 var result = await categoryRepository.GetCategoryByIdAsync(id);
                 if (!result.IsSuccess || result.Data == null)
-                { 
+                {
                     return new Return<GetCategoryDetailResDto?>
                     {
                         Data = null,
@@ -203,15 +203,15 @@ namespace SmE_CommerceServices
                         Message = result.Message
                     };
                 }
-                
+
                 if (result.Data.Status != GeneralStatus.Active)
                     return new Return<GetCategoryDetailResDto?>
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotAvailable
+                        Message = ErrorMessage.NotFoundCategory
                     };
-                
+
                 var categories = new GetCategoryDetailResDto
                 {
                     CategoryId = result.Data!.CategoryId,
@@ -219,7 +219,7 @@ namespace SmE_CommerceServices
                     CategoryImage = result.Data.CategoryImage,
                     Description = result.Data.Description
                 };
-                    
+
                 return new Return<GetCategoryDetailResDto?>
                 {
                     Data = categories,
@@ -238,12 +238,12 @@ namespace SmE_CommerceServices
                 };
             }
         }
-        
+
         public async Task<Return<Category>> GetCategoryDetailForManagerAsync(Guid id)
         {
             try
             {
-                var currentManager = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
                 if (!currentManager.IsSuccess || currentManager.Data == null)
                 {
                     return new Return<Category>
@@ -264,15 +264,15 @@ namespace SmE_CommerceServices
                         Message = result.Message
                     };
                 }
-                
+
                 if (result.Data.Status == GeneralStatus.Deleted)
                     return new Return<Category>
                     {
                         Data = null,
                         IsSuccess = false,
-                        Message = ErrorMessage.NotAvailable
+                        Message = ErrorMessage.NotFoundCategory
                     };
-                    
+
                 return new Return<Category>
                 {
                     Data = result.Data,
@@ -297,7 +297,7 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
                 if (!currentUser.IsSuccess || currentUser.Data == null)
                 {
                     return new Return<bool>
@@ -307,7 +307,7 @@ namespace SmE_CommerceServices
                         Message = currentUser.Message,
                     };
                 }
-                
+
                 var oldCategory = await categoryRepository.GetCategoryByIdAsync(id);
                 if (oldCategory.Data == null || !oldCategory.IsSuccess)
                 {
@@ -318,13 +318,13 @@ namespace SmE_CommerceServices
                         Message = currentUser.Message,
                     };
                 }
-                
+
                 if (oldCategory.Data.Status != GeneralStatus.Active)
                     return new Return<bool>
                     {
                         IsSuccess = false,
                         Data = false,
-                        Message = ErrorMessage.NotAvailable
+                        Message = ErrorMessage.NotFoundCategory
                     };
 
                 oldCategory.Data.Description = req.Description;
@@ -333,7 +333,7 @@ namespace SmE_CommerceServices
                 oldCategory.Data.Status = GeneralStatus.Active;
                 oldCategory.Data.ModifiedAt = DateTime.Now;
                 oldCategory.Data.ModifiedById = currentUser.Data.UserId;
-                
+
                 var result = await categoryRepository.UpdateCategoryAsync(oldCategory.Data);
                 if (!result.IsSuccess)
                     return new Return<bool>
@@ -365,7 +365,7 @@ namespace SmE_CommerceServices
         {
             try
             {
-                var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+                var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
                 if (!currentUser.IsSuccess || currentUser.Data == null)
                 {
                     return new Return<bool>
@@ -385,19 +385,19 @@ namespace SmE_CommerceServices
                         Message = currentUser.Message,
                     };
                 }
-                
+
                 if (category.Data.Status == GeneralStatus.Deleted)
                     return new Return<bool>
                     {
                         IsSuccess = false,
                         Data = false,
-                        Message = ErrorMessage.NotAvailable
+                        Message = ErrorMessage.NotFoundCategory
                     };
-                
+
                 category.Data.Status = GeneralStatus.Deleted;
                 category.Data.ModifiedAt = DateTime.Now;
                 category.Data.ModifiedById = currentUser.Data.UserId;
-                
+
                 var result = await categoryRepository.UpdateCategoryAsync(category.Data);
                 if (result.Data == null || !result.IsSuccess)
                 {

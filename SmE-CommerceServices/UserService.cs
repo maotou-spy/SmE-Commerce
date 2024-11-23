@@ -17,7 +17,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<IEnumerable<User>>
@@ -62,7 +62,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUserWithRole(nameof(RoleEnum.Manager));
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<bool>
@@ -176,7 +176,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<GetUserProfileResDto>
@@ -328,7 +328,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<bool>
@@ -402,7 +402,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            var currentUser = await helperService.GetCurrentUserWithRole(RoleEnum.Manager);
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
             {
                 return new Return<bool>

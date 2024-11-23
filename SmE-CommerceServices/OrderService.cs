@@ -15,7 +15,7 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //     using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
     //     try
     //     {
-    //         var currentCustomer = await helperService.GetCurrentUserWithRole(RoleEnum.Customer);
+    //         var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
     //         if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
     //         {
     //             return new Return<bool>
