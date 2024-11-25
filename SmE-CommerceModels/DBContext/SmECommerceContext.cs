@@ -1026,7 +1026,8 @@ public partial class SmECommerceContext : DbContext
                 .HasColumnName("description");
             entity.Property(e => e.Key)
                 .HasMaxLength(50)
-                .HasComment("Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate")
+                .HasComment(
+                    "Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate")
                 .HasColumnName("key");
             entity.Property(e => e.ModifiedAt)
                 .HasColumnType("timestamp without time zone")

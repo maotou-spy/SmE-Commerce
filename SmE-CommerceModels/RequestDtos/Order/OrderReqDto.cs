@@ -5,8 +5,7 @@ namespace SmE_CommerceModels.RequestDtos.Order;
 
 public class OrderReqDto
 {
-    [Required]
-    public List<CartItemReqDto> CartItems { get; set; } = null!;
+    [Required] public List<CartItemReqDto> CartItems { get; set; } = null!;
 
     public Guid? AddressId { get; set; }
 

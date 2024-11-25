@@ -15,7 +15,7 @@
         public const string Unpublished = "Unpublished";
         public const string Deleted = "Deleted";
     }
-    
+
     public static class DiscountCodeStatus
     {
         public const string Active = "Active";

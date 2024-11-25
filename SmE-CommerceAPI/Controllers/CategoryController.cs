@@ -30,10 +30,14 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at create category user: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<bool>
+            {
+                Message = ErrorMessage.InternalServerError,
+                ErrorCode = ErrorCodes.InternalServerError
+            });
         }
     }
-    
+
     [HttpGet("active")]
     [Authorize]
     public async Task<IActionResult> GetCategoriesForCustomerAsync(string? name, int pageNumber = PagingEnum.PageNumber,
@@ -50,7 +54,11 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at get categories for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<GetProductsResDto>>
+            {
+                Message = ErrorMessage.InternalServerError,
+                ErrorCode = ErrorCodes.InternalServerError
+            });
         }
     }
 
@@ -72,11 +80,15 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get categories for manager: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+                new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Message = ErrorMessage.InternalServerError,
+                    ErrorCode = ErrorCodes.InternalServerError
+                });
         }
     }
 
-    [HttpGet("{id:guid}/active")] 
+    [HttpGet("{id:guid}/active")]
     [Authorize]
     public async Task<IActionResult> GetCategoryDetailForCustomerAsync([FromRoute] Guid id)
     {
@@ -93,11 +105,15 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get category detail for customer: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+                new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Message = ErrorMessage.InternalServerError,
+                    ErrorCode = ErrorCodes.InternalServerError
+                });
         }
     }
-    
-    [HttpGet("{id:guid}")] 
+
+    [HttpGet("{id:guid}")]
     [Authorize]
     public async Task<IActionResult> GetCategoryDetailForManagerAsync([FromRoute] Guid id)
     {
@@ -114,10 +130,14 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at get category detail for manager: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+                new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Message = ErrorMessage.InternalServerError,
+                    ErrorCode = ErrorCodes.InternalServerError
+                });
         }
     }
-    
+
     [HttpPut("{id:guid}")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryDetailAsync([FromRoute] Guid id, [FromBody] AddCategoryReqDto req)
@@ -135,10 +155,11 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at update category detail: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+                new Return<IEnumerable<GetProductsResDto>>
+                    { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
-    
+
     [HttpDelete("{id:guid}")]
     [Authorize]
     public async Task<IActionResult> DeleteCategoryAsync([FromRoute] Guid id)
@@ -146,6 +167,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         try
         {
             var result = await categoryService.DeleteCategoryAsync(id);
+
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at delete category: {ex}", result.InternalErrorMessage);
@@ -156,7 +178,11 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             logger.LogInformation("Error at delete category: {e}", ex);
             return StatusCode(500,
-                new Return<IEnumerable<GetProductsResDto>> { Message = ErrorMessage.InternalServerError });
+                new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Message = ErrorMessage.InternalServerError,
+                    ErrorCode = ErrorCodes.InternalServerError
+                });
         }
     }
 }

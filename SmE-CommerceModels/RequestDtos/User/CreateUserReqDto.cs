@@ -8,13 +8,10 @@ namespace SmE_CommerceModels.RequestDtos.User
         [EmailAddress(ErrorMessage = "Must be email format")]
         public string Email { get; set; } = null!;
 
-        [Required]
-        public string Password { get; set; } = null!;
+        [Required] public string Password { get; set; } = null!;
 
-        [Required]
-        public string FullName { get; set; } = null!;
+        [Required] public string FullName { get; set; } = null!;
 
-        [Required]
-        public string Role { get; set; } = null!;
+        [Required] public string Role { get; set; } = null!;
     }
 }

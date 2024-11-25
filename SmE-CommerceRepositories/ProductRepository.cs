@@ -19,7 +19,7 @@ namespace SmE_CommerceRepositories
                 var product = await dbContext.Products
                     // .Where(x => x.Status != ProductStatus.Deleted)
                     .Include(x => x.ProductCategories)
-                        .ThenInclude(x => x.Category)
+                    .ThenInclude(x => x.Category)
                     .Include(x => x.ProductImages)
                     .Include(x => x.ProductAttributes)
                     .FirstOrDefaultAsync(x => x.ProductId == productId);
@@ -420,7 +420,8 @@ namespace SmE_CommerceRepositories
             }
         }
 
-        public async Task<Return<List<ProductCategory>>> AddProductCategoriesAsync(List<ProductCategory> productCategories)
+        public async Task<Return<List<ProductCategory>>> AddProductCategoriesAsync(
+            List<ProductCategory> productCategories)
         {
             try
             {
@@ -595,7 +596,7 @@ namespace SmE_CommerceRepositories
             try
             {
                 var productImage = await dbContext.ProductImages
-                    .FirstOrDefaultAsync(x =>x.ImageId == productImageId);
+                    .FirstOrDefaultAsync(x => x.ImageId == productImageId);
                 if (productImage is null)
                 {
                     return new Return<ProductImage>
@@ -635,6 +636,5 @@ namespace SmE_CommerceRepositories
         }
 
         #endregion
-
     }
 }

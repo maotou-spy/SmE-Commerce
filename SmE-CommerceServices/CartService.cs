@@ -54,7 +54,8 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
             }
 
             // Check if the cart item exists for the current user
-            var existingCartItem = await cartRepository.GetCartItemByProductIdAndUserIdAsync(cartItem.ProductId, currentCustomer.Data.UserId);
+            var existingCartItem =
+                await cartRepository.GetCartItemByProductIdAndUserIdAsync(cartItem.ProductId, currentCustomer.Data.UserId);
 
             if (existingCartItem is { IsSuccess: true, Data: not null })
             {

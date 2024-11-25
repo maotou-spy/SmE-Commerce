@@ -17,13 +17,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-}).AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-});
+builder.Services.AddControllers()
+    .AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; })
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,14 +44,17 @@ builder.Services.AddScoped<SmECommerceContext>();
 #endregion
 
 #region Firebase Service
+
 var defaultApp = FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile("serviceAccountKey.json"),
 });
 Console.WriteLine(defaultApp.Name);
+
 #endregion
 
 #region Services
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
@@ -62,6 +64,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<BearerTokenUtil>();
+
 #endregion
 
 #region Repository
@@ -76,6 +79,7 @@ builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 #endregion
 
 #region Auth
+
 builder.Services.AddAuthentication(option =>
     {
         option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -86,8 +90,9 @@ builder.Services.AddAuthentication(option =>
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value
-                                                                                        ?? throw new Exception("Invalid Token in configuration"))),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                builder.Configuration.GetSection("AppSettings:Token").Value
+                ?? throw new Exception("Invalid Token in configuration"))),
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
@@ -102,7 +107,8 @@ builder.Services.AddSwaggerGen(c =>
     // Add security definition and requirement for bearer token
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+        Description =
+            "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -151,7 +157,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //Hello World
-app.MapGet("/", [AllowAnonymous] () => "Hello World! Welcome to SmE-Commerce API");
+app.MapGet("/", [AllowAnonymous]() => "Hello World! Welcome to SmE-Commerce API");
 
 app.UseAuthentication();
 

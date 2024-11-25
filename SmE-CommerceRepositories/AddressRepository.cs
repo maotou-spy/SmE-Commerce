@@ -231,7 +231,8 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 ErrorCode = ErrorCodes.Ok,
                 Message = SuccessMessage.Found
             };
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new Return<Address>
             {
