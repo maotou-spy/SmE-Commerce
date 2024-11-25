@@ -12,7 +12,8 @@ namespace SmE_CommerceAPI.Controllers;
 
 [Route("api/users")]
 [Authorize(AuthenticationSchemes = "Defaut")]
-public class UserController(IUserService userService, IAddressService addressService, ILogger<AuthController> logger) : ControllerBase
+public class UserController(IUserService userService, IAddressService addressService, ILogger<AuthController> logger)
+    : ControllerBase
 {
     // [HttpPost]
     // [Authorize]
@@ -54,13 +55,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at get user profile: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -77,13 +78,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at get user profile by manager: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile by manager: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -100,13 +101,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at get user addresses: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user addresses: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -128,13 +129,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at add address: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at add address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -156,13 +157,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at update address: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -179,13 +180,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at delete address: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -202,13 +203,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at set default address: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at set default address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -222,6 +223,7 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
             }
+
             var result = await userService.UpdateProfileAsync(req);
 
             if (result.IsSuccess) return StatusCode(200, result);
@@ -229,19 +231,20 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at update user profile: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update user profile: {e}", ex);
-            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize, [FromQuery] int? pageNumber, [FromQuery] string? phone, [FromQuery] string? email, [FromQuery] string name)
+    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize,
+        [FromQuery] int? pageNumber, [FromQuery] string? phone, [FromQuery] string? email, [FromQuery] string name)
     {
         try
         {
@@ -252,13 +255,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at get all users: {ex}", result.InternalErrorMessage);
             }
-            return Helper.GetErrorResponse(result.Message);
 
+            return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get all users: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError });
         }
     }
 
@@ -274,15 +277,16 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at delete user: {ex}", result.InternalErrorMessage);
             }
+
             return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete user: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError , ErrorCode = ErrorCodes.InternalServerError });
         }
     }
-    
+
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> ChangeUserStatus([FromRoute] Guid id)
@@ -295,12 +299,13 @@ public class UserController(IUserService userService, IAddressService addressSer
             {
                 logger.LogError("Error at change user status: {ex}", result.InternalErrorMessage);
             }
+
             return Helper.GetErrorResponse(result.Message);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at change user status: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { Message = ErrorMessage.InternalServerError, ErrorCode = ErrorCodes.InternalServerError});
         }
     }
 }

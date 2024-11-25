@@ -9,11 +9,11 @@
         public string? Phone { get; set; }
 
         public int? Point { get; set; }
-        
+
         public string? Gender { get; set; }
-        
+
         public DateOnly? Dob { get; set; }
-        
+
         public string? Avatar { get; set; }
     }
 }

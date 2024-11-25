@@ -11,7 +11,7 @@ namespace SmE_CommerceServices;
 
 public class AddressService(IAddressRepository addressRepository, IHelperService helperService) : IAddressService
 {
-    public async Task<Return<IEnumerable<GetUserAddressesResDto>>> GetUserAddressesAsync(int pageSize,int  pageNumber)
+    public async Task<Return<IEnumerable<GetUserAddressesResDto>>> GetUserAddressesAsync(int pageSize, int pageNumber)
     {
         try
         {
@@ -451,7 +451,8 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         }
     }
 
-    private async Task<Return<bool>> CheckDuplicateAddressAsync(AddressReqDto addressReq, Guid userId, Guid? addressId = null)
+    private async Task<Return<bool>> CheckDuplicateAddressAsync(AddressReqDto addressReq, Guid userId,
+        Guid? addressId = null)
     {
         var existingAddresses = await addressRepository.GetAddressesByUserIdAsync(userId);
 
@@ -479,12 +480,18 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
 
     private static bool HasAddressChanged(Address existingAddress, AddressReqDto newAddress)
     {
-        return !string.Equals(existingAddress.ReceiverName.Trim(), newAddress.ReceiverName.Trim(), StringComparison.OrdinalIgnoreCase) ||
-               !string.Equals(existingAddress.ReceiverPhone.Trim(), newAddress.ReceiverPhone.Trim(), StringComparison.OrdinalIgnoreCase) ||
-               !string.Equals(existingAddress.Address1.Trim(), newAddress.Address.Trim(), StringComparison.OrdinalIgnoreCase) ||
-               !string.Equals(existingAddress.Ward.Trim(), newAddress.Ward.Trim(), StringComparison.OrdinalIgnoreCase) ||
-               !string.Equals(existingAddress.District.Trim(), newAddress.District.Trim(), StringComparison.OrdinalIgnoreCase) ||
-               !string.Equals(existingAddress.City.Trim(), newAddress.City.Trim(), StringComparison.OrdinalIgnoreCase) ||
+        return !string.Equals(existingAddress.ReceiverName.Trim(), newAddress.ReceiverName.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.ReceiverPhone.Trim(), newAddress.ReceiverPhone.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.Address1.Trim(), newAddress.Address.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.Ward.Trim(), newAddress.Ward.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.District.Trim(), newAddress.District.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
+               !string.Equals(existingAddress.City.Trim(), newAddress.City.Trim(),
+                   StringComparison.OrdinalIgnoreCase) ||
                existingAddress.IsDefault != newAddress.IsDefault;
     }
 }

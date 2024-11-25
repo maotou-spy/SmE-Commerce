@@ -20,6 +20,7 @@ namespace SmE_CommerceAPI.Controllers
             {
                 logger.LogError("Error at login: {ex}", result.InternalErrorMessage);
             }
+
             return Helper.GetErrorResponse(result.Message);
         }
 
@@ -34,6 +35,7 @@ namespace SmE_CommerceAPI.Controllers
             {
                 logger.LogError("Error at register: {ex}", result.InternalErrorMessage);
             }
+
             return Helper.GetErrorResponse(result.Message);
         }
     }

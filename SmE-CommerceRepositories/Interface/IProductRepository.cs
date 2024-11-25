@@ -7,7 +7,9 @@ namespace SmE_CommerceRepositories.Interface
     {
         Task<Return<Product>> GetProductByIdAsync(Guid productId);
         Task<Return<string>> GetProductSlugAsync(string slug);
+
         Task<Return<Product>> AddProductAsync(Product product);
+
         // Task<Return<IEnumerable<GetProductsResDto>>> GetProductsForCustomerAsync(string? keyword, string? sortBy,
         //     int pageNumber = 1, int pageSize = 10);
         Task<Return<Product>> UpdateProductAsync(Product product);

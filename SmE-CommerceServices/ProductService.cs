@@ -11,7 +11,10 @@ using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IHelperService helperService) : IProductService
+public class ProductService(
+    IProductRepository productRepository,
+    ICategoryRepository categoryRepository,
+    IHelperService helperService) : IProductService
 {
     #region Product
 
@@ -27,6 +30,14 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     IsSuccess = false,
                     ErrorCode = ErrorCodes.ProductNotFound,
                     Message = result.Message
+                };
+            if (result.Data.Status != ProductStatus.Active)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    Message = ErrorMessage.ProductNotFound,
+                    ErrorCode = ErrorCodes.ProductNotFound
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -224,7 +235,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 };
             }
 
-            if(req.CategoryIds.Count == 0)
+            if (req.CategoryIds.Count == 0)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
@@ -334,7 +345,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
             productResult.Data.Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim();
             productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
             productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
-            if(req.MetaKeywords != null)
+            if (req.MetaKeywords != null)
                 productResult.Data.Keywords = req.MetaKeywords;
             productResult.Data.Status = req.StockQuantity > 0
                 ? req.Status != ProductStatus.Inactive
@@ -674,7 +685,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Message = productImageResult.Message
                 };
             // Check if the image belongs to the product
-            if(productImageResult.Data.ProductId != productId)
+            if (productImageResult.Data.ProductId != productId)
                 return new Return<GetProductImageResDto>
                 {
                     Data = null,
@@ -746,7 +757,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                     Message = productImageResult.Message
                 };
             // Check if the image belongs to the product
-            if(productImageResult.Data.ProductId != productId)
+            if (productImageResult.Data.ProductId != productId)
                 return new Return<bool>
                 {
                     Data = false,
@@ -932,7 +943,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 };
 
             // Check if the attribute belongs to the product
-            if(productAttributeResult.Data.Productid != productId)
+            if (productAttributeResult.Data.Productid != productId)
                 return new Return<bool>
                 {
                     Data = false,
@@ -1000,7 +1011,7 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                         : ProductStatus.Inactive
                     : ProductStatus.OutOfStock,
                 CreateById = currentUserId,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now
             };
 
             // Add Product to the database
@@ -1015,7 +1026,8 @@ public class ProductService(IProductRepository productRepository, ICategoryRepos
                 };
 
             // Only add active categories
-            var categoryResult = await categoryRepository.GetCategoriesAsync(status: GeneralStatus.Active, name: null, pageNumber:null, pageSize: null);
+            var categoryResult = await categoryRepository.GetCategoriesAsync(status: GeneralStatus.Active, name: null,
+                pageNumber: null, pageSize: null);
             if (!categoryResult.IsSuccess)
                 return new Return<GetProductDetailsResDto>
                 {

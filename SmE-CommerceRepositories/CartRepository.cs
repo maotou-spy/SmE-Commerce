@@ -51,7 +51,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 IsSuccess = true,
                 TotalRecord = cart == null ? 0 : 1,
                 ErrorCode = cart == null ? ErrorCodes.CartNotFound : ErrorCodes.Ok,
-                Message = cart == null ? ErrorMessage.CartNotFound :SuccessMessage.Found
+                Message = cart == null ? ErrorMessage.CartNotFound : SuccessMessage.Found
             };
         }
         catch (Exception ex)

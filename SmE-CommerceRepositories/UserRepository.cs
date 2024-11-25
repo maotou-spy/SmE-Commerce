@@ -10,8 +10,8 @@ namespace SmE_CommerceRepositories;
 public class UserRepository(SmECommerceContext dbContext) : IUserRepository
 {
     public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(
-    string? status, int? pageSize, int? pageNumber,
-    string? phone, string? email, string? name)
+        string? status, int? pageSize, int? pageNumber,
+        string? phone, string? email, string? name)
     {
         try
         {

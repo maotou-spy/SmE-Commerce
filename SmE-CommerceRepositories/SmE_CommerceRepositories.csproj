@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>SmE_CommerceRepositories</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>SmE_CommerceRepositories</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SmE-CommerceModels\SmE_CommerceModels.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SmE-CommerceModels\SmE_CommerceModels.csproj"/>
+    </ItemGroup>
 
 </Project>

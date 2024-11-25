@@ -13,9 +13,8 @@ namespace SmE_CommerceModels.RequestDtos.Category
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Category name can only contain letters and spaces.")]
         public required string Name { get; set; } = null!;
 
-        [Required]
-        public required string CategoryImage { get; set; }
-        
+        [Required] public required string CategoryImage { get; set; }
+
         public string? Description { get; set; }
     }
 }

@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>SmE_CommerceServices</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>SmE_CommerceServices</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FirebaseAdmin" Version="3.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FirebaseAdmin" Version="3.0.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SmE-CommerceRepositories\SmE_CommerceRepositories.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SmE-CommerceRepositories\SmE_CommerceRepositories.csproj"/>
+    </ItemGroup>
 
 </Project>
