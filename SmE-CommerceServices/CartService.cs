@@ -22,8 +22,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InvalidInput,
-                    Message = ErrorMessage.InvalidInput
+                    StatusCode = ErrorCode.ValidationError
                 };
             }
 
@@ -35,8 +34,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.NotAuthority,
-                    Message = currentCustomer.Message
+                    StatusCode = ErrorCode.NotAuthority
                 };
             }
 
@@ -48,8 +46,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductNotFound,
-                    Message = ErrorMessage.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound
                 };
             }
 
@@ -68,18 +65,22 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                     {
                         Data = false,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.OutOfStock,
-                        Message = ErrorMessage.OutOfStock
+                        StatusCode = ErrorCode.OutOfStock
                     };
                 }
 
                 // Update existing cart item
                 existingCartItem.Data.Quantity = newQuantity;
                 var updatedCart = await cartRepository.UpdateCartItemAsync(existingCartItem.Data);
-
                 if (!updatedCart.IsSuccess)
                 {
-                    throw new Exception(updatedCart.Message);
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = updatedCart.StatusCode,
+                        InternalErrorMessage = updatedCart.InternalErrorMessage
+                    };
                 }
 
                 // Complete transaction and return success
@@ -88,8 +89,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                 {
                     Data = true,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Updated
+                    StatusCode = ErrorCode.Ok
                 };
             }
 
@@ -100,8 +100,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.OutOfStock,
-                    Message = ErrorMessage.OutOfStock
+                    StatusCode = ErrorCode.OutOfStock
                 };
             }
 
@@ -118,7 +117,13 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
 
             if (!addedResult.IsSuccess)
             {
-                throw new Exception(addedResult.Message);
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = addedResult.StatusCode,
+                    InternalErrorMessage = addedResult.InternalErrorMessage
+                };
             }
 
             // Complete transaction and return success
@@ -127,8 +132,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Created
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -137,8 +141,7 @@ public class CartService(ICartRepository cartRepository, IProductRepository prod
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }

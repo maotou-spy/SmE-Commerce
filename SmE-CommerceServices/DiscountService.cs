@@ -30,9 +30,8 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -43,8 +42,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.NameAlreadyExists,
-                    ErrorCode = ErrorCodes.NameAlreadyExists
+                    StatusCode = ErrorCode.NameAlreadyExists
                 };
             }
 
@@ -56,8 +54,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidPercentage,
-                        ErrorCode = ErrorCodes.InvalidPercentage
+                        StatusCode = ErrorCode.InvalidPercentage
                     };
                 }
 
@@ -66,8 +63,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidNumber,
-                        ErrorCode = ErrorCodes.InvalidNumber
+                        StatusCode = ErrorCode.InvalidNumber
                     };
                 }
             }
@@ -78,8 +74,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidNumber,
-                        ErrorCode = ErrorCodes.InvalidNumber
+                        StatusCode = ErrorCode.InvalidNumber
                     };
                 }
             }
@@ -92,8 +87,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
 
@@ -102,8 +96,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
 
@@ -113,8 +106,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
             }
@@ -124,8 +116,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidNumber,
-                    ErrorCode = ErrorCodes.InvalidNumber
+                    StatusCode = ErrorCode.InvalidNumber
                 };
             }
 
@@ -134,8 +125,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidNumber,
-                    ErrorCode = ErrorCodes.InvalidNumber
+                    StatusCode = ErrorCode.InvalidNumber
                 };
             }
 
@@ -147,8 +137,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidNumber,
-                        ErrorCode = ErrorCodes.InvalidNumber
+                        StatusCode = ErrorCode.InvalidNumber
                     };
                 }
 
@@ -157,8 +146,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidNumber,
-                        ErrorCode = ErrorCodes.InvalidNumber
+                        StatusCode = ErrorCode.InvalidNumber
                     };
                 }
             }
@@ -171,8 +159,16 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.DiscountNotFound,
-                        ErrorCode = ErrorCodes.DiscountNotFound
+                        StatusCode = ErrorCode.DiscountNotFound
+                    };
+                }
+
+                if (productExists.Data?.Status == GeneralStatus.Inactive)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound
                     };
                 }
             }
@@ -205,9 +201,8 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = result.Message,
                     InternalErrorMessage = result.InternalErrorMessage,
-                    ErrorCode = result.ErrorCode
+                    StatusCode = result.StatusCode
                 };
             }
 
@@ -235,8 +230,7 @@ public class DiscountService(
                         return new Return<bool>
                         {
                             IsSuccess = false,
-                            Message = ErrorMessage.DiscountCodeAlreadyExists,
-                            ErrorCode = ErrorCodes.DiscountCodeAlreadyExists
+                            StatusCode = ErrorCode.DiscountCodeAlreadyExists
                         };
                 }
             }
@@ -250,8 +244,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
 
@@ -276,8 +269,7 @@ public class DiscountService(
                 {
                     Data = true,
                     IsSuccess = true,
-                    Message = SuccessMessage.Created,
-                    ErrorCode = ErrorCodes.Ok
+                    StatusCode = ErrorCode.Ok
                 };
             var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
             if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
@@ -285,9 +277,8 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = addProductsResult.Message,
                     InternalErrorMessage = addProductsResult.InternalErrorMessage,
-                    ErrorCode = addProductsResult.ErrorCode
+                    StatusCode = addProductsResult.StatusCode
                 };
             }
 
@@ -297,8 +288,7 @@ public class DiscountService(
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessMessage.Created,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -307,9 +297,8 @@ public class DiscountService(
             {
                 Data = false,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = e,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -329,9 +318,8 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -341,8 +329,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidDiscountCode,
-                    ErrorCode = ErrorCodes.InvalidDiscountCode
+                    StatusCode = ErrorCode.InvalidDiscountCode
                 };
             }
 
@@ -353,8 +340,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = discount.Message,
-                    ErrorCode = discount.ErrorCode
+                    StatusCode = discount.StatusCode
                 };
             }
 
@@ -367,8 +353,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = existedUser.Message,
-                        ErrorCode = existedUser.ErrorCode
+                        StatusCode = existedUser.StatusCode
                     };
                 }
             }
@@ -380,8 +365,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
 
@@ -390,8 +374,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
 
@@ -400,8 +383,7 @@ public class DiscountService(
                     return new Return<bool>
                     {
                         IsSuccess = false,
-                        Message = ErrorMessage.InvalidDate,
-                        ErrorCode = ErrorCodes.InvalidDate
+                        StatusCode = ErrorCode.InvalidDate
                     };
                 }
             }
@@ -412,8 +394,7 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.DiscountCodeAlreadyExists,
-                    ErrorCode = ErrorCodes.DiscountCodeAlreadyExists
+                    StatusCode = ErrorCode.DiscountCodeAlreadyExists
                 };
             }
 
@@ -437,9 +418,8 @@ public class DiscountService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = result.Message,
                     InternalErrorMessage = result.InternalErrorMessage,
-                    ErrorCode = result.ErrorCode
+                    StatusCode = result.StatusCode
                 };
             }
 
@@ -447,8 +427,7 @@ public class DiscountService(
             {
                 Data = true,
                 IsSuccess = true,
-                Message = SuccessMessage.Created,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -457,9 +436,8 @@ public class DiscountService(
             {
                 Data = false,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = e,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -474,9 +452,8 @@ public class DiscountService(
                 return new Return<GetDiscountCodeByCodeResDto>
                 {
                     IsSuccess = false,
-                    Message = result.Message,
                     InternalErrorMessage = result.InternalErrorMessage,
-                    ErrorCode = result.ErrorCode
+                    StatusCode = result.StatusCode
                 };
             }
 
@@ -495,9 +472,8 @@ public class DiscountService(
             {
                 Data = res,
                 IsSuccess = true,
-                Message = res != null ? SuccessMessage.Found : ErrorMessage.DiscountNotFound,
                 TotalRecord = res != null ? 1 : 0,
-                ErrorCode = res != null ? ErrorCodes.Ok : ErrorCodes.DiscountNotFound
+                StatusCode = res != null ? ErrorCode.Ok : ErrorCode.DiscountNotFound
             };
         }
         catch (Exception e)
@@ -506,9 +482,8 @@ public class DiscountService(
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = e,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }

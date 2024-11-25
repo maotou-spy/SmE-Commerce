@@ -2,11 +2,11 @@
 {
     public class Return<T>
     {
-        public required int ErrorCode { get; set; } = 999;
-        public T? Data { get; set; }
-        public required string Message { get; set; }
-        public int? TotalRecord { get; set; }
-        public bool IsSuccess { get; set; } = false;
-        public Exception? InternalErrorMessage { get; set; }
+        public required int StatusCode { get; init; } = 999;
+        public T? Data { get; init; }
+        public int TotalRecord { get; init; }
+        public Dictionary<string, List<string>?>? ValidationErrors { get; set; }
+        public bool IsSuccess { get; init; }
+        public Exception? InternalErrorMessage { get; init; }
     }
 }

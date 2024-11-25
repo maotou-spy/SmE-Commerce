@@ -22,8 +22,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.UserNotFound,
-                    Message = ErrorMessage.UserNotFound
+                    StatusCode = ErrorCode.UserNotFound
                 };
             }
 
@@ -33,8 +32,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.AccountIsInactive,
-                    Message = ErrorMessage.AccountIsInactive
+                    StatusCode = ErrorCode.AccountIsInactive
                 };
             }
 
@@ -43,8 +41,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InvalidCredentials,
-                    Message = ErrorMessage.InvalidCredentials
+                    StatusCode = ErrorCode.InvalidCredentials
                 };
             }
 
@@ -57,8 +54,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    ErrorCode = updateResult.ErrorCode,
-                    Message = updateResult.Message
+                    StatusCode = updateResult.StatusCode
                 };
             }
 
@@ -73,8 +69,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                     Phone = user.Phone,
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Successfully
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -82,8 +77,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             return new Return<LoginResDto>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -99,8 +93,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.EmailAlreadyExists,
-                    Message = ErrorMessage.EmailAlreadyExists
+                    StatusCode = ErrorCode.EmailAlreadyExists
                 };
             }
 
@@ -110,8 +103,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.PhoneAlreadyExists,
-                    Message = ErrorMessage.PhoneAlreadyExists
+                    StatusCode = ErrorCode.PhoneAlreadyExists
                 };
             }
 
@@ -135,8 +127,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    ErrorCode = userResult.ErrorCode,
-                    Message = userResult.Message
+                    StatusCode = userResult.StatusCode
                 };
             }
 
@@ -144,8 +135,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Successfully
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -153,8 +143,7 @@ public class AuthService(IUserRepository userRepository, BearerTokenUtil bearerT
             return new Return<bool>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }

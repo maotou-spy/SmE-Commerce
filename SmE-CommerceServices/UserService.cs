@@ -24,8 +24,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -35,18 +34,16 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    Message = users.Message,
-                    ErrorCode = users.ErrorCode
+                    StatusCode = users.StatusCode
                 };
             }
 
             return new Return<IEnumerable<User>>
             {
                 IsSuccess = true,
-                Message = users.Message,
+                StatusCode = users.StatusCode,
                 Data = users.Data,
                 TotalRecord = users.TotalRecord,
-                ErrorCode = users.ErrorCode
             };
         }
         catch (Exception ex)
@@ -54,9 +51,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<IEnumerable<User>>
             {
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                ErrorCode = ErrorCodes.InternalServerError
             };
         }
     }
@@ -72,8 +68,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -84,8 +79,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.EmailAlreadyExists,
-                    ErrorCode = ErrorCodes.EmailAlreadyExists
+                    StatusCode = ErrorCode.UserAlreadyExists
                 };
             }
 
@@ -106,18 +100,16 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = createResult.Message,
+                    StatusCode = createResult.StatusCode,
                     InternalErrorMessage = createResult.InternalErrorMessage,
-                    ErrorCode = createResult.ErrorCode
                 };
             }
 
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = createResult.Message,
+                StatusCode = createResult.StatusCode,
                 Data = true,
-                ErrorCode = createResult.ErrorCode
             };
         }
         catch (Exception ex)
@@ -126,9 +118,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                ErrorCode = ErrorCodes.InternalServerError
             };
         }
     }
@@ -144,9 +135,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
+                    StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
                 };
             }
 
@@ -165,8 +155,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = user,
-                Message = SuccessMessage.Successfully,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -175,10 +164,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                ErrorCode = ErrorCodes.InternalServerError
             };
         }
     }
@@ -194,9 +182,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
+                    StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
                 };
             }
 
@@ -206,9 +193,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
-                    Message = user.Message,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    ErrorCode = user.ErrorCode
+                    StatusCode = user.StatusCode
                 };
             }
 
@@ -227,9 +213,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = userProfileDto,
-                Message = SuccessMessage.Successfully,
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = user.TotalRecord,
-                ErrorCode = ErrorCodes.Ok
             };
         }
         catch (Exception ex)
@@ -238,10 +223,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                ErrorCode = ErrorCodes.InternalServerError
             };
         }
     }
@@ -258,9 +242,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
+                    StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
                 };
             }
 
@@ -270,9 +253,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = user.Message,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    ErrorCode = user.ErrorCode
+                    StatusCode = user.StatusCode
                 };
             }
 
@@ -282,8 +264,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.PhoneAlreadyExists,
-                    ErrorCode = ErrorCodes.PhoneAlreadyExists
+                    StatusCode = ErrorCode.PhoneAlreadyExists,
                 };
             }
 
@@ -292,8 +273,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InvalidDate,
-                    ErrorCode = ErrorCodes.InvalidDate
+                    StatusCode = ErrorCode.ValidationError
                 };
             }
 
@@ -303,9 +283,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = true,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     Data = true,
-                    ErrorCode = ErrorCodes.Ok
                 };
             }
 
@@ -322,9 +301,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = updateResult.Message,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    ErrorCode = updateResult.ErrorCode
+                    StatusCode = updateResult.StatusCode
                 };
             }
 
@@ -333,9 +311,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessMessage.Updated,
                 Data = true,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -343,9 +320,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -361,9 +337,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -373,9 +348,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.UserNotFound,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    ErrorCode = user.ErrorCode
+                    StatusCode = user.StatusCode
                 };
             }
 
@@ -389,9 +363,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = updateResult.Message,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    ErrorCode = updateResult.ErrorCode
+                    StatusCode = updateResult.StatusCode
                 };
             }
 
@@ -400,9 +373,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessMessage.Updated,
                 Data = true,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -411,10 +383,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 Data = false,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -430,9 +401,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = currentUser.Message,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    ErrorCode = currentUser.ErrorCode
+                    StatusCode = currentUser.StatusCode
                 };
             }
 
@@ -442,9 +412,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.UserNotFound,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    ErrorCode = user.ErrorCode
+                    StatusCode = user.StatusCode
                 };
             }
 
@@ -458,9 +427,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    Message = ErrorMessage.InternalServerError,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    ErrorCode = updateResult.ErrorCode
+                    StatusCode = updateResult.StatusCode
                 };
             }
 
@@ -469,9 +437,8 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             return new Return<bool>
             {
                 IsSuccess = true,
-                Message = SuccessMessage.Updated,
                 Data = true,
-                ErrorCode = ErrorCodes.Ok
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -480,10 +447,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 Data = false,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }

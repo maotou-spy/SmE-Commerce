@@ -20,8 +20,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = category,
                 IsSuccess = true,
-                Message = SuccessMessage.Created,
-                ErrorCode = ErrorCodes.Ok,
+
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = 1
             };
         }
@@ -31,8 +31,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError,
+
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
             };
@@ -53,18 +53,16 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.CategoryNotFound,
-                    ErrorCode = ErrorCodes.CategoryNotFound,
+                    StatusCode = ErrorCode.CategoryNotFound,
                     TotalRecord = 0
                 };
             }
-                
+
             return new Return<Category>
             {
                 Data = result,
                 IsSuccess = true,
-                Message = SuccessMessage.Found,
-                ErrorCode = ErrorCodes.Ok,
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = 1
             };
         }
@@ -74,8 +72,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError,
+
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
             };
@@ -114,8 +112,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = result,
                 IsSuccess = true,
-                Message = SuccessMessage.Successfully,
-                ErrorCode = ErrorCodes.Ok,
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = totalRecords
             };
         }
@@ -125,8 +122,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError,
+
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
             };
@@ -144,18 +141,16 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.CategoryNotFound,
-                    ErrorCode = ErrorCodes.CategoryNotFound,
+                    StatusCode = ErrorCode.CategoryNotFound,
                     TotalRecord = 0
                 };
             }
-                
+
             return new Return<Category>
             {
                 Data = result,
                 IsSuccess = true,
-                Message = SuccessMessage.Found,
-                ErrorCode = ErrorCodes.Ok,
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = 1
             };
         }
@@ -165,8 +160,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError,
+
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
             };
@@ -184,8 +179,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = category,
                 IsSuccess = true,
-                Message = SuccessMessage.Updated,
-                ErrorCode = ErrorCodes.Ok,
+                StatusCode = ErrorCode.Ok,
                 TotalRecord = 1
             };
         }
@@ -195,8 +189,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError,
+
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
             };

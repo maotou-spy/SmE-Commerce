@@ -28,16 +28,14 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductNotFound,
-                    Message = result.Message
+                    StatusCode = ErrorCode.ProductNotFound
                 };
             if (result.Data.Status != ProductStatus.Active)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
-                    Message = ErrorMessage.ProductNotFound,
-                    ErrorCode = ErrorCodes.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -76,8 +74,7 @@ public class ProductService(
                     }).ToList()
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -86,8 +83,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -103,8 +99,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentManager.ErrorCode,
-                    Message = currentManager.Message
+                    StatusCode = currentManager.StatusCode
                 };
 
             var result = await productRepository.GetProductByIdAsync(productId);
@@ -113,8 +108,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductNotFound,
-                    Message = result.Message
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             return new Return<ManagerGetProductDetailResDto>
@@ -157,8 +151,7 @@ public class ProductService(
                     ModifiedBy = result.Data.ModifiedBy?.FullName
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -167,8 +160,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -184,15 +176,13 @@ public class ProductService(
     //             return new Return<IEnumerable<GetProductsResDto>>
     //             {
     //                 Data = null,
-    //                 IsSuccess = false,
-    //                 Message = result.Message
+    //                 IsSuccess = false
     //             };
     //
     //         return new Return<IEnumerable<GetProductsResDto>>
     //         {
     //             Data = result.Data,
     //             IsSuccess = true,
-    //             Message = result.Message,
     //             TotalRecord = result.TotalRecord
     //         };
     //     }
@@ -202,7 +192,6 @@ public class ProductService(
     //         {
     //             Data = null,
     //             IsSuccess = false,
-    //             Message = ErrorMessage.InternalServerError,
     //             InternalErrorMessage = ex
     //         };
     //     }
@@ -219,8 +208,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             // Check if the product data is valid
@@ -230,8 +218,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InvalidInput,
-                    Message = ErrorMessage.InvalidInput
+                    StatusCode = ErrorCode.ValidationError
                 };
             }
 
@@ -240,8 +227,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InvalidInput,
-                    Message = ErrorMessage.InvalidInput
+                    StatusCode = ErrorCode.ValidationError
                 };
 
             if (req.Slug != null)
@@ -252,8 +238,7 @@ public class ProductService(
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.SlugAlreadyExists,
-                        Message = ErrorMessage.SlugAlreadyExists
+                        StatusCode = ErrorCode.SlugAlreadyExists
                     };
             }
 
@@ -264,16 +249,14 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = prdResult.ErrorCode,
-                    Message = prdResult.Message
+                    StatusCode = prdResult.StatusCode
                 };
 
             return new Return<GetProductDetailsResDto>
             {
                 Data = prdResult.Data,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = prdResult.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -283,8 +266,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -301,8 +283,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productResult = await productRepository.GetProductByIdAsync(productId);
@@ -311,8 +292,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = productResult.ErrorCode,
-                    Message = productResult.Message
+                    StatusCode = productResult.StatusCode
                 };
             // Check if the product is deleted
             if (productResult.Data.Status == ProductStatus.Deleted)
@@ -320,8 +300,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductNotFound,
-                    Message = ErrorMessage.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             // Check if the product data is valid
@@ -331,8 +310,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InvalidInput,
-                    Message = ErrorMessage.InvalidInput
+                    StatusCode = ErrorCode.ValidationError
                 };
             }
 
@@ -362,8 +340,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -402,8 +379,7 @@ public class ProductService(
                     Status = result.Data.Status
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Updated
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -412,8 +388,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -430,8 +405,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             // Get the product
@@ -441,8 +415,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = product.ErrorCode,
-                    Message = product.Message
+                    StatusCode = product.StatusCode
                 };
             // Check if the product is deleted
             if (product.Data.Status == ProductStatus.Deleted)
@@ -450,8 +423,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductNotFound,
-                    Message = ErrorMessage.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             // Update product status to deleted
@@ -465,16 +437,14 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Deleted
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -484,8 +454,7 @@ public class ProductService(
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -507,8 +476,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             // Get current categories of the product
@@ -518,8 +486,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentCategories.ErrorCode,
-                    Message = currentCategories.Message
+                    StatusCode = currentCategories.StatusCode
                 };
 
             // Get current category ids
@@ -544,8 +511,7 @@ public class ProductService(
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = addResult.ErrorCode,
-                        Message = addResult.Message
+                        StatusCode = addResult.StatusCode
                     };
             }
 
@@ -558,8 +524,7 @@ public class ProductService(
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = deleteResult.ErrorCode,
-                        Message = deleteResult.Message
+                        StatusCode = deleteResult.StatusCode
                     };
             }
 
@@ -570,8 +535,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = updatedCategories.ErrorCode,
-                    Message = updatedCategories.Message
+                    StatusCode = updatedCategories.StatusCode
                 };
 
             return new Return<List<GetProductCategoryResDto>>
@@ -582,8 +546,7 @@ public class ProductService(
                     Name = category.Category?.Name ?? string.Empty
                 }).ToList(),
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Updated
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -592,8 +555,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -613,8 +575,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productImage = new ProductImage
@@ -630,8 +591,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<GetProductImageResDto>
@@ -643,8 +603,7 @@ public class ProductService(
                     AltText = result.Data.AltText
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -653,8 +612,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -671,8 +629,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
@@ -681,8 +638,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = productImageResult.ErrorCode,
-                    Message = productImageResult.Message
+                    StatusCode = productImageResult.StatusCode
                 };
             // Check if the image belongs to the product
             if (productImageResult.Data.ProductId != productId)
@@ -690,8 +646,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductImageNotFound,
-                    Message = ErrorMessage.ProductImageNotFound
+                    StatusCode = ErrorCode.ProductImageNotFound
                 };
 
             productImageResult.Data.Url = req.Url;
@@ -703,8 +658,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<GetProductImageResDto>
@@ -716,8 +670,7 @@ public class ProductService(
                     AltText = result.Data.AltText
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -726,8 +679,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -743,8 +695,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
@@ -753,8 +704,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = productImageResult.ErrorCode,
-                    Message = productImageResult.Message
+                    StatusCode = productImageResult.StatusCode
                 };
             // Check if the image belongs to the product
             if (productImageResult.Data.ProductId != productId)
@@ -762,8 +712,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductImageNotFound,
-                    Message = ErrorMessage.ProductImageNotFound
+                    StatusCode = ErrorCode.ProductImageNotFound
                 };
 
             var result = await productRepository.DeleteProductImageAsync(imageId);
@@ -772,16 +721,14 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -790,8 +737,7 @@ public class ProductService(
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -812,8 +758,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productAttribute = new ProductAttribute
@@ -829,8 +774,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<GetProductAttributeResDto>
@@ -842,8 +786,7 @@ public class ProductService(
                     Value = result.Data.Attributevalue
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -852,8 +795,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -870,8 +812,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productAttribute = new ProductAttribute
@@ -888,8 +829,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<GetProductAttributeResDto>
@@ -901,8 +841,7 @@ public class ProductService(
                     Value = result.Data.Attributevalue
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -911,8 +850,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -928,8 +866,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = currentUser.ErrorCode,
-                    Message = currentUser.Message
+                    StatusCode = currentUser.StatusCode
                 };
 
             var productAttributeResult = await productRepository.GetProductAttributeByIdAsync(attributeId);
@@ -938,8 +875,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = productAttributeResult.ErrorCode,
-                    Message = productAttributeResult.Message
+                    StatusCode = productAttributeResult.StatusCode
                 };
 
             // Check if the attribute belongs to the product
@@ -948,8 +884,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.ProductAttributeNotFound,
-                    Message = ErrorMessage.ProductAttributeNotFound
+                    StatusCode = ErrorCode.ProductAttributeNotFound
                 };
 
             var result = await productRepository.DeleteProductAttributeAsync(attributeId);
@@ -958,16 +893,14 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = result.Message
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -976,8 +909,7 @@ public class ProductService(
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex
             };
         }
@@ -1021,8 +953,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = result.ErrorCode,
-                    Message = result.Message
+                    StatusCode = result.StatusCode
                 };
 
             // Only add active categories
@@ -1033,8 +964,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = categoryResult.ErrorCode,
-                    Message = categoryResult.Message
+                    StatusCode = categoryResult.StatusCode
                 };
 
             var categories = categoryResult.Data?.Where(c => req.CategoryIds.Contains(c.CategoryId)).ToList();
@@ -1043,8 +973,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.CategoryNotFound,
-                    Message = ErrorMessage.CategoryNotFound
+                    StatusCode = ErrorCode.CategoryNotFound
                 };
 
             result.Data.ProductCategories = categories.Select(category => new ProductCategory
@@ -1078,8 +1007,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = productResult.ErrorCode,
-                    Message = productResult.Message
+                    StatusCode = productResult.StatusCode
                 };
 
             transaction.Complete();
@@ -1120,8 +1048,7 @@ public class ProductService(
                     }).ToList()
                 },
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Created
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -1130,8 +1057,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e
             };
         }

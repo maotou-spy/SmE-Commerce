@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.ReturnResult;
@@ -7,51 +8,91 @@ namespace SmE_CommerceAPI.HelperClass;
 
 public static class Helper
 {
+    /// <summary>
+    /// Return error response from model state.
+    /// </summary>
     public static Return<Dictionary<string, List<string>?>> GetValidationErrors(ModelStateDictionary modelState)
     {
-        var errors = modelState.ToDictionary(
-            entry => entry.Key,
-            entry => entry.Value?.Errors.Select(error => error.ErrorMessage).ToList()
-        );
+        var errors = modelState
+            .Where(entry => entry.Value != null && entry.Value.Errors.Any())
+            .ToDictionary(
+                entry => entry.Key,
+                entry => entry.Value?.Errors.Select(error => error.ErrorMessage).ToList()
+            );
 
         return new Return<Dictionary<string, List<string>?>>
         {
-            Data = errors,
+            ValidationErrors = errors,
             IsSuccess = false,
-            Message = ErrorMessage.InvalidInput
+            StatusCode = ErrorCode.ValidationError
         };
     }
 
-    public static IActionResult GetErrorResponse(string error)
+    /// <summary>
+    /// Return error response with status code.
+    /// </summary>
+    public static IActionResult GetErrorResponse(int statusCode)
     {
         var result = new Return<dynamic>
         {
-            Message = error
+            IsSuccess = false,
+            StatusCode = statusCode
         };
 
-        var statusCode = GetStatusCode(error);
+        var httpStatusCode = GetHttpStatusCode(statusCode);
+
         return new ObjectResult(result)
         {
-            StatusCode = statusCode
+            StatusCode = (int)httpStatusCode
         };
     }
 
-    private static int GetStatusCode(string error)
-        => error switch
+    /// <summary>
+    /// Map status code to HTTP status code.
+    /// </summary>
+    private static HttpStatusCode GetHttpStatusCode(int statusCode)
+    {
+        return statusCode switch
         {
-            ErrorMessage.NotAuthentication => 401,
-            ErrorMessage.NotAuthority => 403,
-            ErrorMessage.InvalidInput => 400,
-            ErrorMessage.InvalidPercentage => 400,
-            ErrorMessage.InvalidDate => 400,
-            not null when error.Contains(ErrorMessage.NotFound) => 404,
-            not null when error.Contains(ErrorMessage.AlreadyExists) => 409,
-            ErrorMessage.InvalidPassword => 400,
-            ErrorMessage.InvalidEmail => 400,
-            ErrorMessage.InvalidToken => 401,
-            ErrorMessage.InvalidCredentials => 401,
-            ErrorMessage.AccountIsInactive => 403,
-            ErrorMessage.OutOfStock => 400,
-            _ => 500
+            // Authentication errors
+            ErrorCode.NotAuthority or ErrorCode.AccountIsInactive => HttpStatusCode.Forbidden, // 403
+            ErrorCode.InvalidToken or ErrorCode.InvalidCredentials => HttpStatusCode.Unauthorized, // 401
+
+            // Validation errors
+            ErrorCode.InvalidPercentage or
+            ErrorCode.InvalidDate or
+            ErrorCode.InvalidPassword or
+            ErrorCode.InvalidEmail => HttpStatusCode.BadRequest, // 400
+
+            // Resource not found
+            ErrorCode.ProductNotFound or
+            ErrorCode.CategoryNotFound or
+            ErrorCode.UserNotFound or
+            ErrorCode.OrderNotFound or
+            ErrorCode.DiscountNotFound or
+            ErrorCode.AddressNotFound or
+            ErrorCode.CartNotFound or
+            ErrorCode.ProductImageNotFound or
+            ErrorCode.ProductAttributeNotFound => HttpStatusCode.NotFound, // 404
+
+            // Conflict (already exists)
+            ErrorCode.EmailAlreadyExists or
+            ErrorCode.PhoneAlreadyExists or
+            ErrorCode.NameAlreadyExists or
+            ErrorCode.AddressAlreadyExists or
+            ErrorCode.SlugAlreadyExists or
+            ErrorCode.DiscountCodeAlreadyExists or
+            ErrorCode.UserAlreadyExists => HttpStatusCode.Conflict, // 409
+
+            // Business-specific errors
+            ErrorCode.OutOfStock => HttpStatusCode.BadRequest, // 400
+            ErrorCode.NotForCustomer => HttpStatusCode.Forbidden, // 403
+
+            // Internal server errors
+            ErrorCode.InternalServerError => HttpStatusCode.InternalServerError, // 500
+
+            // Default fallback
+            _ => HttpStatusCode.InternalServerError // 500
         };
+    }
 }

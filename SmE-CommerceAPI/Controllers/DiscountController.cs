@@ -5,6 +5,7 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
+using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
 namespace SmE_CommerceAPI.Controllers;
 
@@ -26,15 +27,14 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at create discount: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at create discount: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -55,15 +55,14 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at create discount code: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at create discount code: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -79,15 +78,14 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at get discount code: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get discount code: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError,
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }

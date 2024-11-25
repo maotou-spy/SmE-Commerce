@@ -21,8 +21,7 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //             return new Return<bool>
     //             {
     //                 Data = false,
-    //                 IsSuccess = false,
-    //                 Message = currentCustomer.Message
+    //                 IsSuccess = false
     //             };
     //         }
     //
@@ -36,8 +35,7 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //                 return new Return<bool>
     //                 {
     //                     Data = false,
-    //                     IsSuccess = false,
-    //                     Message = ErrorMessage.ProductNotAvailable
+    //                     IsSuccess = false
     //                 };
     //             }
     //
@@ -75,7 +73,6 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //             {
     //                 Data = false,
     //                 IsSuccess = false,
-    //                 Message = ErrorMessage.InternalServerError,
     //                 InternalErrorMessage = orderResult.InternalErrorMessage
     //             };
     //         }
@@ -96,7 +93,6 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //                 {
     //                     Data = false,
     //                     IsSuccess = false,
-    //                     Message = ErrorMessage.InternalServerError,
     //                     InternalErrorMessage = orderDetailResult.InternalErrorMessage
     //                 };
     //             }
@@ -109,8 +105,7 @@ public class OrderService(IOrderRepository orderRepository, IHelperService helpe
     //         return new Return<bool>
     //         {
     //             Data = true,
-    //             IsSuccess = true,
-    //             Message = SuccessMessage.Created
+    //             IsSuccess = true
     //         };
     //     }
     //     catch (Exception e)

@@ -20,9 +20,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = cart,
                 IsSuccess = true,
-                ErrorCode = cart == null ? ErrorCodes.CartNotFound : ErrorCodes.Ok,
-                TotalRecord = cart == null ? 0 : 1,
-                Message = cart == null ? ErrorMessage.CartNotFound : SuccessMessage.Found
+                StatusCode = cart == null ? ErrorCode.CartNotFound : ErrorCode.Ok,
+                TotalRecord = cart == null ? 0 : 1
             };
         }
         catch (Exception ex)
@@ -31,8 +30,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -50,8 +49,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 Data = cart,
                 IsSuccess = true,
                 TotalRecord = cart == null ? 0 : 1,
-                ErrorCode = cart == null ? ErrorCodes.CartNotFound : ErrorCodes.Ok,
-                Message = cart == null ? ErrorMessage.CartNotFound : SuccessMessage.Found
+                StatusCode = cart == null ? ErrorCode.CartNotFound : ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -60,8 +58,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -93,8 +91,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 Data = carts,
                 IsSuccess = true,
                 TotalRecord = totalRecords,
-                ErrorCode = carts.Count == 0 ? ErrorCodes.CartNotFound : ErrorCodes.Ok,
-                Message = carts.Count == 0 ? ErrorMessage.CartNotFound : SuccessMessage.Found
+                StatusCode = carts.Count == 0 ? ErrorCode.CartNotFound : ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -103,8 +100,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -124,8 +121,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 Data = carts,
                 IsSuccess = true,
                 TotalRecord = carts.Count,
-                ErrorCode = carts.Count == 0 ? ErrorCodes.CartNotFound : ErrorCodes.Ok,
-                Message = carts.Count == 0 ? ErrorMessage.CartNotFound : SuccessMessage.Found
+                StatusCode = carts.Count == 0 ? ErrorCode.CartNotFound : ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -134,8 +130,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = null,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -152,8 +148,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Successfully
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -162,8 +157,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -180,8 +175,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Successfully
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -190,8 +184,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -208,8 +202,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Updated
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -218,8 +211,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }
@@ -238,8 +231,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 {
                     Data = false,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.CartNotFound,
-                    Message = ErrorMessage.CartNotFound
+                    StatusCode = ErrorCode.CartNotFound
                 };
             }
 
@@ -250,8 +242,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = true,
                 IsSuccess = true,
-                ErrorCode = ErrorCodes.Ok,
-                Message = SuccessMessage.Deleted
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -260,8 +251,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             {
                 Data = false,
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.InternalServerError,
-                Message = ErrorMessage.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError,
+
                 InternalErrorMessage = ex
             };
         }

@@ -5,6 +5,7 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
+using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
 namespace SmE_CommerceAPI.Controllers;
 
@@ -26,15 +27,14 @@ public class ProductController(
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at create product user: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -51,15 +51,14 @@ public class ProductController(
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at create product attribute user: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product attribute user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -76,15 +75,14 @@ public class ProductController(
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at create product image user: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product image user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -103,15 +101,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at update product category user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product category user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -131,15 +128,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at update product attribute user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product attribute user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -156,15 +152,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at delete product attribute user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product attribute user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -184,15 +179,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at update product image user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product image user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -209,15 +203,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at delete product image user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product image user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -236,15 +229,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at update product user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -261,15 +253,14 @@ public class ProductController(
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at delete product user: {ex}", result.InternalErrorMessage);
 
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product user: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -283,15 +274,14 @@ public class ProductController(
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at get product by id: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }
@@ -306,15 +296,14 @@ public class ProductController(
             if (result.IsSuccess) return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at get product by id: {ex}", result.InternalErrorMessage);
-            return Helper.GetErrorResponse(result.Message);
+            return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
-                Message = ErrorMessage.InternalServerError, 
-                ErrorCode = ErrorCodes.InternalServerError
+                StatusCode = ErrorCode.InternalServerError
             });
         }
     }

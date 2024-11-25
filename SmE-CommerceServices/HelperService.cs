@@ -9,6 +9,7 @@ using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
 namespace SmE_CommerceServices;
 
@@ -25,8 +26,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.NotAuthority,
-                Message = ErrorMessage.NotAuthority
+                StatusCode = ErrorCode.NotAuthority
             };
         }
 
@@ -36,8 +36,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.NotAuthority,
-                Message = ErrorMessage.NotAuthority
+                StatusCode = ErrorCode.NotAuthority
             };
         }
 
@@ -47,8 +46,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.NotAuthority,
-                Message = ErrorMessage.NotAuthority
+                StatusCode = ErrorCode.NotAuthority
             };
         }
 
@@ -57,8 +55,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.AccountIsInactive,
-                Message = ErrorMessage.AccountIsInactive
+                StatusCode = ErrorCode.AccountIsInactive
             };
         }
 
@@ -66,8 +63,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            ErrorCode = ErrorCodes.Ok,
-            Message = SuccessMessage.Successfully
+            StatusCode = ErrorCode.Ok
         };
     }
 
@@ -94,8 +90,7 @@ public class HelperService(
             return new Return<User>
             {
                 IsSuccess = false,
-                ErrorCode = ErrorCodes.NotAuthority,
-                Message = ErrorMessage.NotAuthority
+                StatusCode = ErrorCode.NotAuthority
             };
         }
 
@@ -103,8 +98,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            ErrorCode = ErrorCodes.Ok,
-            Message = SuccessMessage.Successfully
+            StatusCode = ErrorCode.Ok
         };
     }
 

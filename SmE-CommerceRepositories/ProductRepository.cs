@@ -30,8 +30,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductNotFound,
-                        Message = ErrorMessage.ProductNotFound,
+                        StatusCode = ErrorCode.ProductNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -40,8 +39,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -51,8 +49,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -70,8 +67,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Created,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -81,8 +77,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -103,8 +98,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductNotFound,
-                        Message = ErrorMessage.ProductNotFound,
+                        StatusCode = ErrorCode.ProductNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -113,8 +107,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product.Slug,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -124,8 +117,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -188,7 +180,6 @@ namespace SmE_CommerceRepositories
         //         {
         //             Data = products,
         //             IsSuccess = true,
-        //             Message = SuccessMessage.Successfully,
         //             TotalRecord = totalRecords
         //         };
         //     }
@@ -198,7 +189,6 @@ namespace SmE_CommerceRepositories
         //         {
         //             Data = null,
         //             IsSuccess = false,
-        //             Message = ErrorMessage.InternalServerError,
         //             InternalErrorMessage = ex,
         //             TotalRecord = 0
         //         };
@@ -216,8 +206,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = product,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Updated,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -227,8 +216,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -252,8 +240,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductAttributeNotFound,
-                        Message = ErrorMessage.ProductAttributeNotFound,
+                        StatusCode = ErrorCode.ProductAttributeNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -262,8 +249,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttribute,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -273,8 +259,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -292,8 +277,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttribute,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Created,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -303,8 +287,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -322,8 +305,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productAttributes,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Updated,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -333,8 +315,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -353,8 +334,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductAttributeNotFound,
-                        Message = ErrorMessage.ProductAttributeNotFound,
+                        StatusCode = ErrorCode.ProductAttributeNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -366,8 +346,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Deleted,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -377,8 +356,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -401,8 +379,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productCategories,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -412,8 +389,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -432,8 +408,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productCategories,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Created,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -443,8 +418,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -466,8 +440,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Deleted,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = productCategories.Count
                 };
             }
@@ -477,8 +450,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
+
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -502,8 +475,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductImageNotFound,
-                        Message = ErrorMessage.ProductImageNotFound,
+                        StatusCode = ErrorCode.ProductImageNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -512,8 +484,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Successfully,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -523,8 +494,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
+
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -542,8 +513,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Created,
+                    StatusCode = ErrorCode.Ok,
+
                     TotalRecord = 1
                 };
             }
@@ -553,8 +524,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
+
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -572,8 +543,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = productImage,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Updated,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -583,8 +553,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
+
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
@@ -603,8 +573,7 @@ namespace SmE_CommerceRepositories
                     {
                         Data = null,
                         IsSuccess = false,
-                        ErrorCode = ErrorCodes.ProductImageNotFound,
-                        Message = ErrorMessage.ProductImageNotFound,
+                        StatusCode = ErrorCode.ProductImageNotFound,
                         TotalRecord = 0
                     };
                 }
@@ -616,8 +585,7 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = true,
-                    ErrorCode = ErrorCodes.Ok,
-                    Message = SuccessMessage.Deleted,
+                    StatusCode = ErrorCode.Ok,
                     TotalRecord = 1
                 };
             }
@@ -627,8 +595,8 @@ namespace SmE_CommerceRepositories
                 {
                     Data = null,
                     IsSuccess = false,
-                    ErrorCode = ErrorCodes.InternalServerError,
-                    Message = ErrorMessage.InternalServerError,
+                    StatusCode = ErrorCode.InternalServerError,
+
                     InternalErrorMessage = ex,
                     TotalRecord = 0
                 };
