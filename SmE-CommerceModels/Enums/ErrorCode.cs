@@ -34,6 +34,7 @@
         public const int SlugAlreadyExists = 205;
         public const int DiscountCodeAlreadyExists = 206;
         public const int UserAlreadyExists = 207;
+        public const int CategoryHasProducts = 208;
 
         // Out of stock
         public const int OutOfStock = 301;

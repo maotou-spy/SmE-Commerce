@@ -9,6 +9,7 @@ namespace SmE_CommerceServices.Interface;
 public interface IDiscountService
 {
     Task<Return<bool>> AddDiscountAsync(AddDiscountReqDto discount);
+    Task<Return<bool>> UpdateDiscountAsync(Guid id, AddDiscountReqDto discount);
 
     Task<Return<bool>> AddDiscountCodeAsync(Guid id, AddDiscountCodeReqDto req);
     Task<Return<GetDiscountCodeByCodeResDto>> GetDiscounCodeByCodeAsync(string code);

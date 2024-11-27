@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmE_CommerceAPI", "SmE-Comm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmE_CommerceModels", "SmE-CommerceModels\SmE_CommerceModels.csproj", "{1FE15307-994F-4438-BCC7-C2A19E29212D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmE_CommerceUnitTest", "SmE_CommerceUnitTest\SmE_CommerceUnitTest.csproj", "{587A2CC0-13A1-4EFD-9CB9-2C0E0BE38F8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1FE15307-994F-4438-BCC7-C2A19E29212D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FE15307-994F-4438-BCC7-C2A19E29212D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FE15307-994F-4438-BCC7-C2A19E29212D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{587A2CC0-13A1-4EFD-9CB9-2C0E0BE38F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{587A2CC0-13A1-4EFD-9CB9-2C0E0BE38F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{587A2CC0-13A1-4EFD-9CB9-2C0E0BE38F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{587A2CC0-13A1-4EFD-9CB9-2C0E0BE38F8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

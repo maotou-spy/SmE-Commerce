@@ -82,16 +82,7 @@ public class DiscountService(
             if (discount is { FromDate: not null, ToDate: not null } || discount.FromDate != null ||
                 discount.ToDate != null)
             {
-                if (discount.FromDate > discount.ToDate)
-                {
-                    return new Return<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = ErrorCode.InvalidDate
-                    };
-                }
-
-                if (discount.FromDate < DateTime.Now)
+                if (discount.FromDate > discount.ToDate || discount.FromDate < DateTime.Now)
                 {
                     return new Return<bool>
                     {
@@ -110,7 +101,8 @@ public class DiscountService(
                     };
                 }
             }
-
+            
+            // Check minimum order amount valid?
             if (discount.MinimumOrderAmount is < 0)
             {
                 return new Return<bool>
@@ -119,7 +111,18 @@ public class DiscountService(
                     StatusCode = ErrorCode.InvalidNumber
                 };
             }
+            
+            // Check maximum discount valid?
+            if (discount.MaximumDiscount is < 0)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidNumber
+                };
+            }
 
+            // Check usage limit valid?
             if (discount.UsageLimit is < 0)
             {
                 return new Return<bool>
@@ -132,16 +135,7 @@ public class DiscountService(
             if (discount is { MinQuantity: not null, MaxQuantity: not null } || discount.MinQuantity != null ||
                 discount.MaxQuantity != null)
             {
-                if (discount.MinQuantity > discount.MaxQuantity)
-                {
-                    return new Return<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = ErrorCode.InvalidNumber
-                    };
-                }
-
-                if (discount.MinQuantity < 0 || discount.MaxQuantity < 0)
+                if (discount.MinQuantity > discount.MaxQuantity || discount.MinQuantity < 0 || discount.MaxQuantity < 0)
                 {
                     return new Return<bool>
                     {
@@ -282,6 +276,198 @@ public class DiscountService(
                 };
             }
 
+            transaction.Complete();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+
+    public async Task<Return<bool>> UpdateDiscountAsync(Guid id, AddDiscountReqDto req)
+    {
+        using var transaction = new TransactionScope(TransactionScopeOption.Required, 
+            new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, 
+            TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    StatusCode = currentUser.StatusCode
+                };
+            }
+            
+            var discount = await discountRepository.GetDiscountByIdForUpdateAsync(id);
+            if (!discount.IsSuccess || discount.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = discount.StatusCode
+                };
+            }
+            
+            // Checking the name of discount
+            var existedName = await discountRepository.GetDiscountByNameAsync(req.DiscountName);
+            if (existedName is { IsSuccess: true, Data: not null })
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.NameAlreadyExists
+                };
+            }
+            
+            // Check Date valid?
+            if (req is { FromDate: not null, ToDate: not null } || req.FromDate != null ||
+                req.ToDate != null)
+            {
+                if (req.FromDate > req.ToDate || req.FromDate < DateTime.Now)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidDate
+                    };
+                }
+            }
+            
+            // Check minimum order amount valid?
+            if (req.MinimumOrderAmount is < 0)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidNumber
+                };
+            }
+            
+            // Check maximum discount valid?
+            if (req.MaximumDiscount is < 0)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidNumber
+                };
+            }
+
+            // Check usage limit valid?
+            if (req.UsageLimit is < 0)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidNumber
+                };
+            }
+            
+            // Check min quantity and max quantity valid?
+            if (req is { MinQuantity: not null, MaxQuantity: not null } || req.MinQuantity != null ||
+                req.MaxQuantity != null)
+            {
+                if (req.MinQuantity > req.MaxQuantity || req.MinQuantity < 0 || req.MaxQuantity < 0)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidNumber
+                    };
+                }
+            }
+            
+            // Check products valid?
+            foreach (var productId in req.ProductIds)
+            {
+                var productExists = await productRepository.GetProductByIdAsync(productId);
+                if (productExists is { IsSuccess: false, Data: null } || productExists.Data?.Status == GeneralStatus.Inactive)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound
+                    };
+                }
+            }
+            
+            discount.Data.DiscountName = req.DiscountName;
+            discount.Data.Description = req.Description;
+            discount.Data.IsPercentage = discount.Data.IsPercentage;   // can not update this field
+            discount.Data.DiscountValue = discount.Data.DiscountValue; // can not update this field
+            discount.Data.MinimumOrderAmount = req.MinimumOrderAmount;
+            discount.Data.MaximumDiscount = req.MaximumDiscount;
+            discount.Data.FromDate = req.FromDate != discount.Data.FromDate ? req.FromDate : discount.Data.FromDate;
+            discount.Data.ToDate = req.ToDate != discount.Data.ToDate ? req.ToDate : discount.Data.ToDate;
+            discount.Data.Status = discount.Data.Status;               // can not update this field
+            discount.Data.UsageLimit = req.UsageLimit;
+            discount.Data.MinQuantity = req.MinQuantity;
+            discount.Data.MaxQuantity = req.MaxQuantity;
+            discount.Data.IsFirstOrder = req.IsFirstOrder;
+            discount.Data.ModifiedAt = DateTime.Now;
+            discount.Data.ModifiedById = currentUser.Data.UserId;
+            
+            var result = await discountRepository.UpdateDiscountAsync(discount.Data);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+            
+            // Kiểm tra xem có cần update không
+            var needUpdate = false;
+            
+            // Add products for discount
+            if (req.ProductIds.Count > 0)
+            {
+                result.Data.DiscountProducts = req.ProductIds.Select(x => new DiscountProduct
+                {
+                    DiscountId = result.Data.DiscountId,
+                    ProductId = x
+                }).ToList();
+                needUpdate = true;
+            }
+            
+            if (!needUpdate)
+                return new Return<bool>
+                {
+                    Data = true,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok
+                };
+            var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
+            if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = addProductsResult.InternalErrorMessage,
+                    StatusCode = addProductsResult.StatusCode
+                };
+            }
+            
             transaction.Complete();
 
             return new Return<bool>

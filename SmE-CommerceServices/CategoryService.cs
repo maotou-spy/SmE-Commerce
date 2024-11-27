@@ -192,7 +192,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = currentCustomer.StatusCode,
+                    StatusCode = currentCustomer.StatusCode
                 };
             }
 
@@ -379,6 +379,18 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                     IsSuccess = false,
                     Data = false,
                     StatusCode = category.StatusCode
+                };
+            }
+
+            // Check if the category still has products
+            var products = await categoryRepository.GetProductsByCategoryIdAsync(id);
+            if (products is { IsSuccess: true, Data: not null } && products.Data.Any())
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Data = false,
+                    StatusCode = ErrorCode.CategoryHasProducts
                 };
             }
 
