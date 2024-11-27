@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
-using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
@@ -32,6 +31,30 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         catch (Exception ex)
         {
             logger.LogInformation("Error at create discount: {e}", ex);
+            return StatusCode(500, new Return<bool>
+            {
+                StatusCode = ErrorCode.InternalServerError
+            });
+        }
+    }
+    
+    [HttpPut("{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateDiscountAsync([FromRoute] Guid id, [FromBody] AddDiscountReqDto req)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            var result = await discountService.UpdateDiscountAsync(id, req);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update discount: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update discount: {e}", ex);
             return StatusCode(500, new Return<bool>
             {
                 StatusCode = ErrorCode.InternalServerError

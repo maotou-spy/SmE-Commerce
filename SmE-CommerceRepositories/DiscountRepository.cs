@@ -76,6 +76,48 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
+    
+    // GetDiscountByIdForUpdateAsync to using FOR UPDATE
+    public async Task<Return<Discount>> GetDiscountByIdForUpdateAsync(Guid id)
+    {
+        try
+        {
+            // 1. Fetching the discount data
+            var discount = await dbContext.Discounts.Where(d => d.DiscountId == id).FirstOrDefaultAsync();
+            if (discount == null)
+
+            {
+                return new Return<Discount>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.DiscountNotFound
+                };
+            }
+
+            // 2. Ensuring that the record is locked for update
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE", id);
+
+            return new Return<Discount>
+            {
+                Data = discount,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<Discount>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
 
     public async Task<Return<Discount>> UpdateDiscountAsync(Discount discount)
     {

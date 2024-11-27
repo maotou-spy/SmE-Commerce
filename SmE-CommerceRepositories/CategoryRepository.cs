@@ -189,7 +189,37 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             {
                 Data = null,
                 IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
 
+    public async Task<Return<IEnumerable<Category>>> GetProductsByCategoryIdAsync(Guid id)
+    {
+        try
+        {
+            var result = await dbContext.Categories
+                .Include(x => x.ProductCategories)
+                .ThenInclude(y => y.Product)
+                .Where(x => x.CategoryId == id)
+                .ToListAsync();
+
+            return new Return<IEnumerable<Category>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = result.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Category>>
+            {
+                Data = null,
+                IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
                 TotalRecord = 0
