@@ -23,7 +23,7 @@ public class DiscountServiceTesting
         _helperServiceMock = new Mock<IHelperService>();
         _productRepositoryMock = new Mock<IProductRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
-        
+
         _discountService = new DiscountService(
             _discountRepositoryMock.Object,
             _helperServiceMock.Object,
@@ -31,7 +31,7 @@ public class DiscountServiceTesting
             _userRepositoryMock.Object
         );
     }
-    
+
     // Update Discount
     [Fact]
     public async Task UpdateDiscountAsync_ShouldReturnSuccess_WhenConcurrentRequests()
@@ -88,20 +88,22 @@ public class DiscountServiceTesting
             {
                 Data = new Product
                 {
-                    ProductId = Guid.NewGuid()
+                    ProductId = Guid.NewGuid(),
+                    PrimaryImage = "image.jpg"
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1
             });
 
-        _discountRepositoryMock.Setup(x => x.UpdateDiscountAsync(It.IsAny<Discount>())).ReturnsAsync(new Return<Discount>
-        {
-            Data = discount,
-            IsSuccess = true,
-            StatusCode = ErrorCode.Ok,
-            TotalRecord = 1
-        });
+        _discountRepositoryMock.Setup(x => x.UpdateDiscountAsync(It.IsAny<Discount>())).ReturnsAsync(
+            new Return<Discount>
+            {
+                Data = discount,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            });
 
         // Act
         var task1 = _discountService.UpdateDiscountAsync(discountId, discountReq);

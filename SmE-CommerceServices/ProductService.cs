@@ -23,7 +23,7 @@ public class ProductService(
         try
         {
             var result = await productRepository.GetProductByIdAsync(productId);
-            if (!result.IsSuccess || result.Data == null || result.Data.Status != ProductStatus.Active)
+            if (!result.IsSuccess || result.Data is not { Status: ProductStatus.Active })
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
@@ -45,6 +45,7 @@ public class ProductService(
                     ProductId = result.Data.ProductId,
                     ProductCode = result.Data.ProductCode ?? string.Empty,
                     Name = result.Data.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
                     Price = result.Data.Price,
                     StockQuantity = result.Data.StockQuantity,
@@ -118,6 +119,7 @@ public class ProductService(
                     ProductId = result.Data.ProductId,
                     ProductCode = result.Data.ProductCode ?? string.Empty,
                     Name = result.Data.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
                     Price = result.Data.Price,
                     StockQuantity = result.Data.StockQuantity,
@@ -166,37 +168,6 @@ public class ProductService(
         }
     }
 
-    // public async Task<Return<IEnumerable<GetProductsResDto>>> CustomerGetProductsAsync(string? keyword,
-    //     string? sortBy, int pageNumber, int pageSize)
-    // {
-    //     try
-    //     {
-    //         var result = await productRepository.CustomerGetProductsAsync(keyword, sortBy, pageNumber, pageSize);
-    //         if (!result.IsSuccess)
-    //             return new Return<IEnumerable<GetProductsResDto>>
-    //             {
-    //                 Data = null,
-    //                 IsSuccess = false
-    //             };
-    //
-    //         return new Return<IEnumerable<GetProductsResDto>>
-    //         {
-    //             Data = result.Data,
-    //             IsSuccess = true,
-    //             TotalRecord = result.TotalRecord
-    //         };
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return new Return<IEnumerable<GetProductsResDto>>
-    //         {
-    //             Data = null,
-    //             IsSuccess = false,
-    //             InternalErrorMessage = ex
-    //         };
-    //     }
-    // }
-
     public async Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req)
     {
         try
@@ -213,14 +184,12 @@ public class ProductService(
 
             // Check if the product data is valid
             if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-            {
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ValidationError
                 };
-            }
 
             if (req.CategoryIds.Count == 0)
                 return new Return<GetProductDetailsResDto>
@@ -274,6 +243,7 @@ public class ProductService(
 
     public async Task<Return<GetProductDetailsResDto>> UpdateProductAsync(Guid productId, UpdateProductReqDto req)
     {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
             // Get the current user
@@ -286,7 +256,7 @@ public class ProductService(
                     StatusCode = currentUser.StatusCode
                 };
 
-            var productResult = await productRepository.GetProductByIdAsync(productId);
+            var productResult = await productRepository.GetProductByIdForUpdateAsync(productId);
             if (!productResult.IsSuccess || productResult.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
@@ -294,6 +264,7 @@ public class ProductService(
                     IsSuccess = false,
                     StatusCode = productResult.StatusCode
                 };
+
             // Check if the product is deleted
             if (productResult.Data.Status == ProductStatus.Deleted)
                 return new Return<GetProductDetailsResDto>
@@ -305,14 +276,12 @@ public class ProductService(
 
             // Check if the product data is valid
             if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-            {
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ValidationError
                 };
-            }
 
             productResult.Data.Name = req.Name.Trim();
             productResult.Data.Description = req.Description.Trim();
@@ -343,6 +312,8 @@ public class ProductService(
                     StatusCode = result.StatusCode
                 };
 
+            // Mark the transaction as complete
+            transaction.Complete();
             return new Return<GetProductDetailsResDto>
             {
                 Data = new GetProductDetailsResDto
@@ -350,6 +321,7 @@ public class ProductService(
                     ProductId = result.Data.ProductId,
                     ProductCode = result.Data.ProductCode ?? string.Empty,
                     Name = result.Data.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
                     Price = result.Data.Price,
                     StockQuantity = result.Data.StockQuantity,
@@ -396,6 +368,7 @@ public class ProductService(
 
     public async Task<Return<bool>> DeleteProductAsync(Guid productId)
     {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
             // Get the current user
@@ -409,7 +382,7 @@ public class ProductService(
                 };
 
             // Get the product
-            var product = await productRepository.GetProductByIdAsync(productId);
+            var product = await productRepository.GetProductByIdForUpdateAsync(productId);
             if (!product.IsSuccess || product.Data == null)
                 return new Return<bool>
                 {
@@ -440,6 +413,7 @@ public class ProductService(
                     StatusCode = result.StatusCode
                 };
 
+            transaction.Complete();
             return new Return<bool>
             {
                 Data = true,
@@ -449,7 +423,6 @@ public class ProductService(
         }
         catch (Exception ex)
         {
-            // Log exception details here as appropriate for debugging
             return new Return<bool>
             {
                 Data = false,
@@ -490,7 +463,7 @@ public class ProductService(
                 };
 
             // Get current category ids
-            var currentCategoryIds = currentCategories.Data?.Select(c => c.CategoryId).ToList() ?? new List<Guid>();
+            var currentCategoryIds = currentCategories.Data?.Select(c => c.CategoryId).ToList() ?? [];
 
             // Get categories to add and remove
             var categoriesToAdd = categoryIds.Except(currentCategoryIds).ToList();
@@ -538,6 +511,7 @@ public class ProductService(
                     StatusCode = updatedCategories.StatusCode
                 };
 
+            transaction.Complete();
             return new Return<List<GetProductCategoryResDto>>
             {
                 Data = updatedCategories.Data?.Select(category => new GetProductCategoryResDto
@@ -698,21 +672,29 @@ public class ProductService(
                     StatusCode = currentUser.StatusCode
                 };
 
-            var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
-            if (!productImageResult.IsSuccess || productImageResult.Data == null)
+            var productImagesResult = await productRepository.GetProductImagesAsync(productId);
+            if (!productImagesResult.IsSuccess || productImagesResult.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = productImageResult.StatusCode
+                    StatusCode = productImagesResult.StatusCode
                 };
             // Check if the image belongs to the product
-            if (productImageResult.Data.ProductId != productId)
+            if (productImagesResult.Data.All(i => i.ImageId != imageId))
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductImageNotFound
+                };
+            // Check if only one image is left
+            if (productImagesResult.Data.Count == 1)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductImageMinimum
                 };
 
             var result = await productRepository.DeleteProductImageAsync(imageId);
@@ -928,6 +910,7 @@ public class ProductService(
             var product = new Product
             {
                 Name = req.Name.Trim(),
+                PrimaryImage = req.PrimaryImage,
                 Description = req.Description?.Trim(),
                 Price = req.Price < 0 ? 0 : req.Price,
                 StockQuantity = req.StockQuantity,
@@ -1019,6 +1002,7 @@ public class ProductService(
                     ProductId = product.ProductId,
                     ProductCode = product.ProductCode ?? string.Empty,
                     Name = product.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
                     Description = product.Description,
                     Price = product.Price,
                     StockQuantity = product.StockQuantity,

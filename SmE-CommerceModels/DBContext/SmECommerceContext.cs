@@ -426,9 +426,6 @@ public partial class SmECommerceContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("altText");
             entity.Property(e => e.ContentId).HasColumnName("contentId");
-            entity.Property(e => e.ImageHash)
-                .HasColumnType("character varying")
-                .HasColumnName("imageHash");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(255)
                 .HasColumnName("imageUrl");
@@ -860,6 +857,9 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.StockQuantity)
                 .HasDefaultValue(0)
                 .HasColumnName("stockQuantity");
+            entity.Property(e => e.PrimaryImage)
+                .HasMaxLength(255)
+                .HasColumnName("primaryImage");
 
             entity.HasOne(d => d.CreateBy).WithMany(p => p.ProductCreateBies)
                 .HasForeignKey(d => d.CreateById)

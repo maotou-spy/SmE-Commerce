@@ -6,6 +6,8 @@ public class Product
 
     public string? ProductCode { get; set; }
 
+    public required string PrimaryImage { get; set; }
+
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }

@@ -5,6 +5,7 @@ public class GetProductDetailsResDto
     public Guid ProductId { get; set; }
     public required string ProductCode { get; set; }
     public string Name { get; set; } = null!;
+    public required string PrimaryImage { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }

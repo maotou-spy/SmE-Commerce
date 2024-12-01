@@ -8,6 +8,9 @@ public class UpdateProductReqDto
     [Required(ErrorMessage = "Product name is required")]
     public required string Name { get; set; }
 
+    [Required(ErrorMessage = "Product image is required")]
+    public required string PrimaryImage { get; set; }
+
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "Product price is required")]

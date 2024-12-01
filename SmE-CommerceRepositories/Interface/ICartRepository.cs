@@ -5,12 +5,17 @@ namespace SmE_CommerceRepositories.Interface;
 
 public interface ICartRepository
 {
-    Task<Return<CartItem>> GetCartItemById(Guid cartId);
+    Task<Return<CartItem>> GetCartItemByIdAsync(Guid cartId);
+
     Task<Return<CartItem>> GetCartItemByProductIdAndUserIdAsync(Guid productId, Guid userId);
-    Task<Return<List<CartItem>>> GetCartItemsByUserId(Guid userId, int? pageIndex, int? pageSize);
-    Task<Return<List<CartItem>>> GetCartItems();
+
+    Task<Return<List<CartItem>>> GetCartItemsByUserIdAsync(Guid userId);
+
     Task<Return<bool>> AddToCartAsync(CartItem cartItem);
-    Task<Return<bool>> SyncCart(List<CartItem> carts);
+
     Task<Return<bool>> UpdateCartItemAsync(CartItem cartItem);
-    Task<Return<bool>> DeleteCartItem(Guid cartId);
+
+    Task<Return<bool>> RemoveCartItemByIdAsync(Guid cartId);
+
+    Task<Return<bool>> ClearCartByUserIdAsync(Guid userId);
 }
