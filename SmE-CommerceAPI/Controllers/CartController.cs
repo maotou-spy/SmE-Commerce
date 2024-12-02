@@ -58,9 +58,12 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
         }
     }
 
-    [HttpPut("{cartId}")]
+    [HttpPut("{cartId:guid}")]
     [Authorize]
-    public async Task<IActionResult> UpdateCartItemAsync(Guid cartId, [FromBody] int updatedQuantity)
+    public async Task<IActionResult> UpdateCartItemAsync(
+        Guid cartId,
+        [FromBody] int updatedQuantity
+    )
     {
         try
         {
@@ -80,7 +83,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
         }
     }
 
-    [HttpDelete("{cartId}")]
+    [HttpDelete("{cartId:guid}")]
     [Authorize]
     public async Task<IActionResult> RemoveCartItemByIdAsync(Guid cartId)
     {

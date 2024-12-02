@@ -1,14 +1,29 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public class ProductAttribute
+namespace SmE_CommerceModels.Models;
+
+public partial class ProductAttribute
 {
+    [Key]
+    [Column("attributeid")]
     public Guid Attributeid { get; set; }
 
+    [Column("productid")]
     public Guid Productid { get; set; }
 
+    [Column("attributename")]
+    [StringLength(100)]
     public string Attributename { get; set; } = null!;
 
-    public string Attributevalue { get; set; }
+    [Column("attributevalue")]
+    [StringLength(255)]
+    public string Attributevalue { get; set; } = null!;
 
+    [ForeignKey("Productid")]
+    [InverseProperty("ProductAttributes")]
     public virtual Product Product { get; set; } = null!;
 }

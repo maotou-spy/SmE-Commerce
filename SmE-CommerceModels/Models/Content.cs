@@ -1,61 +1,102 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public class Content
+namespace SmE_CommerceModels.Models;
+
+[Index("Slug", Name = "Contents_slug_key", IsUnique = true)]
+[Index("Status", Name = "idx_contents_status")]
+public partial class Content
 {
+    [Key]
+    [Column("contentId")]
     public Guid ContentId { get; set; }
 
+    [Column("title")]
+    [StringLength(255)]
     public string Title { get; set; } = null!;
 
-    public string? Content1 { get; set; }
+    [Column("content")]
+    public string Content1 { get; set; } = null!;
 
-    public Guid? AuthorId { get; set; }
+    [Column("authorId")]
+    public Guid AuthorId { get; set; }
 
+    [Column("productId")]
     public Guid? ProductId { get; set; }
 
     /// <summary>
     /// Values: blog, facebook
     /// </summary>
+    [Column("externalType")]
+    [StringLength(50)]
     public string ExternalType { get; set; } = null!;
 
     /// <summary>
     /// blogId for blogs, facebookPostId for Facebook posts
     /// </summary>
+    [Column("externalId")]
+    [StringLength(255)]
     public string? ExternalId { get; set; }
 
     /// <summary>
     /// Values: draft, pending, published, unpublished, deleted
     /// </summary>
+    [Column("status")]
+    [StringLength(50)]
     public string Status { get; set; } = null!;
 
-    public DateTime? PublishedAt { get; set; }
+    [Column("publishedAt", TypeName = "timestamp without time zone")]
+    public DateTime PublishedAt { get; set; }
 
+    [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
 
+    [Column("createById")]
     public Guid? CreateById { get; set; }
 
+    [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
+    [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    public string? Slug { get; set; }
+    [Column("slug")]
+    [StringLength(255)]
+    public string Slug { get; set; } = null!;
 
-    public string? MetaTitle { get; set; }
+    [Column("metaTitle")]
+    [StringLength(255)]
+    public string MetaTitle { get; set; } = null!;
 
-    public string? MetaDescription { get; set; }
+    [Column("metaDescription")]
+    public string MetaDescription { get; set; } = null!;
 
-    public List<string>? Keywords { get; set; }
+    [Column("keywords", TypeName = "character varying[]")]
+    public List<string> Keywords { get; set; } = null!;
 
+    [Column("viewCount")]
     public int? ViewCount { get; set; }
 
-    public string? ShortDescription { get; set; }
+    [Column("shortDescription")]
+    public string ShortDescription { get; set; } = null!;
 
+    [InverseProperty("Content")]
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
 
+    [InverseProperty("Content")]
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();
 
+    [InverseProperty("Content")]
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
 
+    [ForeignKey("CreateById")]
+    [InverseProperty("ContentCreateBies")]
     public virtual User? CreateBy { get; set; }
 
+    [ForeignKey("ModifiedById")]
+    [InverseProperty("ContentModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
 }

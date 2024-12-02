@@ -1,33 +1,58 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public class Category
+namespace SmE_CommerceModels.Models;
+
+[Index("Slug", Name = "Categories_slug_key", IsUnique = true)]
+public partial class Category
 {
+    [Key]
+    [Column("categoryId")]
     public Guid CategoryId { get; set; }
 
+    [Column("name")]
+    [StringLength(100)]
     public string Name { get; set; } = null!;
 
-    public string? CategoryImage { get; set; }
-
+    [Column("description")]
+    [StringLength(100)]
     public string? Description { get; set; }
 
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>
+    [Column("status")]
+    [StringLength(50)]
     public string Status { get; set; } = null!;
 
+    [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
 
+    [Column("createById")]
     public Guid? CreateById { get; set; }
 
+    [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
+    [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    public string? Slug { get; set; }
+    [Column("slug")]
+    [StringLength(255)]
+    public string Slug { get; set; } = null!;
 
+    [ForeignKey("CreateById")]
+    [InverseProperty("CategoryCreateBies")]
     public virtual User? CreateBy { get; set; }
 
+    [ForeignKey("ModifiedById")]
+    [InverseProperty("CategoryModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
 
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    [InverseProperty("Category")]
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } =
+        new List<ProductCategory>();
 }

@@ -1,27 +1,47 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public class Review
+namespace SmE_CommerceModels.Models;
+
+public partial class Review
 {
+    [Key]
+    [Column("reviewId")]
     public Guid ReviewId { get; set; }
 
+    [Column("productId")]
     public Guid? ProductId { get; set; }
 
-    public Guid? UserId { get; set; }
+    [Column("userId")]
+    public Guid UserId { get; set; }
 
-    public bool? IsTop { get; set; }
+    [Column("isTop")]
+    public bool IsTop { get; set; }
 
+    [Column("rating")]
     public int Rating { get; set; }
 
+    [Column("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>
+    [Column("status")]
+    [StringLength(50)]
     public string Status { get; set; } = null!;
 
+    [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
 
+    [ForeignKey("ProductId")]
+    [InverseProperty("Reviews")]
     public virtual Product? Product { get; set; }
 
-    public virtual User? User { get; set; }
+    [ForeignKey("UserId")]
+    [InverseProperty("Reviews")]
+    public virtual User User { get; set; } = null!;
 }

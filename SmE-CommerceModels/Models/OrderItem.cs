@@ -1,31 +1,57 @@
-﻿namespace SmE_CommerceModels.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public class OrderItem
+namespace SmE_CommerceModels.Models;
+
+public partial class OrderItem
 {
+    [Key]
+    [Column("orderItemId")]
     public Guid OrderItemId { get; set; }
 
-    public Guid? OrderId { get; set; }
+    [Column("orderId")]
+    public Guid OrderId { get; set; }
 
-    public Guid? ProductId { get; set; }
+    [Column("productId")]
+    public Guid ProductId { get; set; }
 
+    [Column("quantity")]
     public int Quantity { get; set; }
 
+    [Column("price")]
+    [Precision(15, 0)]
     public decimal Price { get; set; }
 
     /// <summary>
     /// Values: active, inactive, deleted
     /// </summary>
+    [Column("status")]
+    [StringLength(50)]
     public string Status { get; set; } = null!;
 
-    public Guid? VariantId { get; set; }
+    [Column("variantId")]
+    public Guid VariantId { get; set; }
 
-    public string? ProductName { get; set; }
+    [Column("productName")]
+    [StringLength(100)]
+    public string ProductName { get; set; } = null!;
 
-    public string? VariantName { get; set; }
+    [Column("attributeValue")]
+    [StringLength(100)]
+    public string? AttributeValue { get; set; }
 
-    public virtual Order? Order { get; set; }
+    [ForeignKey("OrderId")]
+    [InverseProperty("OrderItems")]
+    public virtual Order Order { get; set; } = null!;
 
-    public virtual Product? Product { get; set; }
+    [ForeignKey("ProductId")]
+    [InverseProperty("OrderItems")]
+    public virtual Product Product { get; set; } = null!;
 
-    public virtual ProductVariant? Variant { get; set; }
+    [ForeignKey("VariantId")]
+    [InverseProperty("OrderItems")]
+    public virtual ProductVariant Variant { get; set; } = null!;
 }
