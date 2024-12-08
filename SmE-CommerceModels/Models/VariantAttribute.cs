@@ -9,10 +9,10 @@ namespace SmE_CommerceModels.Models;
 public partial class VariantAttribute
 {
     [Key]
-    [Column("attributeId")]
-    public Guid AttributeId { get; set; }
+    [Column("variantId")]
+    public Guid VariantId { get; set; }
 
-    [Column("attributeName")]
+    [Column("variantName")]
     [StringLength(100)]
     public string AttributeName { get; set; } = null!;
 
@@ -37,5 +37,6 @@ public partial class VariantAttribute
     public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Attribute")]
-    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } =
+        new List<ProductVariant>();
 }

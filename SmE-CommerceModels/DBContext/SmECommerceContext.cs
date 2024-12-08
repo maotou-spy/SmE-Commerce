@@ -492,9 +492,9 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<ProductAttribute>(entity =>
         {
-            entity.HasKey(e => e.Attributeid).HasName("productattributes_pk");
+            entity.HasKey(e => e.AttributeId).HasName("productattributes_pk");
 
-            entity.Property(e => e.Attributeid).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.AttributeId).HasDefaultValueSql("gen_random_uuid()");
 
             entity
                 .HasOne(d => d.Product)
@@ -537,9 +537,9 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<ProductVariant>(entity =>
         {
-            entity.HasKey(e => e.VariantId).HasName("productvariants_pk");
+            entity.HasKey(e => e.ProductVariantId).HasName("productvariants_pk");
 
-            entity.Property(e => e.VariantId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.ProductVariantId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
             entity.Property(e => e.StockQuantity).HasDefaultValue(0);
 
@@ -631,9 +631,9 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<VariantAttribute>(entity =>
         {
-            entity.HasKey(e => e.AttributeId).HasName("variantattributes_pk");
+            entity.HasKey(e => e.VariantId).HasName("variantattributes_pk");
 
-            entity.Property(e => e.AttributeId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.VariantId).HasDefaultValueSql("gen_random_uuid()");
 
             entity
                 .HasOne(d => d.CreatedBy)

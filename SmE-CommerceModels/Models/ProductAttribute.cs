@@ -10,20 +10,20 @@ public partial class ProductAttribute
 {
     [Key]
     [Column("attributeid")]
-    public Guid Attributeid { get; set; }
+    public Guid AttributeId { get; set; }
 
     [Column("productid")]
-    public Guid Productid { get; set; }
+    public Guid ProductId { get; set; }
 
     [Column("attributename")]
     [StringLength(100)]
-    public string Attributename { get; set; } = null!;
+    public string AttributeName { get; set; } = null!;
 
     [Column("attributevalue")]
     [StringLength(255)]
-    public string Attributevalue { get; set; } = null!;
+    public string AttributeValue { get; set; } = null!;
 
-    [ForeignKey("Productid")]
+    [ForeignKey("ProductId")]
     [InverseProperty("ProductAttributes")]
     public virtual Product Product { get; set; } = null!;
 }

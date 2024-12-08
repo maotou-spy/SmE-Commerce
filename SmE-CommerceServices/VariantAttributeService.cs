@@ -40,7 +40,7 @@ public class VariantAttributeService(
             var attributes = attributesResult
                 .Data.Select(attribute => new ManagerVariantAttributeResDto
                 {
-                    AttributeId = attribute.AttributeId,
+                    AttributeId = attribute.VariantId,
                     AttributeName = attribute.AttributeName,
                     CreatedById = attribute.CreatedById,
                     CreatedAt = attribute.CreatedAt,

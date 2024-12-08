@@ -13,14 +13,14 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
     {
         try
         {
-            var attributes = await dbContext.VariantAttributes.ToListAsync();
+            var variants = await dbContext.VariantAttributes.ToListAsync();
 
             return new Return<List<VariantAttribute>>
             {
-                Data = attributes,
+                Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = attributes.Count,
+                TotalRecord = variants.Count,
             };
         }
         catch (Exception ex)
@@ -40,13 +40,13 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
     {
         try
         {
-            var attribute = await dbContext
+            var variant = await dbContext
                 .VariantAttributes.Include(x => x.ProductVariants)
-                .FirstOrDefaultAsync(x => x.AttributeId == id);
+                .FirstOrDefaultAsync(x => x.VariantId == id);
 
             return new Return<VariantAttribute>
             {
-                Data = attribute,
+                Data = variant,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
@@ -66,21 +66,21 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
     }
 
     public async Task<Return<List<VariantAttribute>>> GetVariantAttributesByIds(
-        List<Guid> attributeIds
+        List<Guid> variantIds
     )
     {
         try
         {
-            var attributes = await dbContext
-                .VariantAttributes.Where(x => attributeIds.Contains(x.AttributeId))
+            var variants = await dbContext
+                .VariantAttributes.Where(x => variantIds.Contains(x.VariantId))
                 .ToListAsync();
 
             return new Return<List<VariantAttribute>>
             {
-                Data = attributes,
+                Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = attributes.Count,
+                TotalRecord = variants.Count,
             };
         }
         catch (Exception ex)
@@ -96,11 +96,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<bool>> BulkCreateVariantAttribute(List<VariantAttribute> attributes)
+    public async Task<Return<bool>> BulkCreateVariantAttribute(List<VariantAttribute> variants)
     {
         try
         {
-            await dbContext.VariantAttributes.AddRangeAsync(attributes);
+            await dbContext.VariantAttributes.AddRangeAsync(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>
@@ -108,7 +108,7 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = attributes.Count,
+                TotalRecord = variants.Count,
             };
         }
         catch (Exception ex)
@@ -124,11 +124,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<bool>> UpdateVariantAttribute(VariantAttribute attribute)
+    public async Task<Return<bool>> UpdateVariantAttribute(VariantAttribute variants)
     {
         try
         {
-            dbContext.VariantAttributes.Update(attribute);
+            dbContext.VariantAttributes.Update(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>
@@ -152,11 +152,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<bool>> DeleteVariantAttributes(VariantAttribute attribute)
+    public async Task<Return<bool>> DeleteVariantAttributes(VariantAttribute variants)
     {
         try
         {
-            dbContext.VariantAttributes.Remove(attribute);
+            dbContext.VariantAttributes.Remove(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>

@@ -9,9 +9,9 @@ public interface IVariantAttributeRepository
 
     Task<Return<VariantAttribute>> GetVariantAttributeById(Guid id);
 
-    Task<Return<bool>> BulkCreateVariantAttribute(List<VariantAttribute> attributes);
+    Task<Return<bool>> BulkCreateVariantAttribute(List<VariantAttribute> variants);
 
-    Task<Return<bool>> UpdateVariantAttribute(VariantAttribute attribute);
+    Task<Return<bool>> UpdateVariantAttribute(VariantAttribute variants);
 
-    Task<Return<bool>> DeleteVariantAttributes(VariantAttribute attribute);
+    Task<Return<bool>> DeleteVariantAttributes(VariantAttribute variants);
 }

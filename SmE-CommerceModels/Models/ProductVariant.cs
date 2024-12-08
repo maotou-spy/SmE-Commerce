@@ -9,11 +9,14 @@ namespace SmE_CommerceModels.Models;
 public partial class ProductVariant
 {
     [Key]
-    [Column("variantId")]
-    public Guid VariantId { get; set; }
+    [Column("productVariantId")]
+    public Guid ProductVariantId { get; set; }
 
     [Column("productId")]
     public Guid ProductId { get; set; }
+
+    [Column("variantId")]
+    public Guid VariantId { get; set; }
 
     [Column("attributeValue")]
     [StringLength(100)]
@@ -49,10 +52,7 @@ public partial class ProductVariant
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    [Column("attributeId")]
-    public Guid AttributeId { get; set; }
-
-    [ForeignKey("AttributeId")]
+    [ForeignKey("ProductVariantId")]
     [InverseProperty("ProductVariants")]
     public virtual VariantAttribute Attribute { get; set; } = null!;
 

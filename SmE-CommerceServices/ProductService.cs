@@ -78,9 +78,9 @@ public class ProductService(
                     Attributes = result
                         .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
                         {
-                            AttributeId = attribute.Attributeid,
-                            Name = attribute.Attributename,
-                            Value = attribute.Attributevalue,
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
                         })
                         .ToList(),
                 },
@@ -161,9 +161,9 @@ public class ProductService(
                     Attributes = result
                         .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
                         {
-                            AttributeId = attribute.Attributeid,
-                            Name = attribute.Attributename,
-                            Value = attribute.Attributevalue,
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
                         })
                         .ToList(),
                     CreatedAt = result.Data.CreatedAt,
@@ -356,9 +356,9 @@ public class ProductService(
                     Attributes = result
                         .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
                         {
-                            AttributeId = attribute.Attributeid,
-                            Name = attribute.Attributename,
-                            Value = attribute.Attributevalue,
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
                         })
                         .ToList(),
                     Categories = result
@@ -813,9 +813,9 @@ public class ProductService(
 
             var productAttribute = new ProductAttribute
             {
-                Productid = productId,
-                Attributename = req.AttributeName,
-                Attributevalue = req.AttributeValue,
+                ProductId = productId,
+                AttributeName = req.AttributeName,
+                AttributeValue = req.AttributeValue,
             };
 
             var result = await productRepository.AddProductAttributeAsync(productAttribute);
@@ -832,9 +832,9 @@ public class ProductService(
             {
                 Data = new GetProductAttributeResDto
                 {
-                    AttributeId = result.Data.Attributeid,
-                    Name = result.Data.Attributename,
-                    Value = result.Data.Attributevalue,
+                    AttributeId = result.Data.AttributeId,
+                    Name = result.Data.AttributeName,
+                    Value = result.Data.AttributeValue,
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
@@ -872,10 +872,10 @@ public class ProductService(
 
             var productAttribute = new ProductAttribute
             {
-                Productid = productId,
-                Attributeid = attributeId,
-                Attributename = req.AttributeName,
-                Attributevalue = req.AttributeValue,
+                ProductId = productId,
+                AttributeId = attributeId,
+                AttributeName = req.AttributeName,
+                AttributeValue = req.AttributeValue,
             };
 
             var result = await productRepository.UpdateProductAttributeAsync(productAttribute);
@@ -892,9 +892,9 @@ public class ProductService(
             {
                 Data = new GetProductAttributeResDto
                 {
-                    AttributeId = result.Data.Attributeid,
-                    Name = result.Data.Attributename,
-                    Value = result.Data.Attributevalue,
+                    AttributeId = result.Data.AttributeId,
+                    Name = result.Data.AttributeName,
+                    Value = result.Data.AttributeValue,
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
@@ -939,7 +939,7 @@ public class ProductService(
                 };
 
             // Check if the attribute belongs to the product
-            if (productAttributeResult.Data.Productid != productId)
+            if (productAttributeResult.Data.ProductId != productId)
                 return new Return<bool>
                 {
                     Data = false,
@@ -1073,9 +1073,9 @@ public class ProductService(
             var productAttributes = req
                 .Attributes.Select(attribute => new ProductAttribute
                 {
-                    Productid = result.Data.ProductId,
-                    Attributename = attribute.AttributeName,
-                    Attributevalue = attribute.AttributeValue,
+                    ProductId = result.Data.ProductId,
+                    AttributeName = attribute.AttributeName,
+                    AttributeValue = attribute.AttributeValue,
                 })
                 .ToList();
             result.Data.ProductAttributes = productAttributes;
@@ -1129,9 +1129,9 @@ public class ProductService(
                     Attributes = result
                         .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
                         {
-                            AttributeId = attribute.Attributeid,
-                            Name = attribute.Attributename,
-                            Value = attribute.Attributevalue,
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
                         })
                         .ToList(),
                 },

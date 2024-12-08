@@ -31,7 +31,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             return new Return<Product>
@@ -39,7 +39,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -60,8 +60,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var product = await dbContext
-                .Products
-                .Include(x => x.ProductCategories)
+                .Products.Include(x => x.ProductCategories)
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
@@ -73,11 +72,12 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             await dbContext.Database.ExecuteSqlRawAsync(
-                "SELECT * FROM public.\"Products\" WHERE public.\"Products\".\"productId\" = {0} FOR UPDATE", productId
+                "SELECT * FROM public.\"Products\" WHERE public.\"Products\".\"productId\" = {0} FOR UPDATE",
+                productId
             );
 
             return new Return<Product>
@@ -85,7 +85,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -96,7 +96,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -113,7 +113,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -124,7 +124,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -143,7 +143,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             return new Return<string>
@@ -151,7 +151,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product.Slug,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -162,7 +162,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -179,7 +179,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -190,7 +190,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -204,7 +204,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var productAttribute = await dbContext.ProductAttributes.FirstOrDefaultAsync(x =>
-                x.Attributeid == attributeId
+                x.AttributeId == attributeId
             );
 
             if (productAttribute is null)
@@ -213,7 +213,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductAttributeNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             return new Return<ProductAttribute>
@@ -221,7 +221,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productAttribute,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -232,7 +232,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -251,7 +251,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productAttribute,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -262,7 +262,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -281,7 +281,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productAttributes,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -292,7 +292,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -302,7 +302,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var productAttribute = await dbContext.ProductAttributes.FirstOrDefaultAsync(x =>
-                x.Attributeid == attributeId
+                x.AttributeId == attributeId
             );
             if (productAttribute is null)
                 return new Return<ProductAttribute>
@@ -310,7 +310,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductAttributeNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             dbContext.ProductAttributes.Remove(productAttribute);
@@ -321,7 +321,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -332,7 +332,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -354,7 +354,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productCategories,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = productCategories.Count
+                TotalRecord = productCategories.Count,
             };
         }
         catch (Exception ex)
@@ -365,7 +365,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -384,7 +384,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productCategories,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = productCategories.Count
+                TotalRecord = productCategories.Count,
             };
         }
         catch (Exception ex)
@@ -395,7 +395,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -421,7 +421,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = productCategories.Count
+                TotalRecord = productCategories.Count,
             };
         }
         catch (Exception ex)
@@ -433,7 +433,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -455,7 +455,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productImages,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = productImages.Count
+                TotalRecord = productImages.Count,
             };
         }
         catch (Exception ex)
@@ -466,7 +466,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -485,7 +485,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductImageNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             return new Return<ProductImage>
@@ -493,7 +493,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productImage,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -505,7 +505,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -523,7 +523,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
 
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -535,7 +535,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -552,7 +552,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = productImage,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -564,7 +564,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -582,7 +582,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductImageNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             dbContext.ProductImages.Remove(productImage);
@@ -593,7 +593,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -605,7 +605,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
