@@ -25,6 +25,7 @@ public static class ErrorCode
     public const int CartNotFound = 107;
     public const int ProductImageNotFound = 108;
     public const int ProductAttributeNotFound = 109;
+    public const int VariantAttributeNotFound = 110;
 
     // Already exists
     public const int EmailAlreadyExists = 201;
@@ -35,11 +36,13 @@ public static class ErrorCode
     public const int DiscountCodeAlreadyExists = 206;
     public const int UserAlreadyExists = 207;
     public const int CategoryHasProducts = 208;
+    public const int VariantAttributeAlreadyExists = 209;
 
     // Conflict
     public const int OutOfStock = 301;
     public const int ProductImageMinimum = 302;
     public const int OverStockQuantity = 303;
+    public const int AttributeValueConflict = 304;
 
     // Authorization
     public const int NotAuthority = 401;

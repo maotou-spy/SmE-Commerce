@@ -10,6 +10,7 @@ using SmE_CommerceModels.DBContext;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
+using SmE_CommerceServices.Firebase;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
 
@@ -58,6 +59,8 @@ var defaultApp = FirebaseApp.Create(
 );
 Console.WriteLine(defaultApp.Name);
 
+builder.Services.AddScoped<IFirebaseAuthService, FirebaseService>();
+
 #endregion
 
 #region Services
@@ -70,6 +73,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<IVariantAttributeService, VariantAttributeService>();
 builder.Services.AddScoped<BearerTokenUtil>();
 
 #endregion
@@ -82,6 +86,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
+builder.Services.AddScoped<IVariantAttributeRepository, VariantAttributeRepository>();
 
 #endregion
 
