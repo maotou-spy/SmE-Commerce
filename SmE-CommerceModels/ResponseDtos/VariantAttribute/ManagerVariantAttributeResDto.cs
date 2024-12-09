@@ -6,15 +6,5 @@ public class ManagerVariantAttributeResDto
 
     public string AttributeName { get; set; } = null!;
 
-    public Guid? CreatedById { get; set; }
-
-    public string? CreatedBy { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public Guid? ModifiedById { get; set; }
-
-    public string? ModifiedBy { get; set; }
-
-    public DateTime? ModifiedAt { get; set; }
+    public AuditMetadata? AuditMetadata { get; set; }
 }

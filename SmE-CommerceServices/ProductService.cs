@@ -2,6 +2,7 @@ using System.Transactions;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
+using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ResponseDtos.Product.Manager;
 using SmE_CommerceModels.ReturnResult;
@@ -47,7 +48,7 @@ public class ProductService(
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode ?? string.Empty,
+                    ProductCode = result.Data.ProductCode,
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
@@ -72,7 +73,7 @@ public class ProductService(
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category?.Name ?? string.Empty,
+                            Name = category.Category.Name,
                         })
                         .ToList(),
                     Attributes = result
@@ -130,7 +131,7 @@ public class ProductService(
                 Data = new ManagerGetProductDetailResDto
                 {
                     ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode ?? string.Empty,
+                    ProductCode = result.Data.ProductCode,
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
@@ -155,7 +156,7 @@ public class ProductService(
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category?.Name ?? string.Empty,
+                            Name = category.Category.Name,
                         })
                         .ToList(),
                     Attributes = result
@@ -166,10 +167,15 @@ public class ProductService(
                             Value = attribute.AttributeValue,
                         })
                         .ToList(),
-                    CreatedAt = result.Data.CreatedAt,
-                    CreatedBy = result.Data.CreateBy?.FullName,
-                    ModifiedAt = result.Data.ModifiedAt,
-                    ModifiedBy = result.Data.ModifiedBy?.FullName,
+                    AuditMetadata = new AuditMetadata
+                    {
+                        CreatedById = result.Data.CreateById,
+                        CreatedAt = result.Data.CreatedAt,
+                        CreatedBy = result.Data.CreateBy?.FullName,
+                        ModifiedById = result.Data.ModifiedById,
+                        ModifiedAt = result.Data.ModifiedAt,
+                        ModifiedBy = result.Data.ModifiedBy?.FullName,
+                    },
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
@@ -345,7 +351,7 @@ public class ProductService(
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode ?? string.Empty,
+                    ProductCode = result.Data.ProductCode,
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
@@ -365,7 +371,7 @@ public class ProductService(
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category?.Name ?? string.Empty,
+                            Name = category.Category.Name,
                         })
                         .ToList(),
                     Images = result
@@ -567,7 +573,7 @@ public class ProductService(
                     .Data?.Select(category => new GetProductCategoryResDto
                     {
                         CategoryId = category.CategoryId,
-                        Name = category.Category?.Name ?? string.Empty,
+                        Name = category.Category.Name,
                     })
                     .ToList(),
                 IsSuccess = true,
@@ -1098,7 +1104,7 @@ public class ProductService(
                 Data = new GetProductDetailsResDto
                 {
                     ProductId = product.ProductId,
-                    ProductCode = product.ProductCode ?? string.Empty,
+                    ProductCode = product.ProductCode,
                     Name = product.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = product.Description,
@@ -1123,7 +1129,7 @@ public class ProductService(
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category?.Name ?? string.Empty,
+                            Name = category.Category.Name,
                         })
                         .ToList(),
                     Attributes = result

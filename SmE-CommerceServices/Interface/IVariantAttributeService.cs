@@ -9,9 +9,9 @@ public interface IVariantAttributeService
 {
     Task<Return<List<ManagerVariantAttributeResDto>>> GetVariantAttributesAsync();
 
-    Task<Return<bool>> BulkCreateVariantAttributeAsync(List<AttributeReqDto> attributeReqs);
+    Task<Return<bool>> BulkCreateVariantAttributeAsync(List<VariantReqDto> variantReqs);
 
-    Task<Return<bool>> UpdateVariantAttributeAsync(Guid attributeId, AttributeReqDto attributeReq);
+    Task<Return<bool>> UpdateVariantAttributeAsync(Guid variantId, VariantReqDto variantReq);
 
-    Task<Return<bool>> DeleteVariantAttributeAsync(Guid id);
+    Task<Return<bool>> DeleteVariantAttributeAsync(Guid variantId);
 }

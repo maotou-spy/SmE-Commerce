@@ -1,6 +1,7 @@
 ﻿using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.VariantAttribute;
+using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.VariantAttribute;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
@@ -9,7 +10,7 @@ using SmE_CommerceServices.Interface;
 namespace SmE_CommerceServices;
 
 public class VariantAttributeService(
-    IVariantAttributeRepository attributeRepository,
+    IVariantAttributeRepository variantRepository,
     IHelperService helperService
 ) : IVariantAttributeService
 {
@@ -27,36 +28,39 @@ public class VariantAttributeService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            var attributesResult = await attributeRepository.GetVariantAttributes();
-            if (!attributesResult.IsSuccess || attributesResult.Data == null)
+            var variantsResult = await variantRepository.GetVariantAttributes();
+            if (!variantsResult.IsSuccess || variantsResult.Data == null)
                 return new Return<List<ManagerVariantAttributeResDto>>
                 {
                     Data = [],
                     IsSuccess = false,
-                    StatusCode = attributesResult.StatusCode,
-                    InternalErrorMessage = attributesResult.InternalErrorMessage,
+                    StatusCode = variantsResult.StatusCode,
+                    InternalErrorMessage = variantsResult.InternalErrorMessage,
                 };
 
-            var attributes = attributesResult
+            var variants = variantsResult
                 .Data.Select(attribute => new ManagerVariantAttributeResDto
                 {
                     AttributeId = attribute.VariantId,
                     AttributeName = attribute.AttributeName,
-                    CreatedById = attribute.CreatedById,
-                    CreatedAt = attribute.CreatedAt,
-                    CreatedBy = attribute.CreatedBy?.FullName,
-                    ModifiedById = attribute.ModifiedById,
-                    ModifiedAt = attribute.ModifiedAt,
-                    ModifiedBy = attribute.ModifiedBy?.FullName,
+                    AuditMetadata = new AuditMetadata
+                    {
+                        CreatedById = attribute.CreatedById,
+                        CreatedAt = attribute.CreatedAt,
+                        CreatedBy = attribute.CreatedBy?.FullName,
+                        ModifiedById = attribute.ModifiedById,
+                        ModifiedAt = attribute.ModifiedAt,
+                        ModifiedBy = attribute.ModifiedBy?.FullName,
+                    },
                 })
                 .ToList();
 
             return new Return<List<ManagerVariantAttributeResDto>>
             {
-                Data = attributes,
+                Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = attributes.Count,
+                TotalRecord = variants.Count,
             };
         }
         catch (Exception ex)
@@ -72,9 +76,7 @@ public class VariantAttributeService(
         }
     }
 
-    public async Task<Return<bool>> BulkCreateVariantAttributeAsync(
-        List<AttributeReqDto> attributeReqs
-    )
+    public async Task<Return<bool>> BulkCreateVariantAttributeAsync(List<VariantReqDto> variantReqs)
     {
         try
         {
@@ -90,42 +92,42 @@ public class VariantAttributeService(
                 };
 
             // Remove duplicates within the input list
-            attributeReqs = attributeReqs
+            variantReqs = variantReqs
                 .GroupBy(req => req.AttributeName)
                 .Select(group => group.First())
                 .ToList();
 
             // Fetch existing attributes
-            var existingAttributesResult = await attributeRepository.GetVariantAttributes();
-            if (!existingAttributesResult.IsSuccess || existingAttributesResult.Data == null)
+            var existingVariantsResult = await variantRepository.GetVariantAttributes();
+            if (!existingVariantsResult.IsSuccess || existingVariantsResult.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = existingAttributesResult.StatusCode,
-                    InternalErrorMessage = existingAttributesResult.InternalErrorMessage,
+                    StatusCode = existingVariantsResult.StatusCode,
+                    InternalErrorMessage = existingVariantsResult.InternalErrorMessage,
                 };
 
             // Check for duplicate attributes in the input list
-            var duplicateAttributes = attributeReqs
+            var duplicateVariants = variantReqs
                 .Where(req =>
-                    existingAttributesResult.Data.Any(existing =>
+                    existingVariantsResult.Data.Any(existing =>
                         existing.AttributeName == req.AttributeName
                     )
                 )
                 .ToList();
 
-            if (duplicateAttributes.Count != 0)
-                attributeReqs = attributeReqs
+            if (duplicateVariants.Count != 0)
+                variantReqs = variantReqs
                     .Where(req =>
-                        duplicateAttributes.All(duplicate =>
+                        duplicateVariants.All(duplicate =>
                             duplicate.AttributeName != req.AttributeName
                         )
                     )
                     .ToList();
 
             // Map incoming DTOs to domain models
-            var attributesToCreate = attributeReqs
+            var variantsToCreate = variantReqs
                 .Select(req => new VariantAttribute
                 {
                     AttributeName = req.AttributeName,
@@ -135,8 +137,8 @@ public class VariantAttributeService(
                 .ToList();
 
             // Perform bulk creation
-            var bulkCreateResult = await attributeRepository.BulkCreateVariantAttribute(
-                attributesToCreate
+            var bulkCreateResult = await variantRepository.BulkCreateVariantAttribute(
+                variantsToCreate
             );
 
             if (!bulkCreateResult.IsSuccess)
@@ -170,8 +172,8 @@ public class VariantAttributeService(
     }
 
     public async Task<Return<bool>> UpdateVariantAttributeAsync(
-        Guid attributeId,
-        AttributeReqDto attributeReq
+        Guid variantId,
+        VariantReqDto variantReq
     )
     {
         try
@@ -186,17 +188,17 @@ public class VariantAttributeService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            var existingAttribute = await attributeRepository.GetVariantAttributeById(attributeId);
-            if (!existingAttribute.IsSuccess || existingAttribute.Data == null)
+            var existingVariant = await variantRepository.GetVariantAttributeById(variantId);
+            if (!existingVariant.IsSuccess || existingVariant.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantAttributeNotFound,
-                    InternalErrorMessage = existingAttribute.InternalErrorMessage,
+                    InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
             // Check if the attribute name is the same
-            if (existingAttribute.Data.AttributeName == attributeReq.AttributeName)
+            if (existingVariant.Data.AttributeName == variantReq.AttributeName)
                 return new Return<bool>
                 {
                     Data = true,
@@ -205,24 +207,24 @@ public class VariantAttributeService(
                 };
 
             // Check if the attribute name already exists
-            var existingAttributes = await attributeRepository.GetVariantAttributes();
+            var existingVariantsResult = await variantRepository.GetVariantAttributes();
             if (
-                existingAttributes is { IsSuccess: true, Data: not null }
-                && existingAttributes.Data.Any(x => x.AttributeName == attributeReq.AttributeName)
+                existingVariantsResult is { IsSuccess: true, Data: not null }
+                && existingVariantsResult.Data.Any(x => x.AttributeName == variantReq.AttributeName)
             )
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantAttributeAlreadyExists,
-                    InternalErrorMessage = existingAttributes.InternalErrorMessage,
+                    InternalErrorMessage = existingVariantsResult.InternalErrorMessage,
                 };
 
-            existingAttribute.Data.AttributeName = attributeReq.AttributeName;
-            existingAttribute.Data.ModifiedAt = DateTime.Now;
-            existingAttribute.Data.ModifiedById = currentUser.Data.UserId;
+            existingVariant.Data.AttributeName = variantReq.AttributeName;
+            existingVariant.Data.ModifiedAt = DateTime.Now;
+            existingVariant.Data.ModifiedById = currentUser.Data.UserId;
 
-            return await attributeRepository.UpdateVariantAttribute(existingAttribute.Data);
+            return await variantRepository.UpdateVariantAttribute(existingVariant.Data);
         }
         catch (Exception ex)
         {
@@ -237,7 +239,7 @@ public class VariantAttributeService(
         }
     }
 
-    public async Task<Return<bool>> DeleteVariantAttributeAsync(Guid attributeId)
+    public async Task<Return<bool>> DeleteVariantAttributeAsync(Guid variantId)
     {
         try
         {
@@ -251,26 +253,26 @@ public class VariantAttributeService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            var existingAttribute = await attributeRepository.GetVariantAttributeById(attributeId);
-            if (!existingAttribute.IsSuccess || existingAttribute.Data == null)
+            var existingVariant = await variantRepository.GetVariantAttributeById(variantId);
+            if (!existingVariant.IsSuccess || existingVariant.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantAttributeNotFound,
-                    InternalErrorMessage = existingAttribute.InternalErrorMessage,
+                    InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
 
             // Check if the attribute is used in any product variant
-            if (existingAttribute.Data.ProductVariants.Count != 0)
+            if (existingVariant.Data.ProductVariants.Count != 0)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AttributeValueConflict,
+                    StatusCode = ErrorCode.VariantAttributeConflict,
                 };
 
-            return await attributeRepository.DeleteVariantAttributes(existingAttribute.Data);
+            return await variantRepository.DeleteVariantAttributes(existingVariant.Data);
         }
         catch (Exception ex)
         {

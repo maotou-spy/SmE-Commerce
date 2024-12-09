@@ -2,7 +2,7 @@
 
 namespace SmE_CommerceModels.RequestDtos.VariantAttribute;
 
-public class AttributeReqDto
+public class VariantReqDto
 {
     [Required(ErrorMessage = "Attribute name is required")]
     public required string AttributeName { get; init; }

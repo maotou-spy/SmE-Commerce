@@ -42,7 +42,7 @@ public static class ErrorCode
     public const int OutOfStock = 301;
     public const int ProductImageMinimum = 302;
     public const int OverStockQuantity = 303;
-    public const int AttributeValueConflict = 304;
+    public const int VariantAttributeConflict = 304;
 
     // Authorization
     public const int NotAuthority = 401;

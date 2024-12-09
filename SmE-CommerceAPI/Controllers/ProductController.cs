@@ -364,7 +364,7 @@ public class ProductController(
     [HttpPost("variant-attributes")]
     [Authorize]
     public async Task<IActionResult> CreateVariantAttributeAsync(
-        [FromBody] List<AttributeReqDto> reqs
+        [FromBody] List<VariantReqDto> reqs
     )
     {
         try
@@ -391,11 +391,11 @@ public class ProductController(
         }
     }
 
-    [HttpPut("variant-attributes/{attributeId:guid}")]
+    [HttpPut("variant-attributes/{variantId:guid}")]
     [Authorize]
     public async Task<IActionResult> UpdateVariantAttributeAsync(
-        [FromBody] AttributeReqDto req,
-        Guid attributeId
+        [FromBody] VariantReqDto req,
+        Guid variantId
     )
     {
         try
@@ -403,10 +403,7 @@ public class ProductController(
             if (!ModelState.IsValid)
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
 
-            var result = await variantAttributeService.UpdateVariantAttributeAsync(
-                attributeId,
-                req
-            );
+            var result = await variantAttributeService.UpdateVariantAttributeAsync(variantId, req);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -425,13 +422,13 @@ public class ProductController(
         }
     }
 
-    [HttpDelete("variant-attributes/{attributeId:guid}")]
+    [HttpDelete("variant-attributes/{variantId:guid}")]
     [Authorize]
-    public async Task<IActionResult> DeleteVariantAttributeAsync(Guid attributeId)
+    public async Task<IActionResult> DeleteVariantAttributeAsync(Guid variantId)
     {
         try
         {
-            var result = await variantAttributeService.DeleteVariantAttributeAsync(attributeId);
+            var result = await variantAttributeService.DeleteVariantAttributeAsync(variantId);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
