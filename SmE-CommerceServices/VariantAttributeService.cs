@@ -39,18 +39,18 @@ public class VariantAttributeService(
                 };
 
             var variants = variantsResult
-                .Data.Select(attribute => new ManagerVariantAttributeResDto
+                .Data.Select(variant => new ManagerVariantAttributeResDto
                 {
-                    AttributeId = attribute.VariantId,
-                    AttributeName = attribute.AttributeName,
+                    AttributeId = variant.VariantId,
+                    AttributeName = variant.VariantName,
                     AuditMetadata = new AuditMetadata
                     {
-                        CreatedById = attribute.CreatedById,
-                        CreatedAt = attribute.CreatedAt,
-                        CreatedBy = attribute.CreatedBy?.FullName,
-                        ModifiedById = attribute.ModifiedById,
-                        ModifiedAt = attribute.ModifiedAt,
-                        ModifiedBy = attribute.ModifiedBy?.FullName,
+                        CreatedById = variant.CreatedById,
+                        CreatedAt = variant.CreatedAt,
+                        CreatedBy = variant.CreatedBy?.FullName,
+                        ModifiedById = variant.ModifiedById,
+                        ModifiedAt = variant.ModifiedAt,
+                        ModifiedBy = variant.ModifiedBy?.FullName,
                     },
                 })
                 .ToList();
@@ -112,7 +112,7 @@ public class VariantAttributeService(
             var duplicateVariants = variantReqs
                 .Where(req =>
                     existingVariantsResult.Data.Any(existing =>
-                        existing.AttributeName == req.AttributeName
+                        existing.VariantName == req.AttributeName
                     )
                 )
                 .ToList();
@@ -130,7 +130,7 @@ public class VariantAttributeService(
             var variantsToCreate = variantReqs
                 .Select(req => new VariantAttribute
                 {
-                    AttributeName = req.AttributeName,
+                    VariantName = req.AttributeName,
                     CreatedAt = DateTime.Now,
                     CreatedById = currentUser.Data.UserId,
                 })
@@ -198,7 +198,7 @@ public class VariantAttributeService(
                     InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
             // Check if the attribute name is the same
-            if (existingVariant.Data.AttributeName == variantReq.AttributeName)
+            if (existingVariant.Data.VariantName == variantReq.AttributeName)
                 return new Return<bool>
                 {
                     Data = true,
@@ -210,7 +210,7 @@ public class VariantAttributeService(
             var existingVariantsResult = await variantRepository.GetVariantAttributes();
             if (
                 existingVariantsResult is { IsSuccess: true, Data: not null }
-                && existingVariantsResult.Data.Any(x => x.AttributeName == variantReq.AttributeName)
+                && existingVariantsResult.Data.Any(x => x.VariantName == variantReq.AttributeName)
             )
                 return new Return<bool>
                 {
@@ -220,7 +220,7 @@ public class VariantAttributeService(
                     InternalErrorMessage = existingVariantsResult.InternalErrorMessage,
                 };
 
-            existingVariant.Data.AttributeName = variantReq.AttributeName;
+            existingVariant.Data.VariantName = variantReq.AttributeName;
             existingVariant.Data.ModifiedAt = DateTime.Now;
             existingVariant.Data.ModifiedById = currentUser.Data.UserId;
 

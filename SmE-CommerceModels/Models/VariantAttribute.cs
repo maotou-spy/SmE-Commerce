@@ -14,7 +14,7 @@ public partial class VariantAttribute
 
     [Column("variantName")]
     [StringLength(100)]
-    public string AttributeName { get; set; } = null!;
+    public string VariantName { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
