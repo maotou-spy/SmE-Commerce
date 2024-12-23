@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SmE_CommerceModels.ResponseDtos;
 
 namespace SmE_CommerceModels.RequestDtos.Category;
 

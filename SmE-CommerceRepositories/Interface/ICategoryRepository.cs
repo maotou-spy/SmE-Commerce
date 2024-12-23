@@ -12,5 +12,6 @@ namespace SmE_CommerceRepositories.Interface
         Task<Return<Category>> GetCategoryByIdAsync(Guid id);
         Task<Return<Category>> UpdateCategoryAsync(Category category);
         Task<Return<IEnumerable<Category>>> GetProductsByCategoryIdAsync(Guid id);
+        Task<Return<Category>> GetCategoryByIdForUpdateAsync(Guid categoryId);
     }
 }

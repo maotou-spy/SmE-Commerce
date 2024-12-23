@@ -2,7 +2,6 @@
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ResponseDtos;
-using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category.Custumer;
 using SmE_CommerceModels.ResponseDtos.Category.Manager;
 using SmE_CommerceModels.ReturnResult;
@@ -194,7 +193,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                     StatusCode = currentUser.StatusCode
                 };
 
-            var oldCategory = await categoryRepository.GetCategoryByIdAsync(id);
+            var oldCategory = await categoryRepository.GetCategoryByIdForUpdateAsync(id);
             if (oldCategory.Data == null || !oldCategory.IsSuccess)
                 return new Return<bool>
                 {
@@ -202,10 +201,20 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                     Data = false,
                     StatusCode = oldCategory.StatusCode
                 };
+            
+            // Check if name already exists
+            var existedCate = await categoryRepository.GetCategoryByNameAsync(req.Name);
+            if (existedCate is { IsSuccess: true, Data: not null } && existedCate.Data.CategoryId != id)
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.NameAlreadyExists
+                };
 
             oldCategory.Data.Description = req.Description;
             oldCategory.Data.Name = req.Name;
             oldCategory.Data.Status = oldCategory.Data.Status;
+            oldCategory.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
             oldCategory.Data.ModifiedAt = DateTime.Now;
             oldCategory.Data.ModifiedById = currentUser.Data.UserId;
 
