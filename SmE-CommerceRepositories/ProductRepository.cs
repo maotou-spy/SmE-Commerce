@@ -59,7 +59,8 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var product = await dbContext
-                .Products.Include(x => x.ProductCategories)
+                .Products.Where(x => x.Status != ProductStatus.Deleted)
+                .Include(x => x.ProductCategories)
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
@@ -133,7 +134,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var product = await dbContext
-                .Products.Where(x => x.Status == ProductStatus.Active)
+                .Products.Where(x => x.Status != ProductStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Name == productName);
 
             if (product is null)

@@ -56,9 +56,12 @@ public class ProductService(
                     StockQuantity = result.Data.StockQuantity,
                     SoldQuantity = result.Data.SoldQuantity,
                     IsTopSeller = result.Data.IsTopSeller,
-                    Slug = result.Data.Slug,
-                    MetaTitle = result.Data.MetaTitle,
-                    MetaDescription = result.Data.MetaDescription,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
                     Status = result.Data.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto
@@ -138,9 +141,12 @@ public class ProductService(
                     StockQuantity = result.Data.StockQuantity,
                     SoldQuantity = result.Data.SoldQuantity,
                     IsTopSeller = result.Data.IsTopSeller,
-                    Slug = result.Data.Slug,
-                    MetaTitle = result.Data.MetaTitle,
-                    MetaDescription = result.Data.MetaDescription,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
                     Status = result.Data.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto
@@ -242,7 +248,6 @@ public class ProductService(
         }
         catch (Exception ex)
         {
-            // Log exception details here as appropriate for debugging
             return new Return<GetProductDetailsResDto>
             {
                 Data = null,
@@ -298,6 +303,19 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ValidationError,
+                };
+
+            // Check if the product name is unique except the current product
+            var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
+            if (
+                exitedProductResult is { IsSuccess: true, Data: not null }
+                && exitedProductResult.Data.ProductId != productId
+            )
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNameAlreadyExists,
                 };
 
             productResult.Data.Name = req.Name.Trim();
@@ -366,9 +384,12 @@ public class ProductService(
                             AltText = image.AltText,
                         })
                         .ToList(),
-                    Slug = result.Data.Slug,
-                    MetaTitle = result.Data.MetaTitle,
-                    MetaDescription = result.Data.MetaDescription,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
                     Status = result.Data.Status,
                 },
                 IsSuccess = true,
@@ -1104,9 +1125,12 @@ public class ProductService(
                     StockQuantity = product.StockQuantity,
                     SoldQuantity = product.SoldQuantity,
                     IsTopSeller = product.IsTopSeller,
-                    Slug = product.Slug,
-                    MetaTitle = product.MetaTitle,
-                    MetaDescription = product.MetaDescription,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
                     Status = product.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto

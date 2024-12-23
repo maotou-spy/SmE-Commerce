@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SmE_CommerceUtilities;
 
-public class TextUtils
+public static class TextUtils
 {
     // Remove diacritics from a string for search purposes
     public static string RemoveDiacritics(string input)
