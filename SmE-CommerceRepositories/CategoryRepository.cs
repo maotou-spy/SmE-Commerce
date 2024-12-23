@@ -166,6 +166,52 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             };
         }
     }
+    
+    public async Task<Return<Category>> GetCategoryByIdForUpdateAsync(Guid categoryId)
+    {
+        try
+        {
+            var category = await dbContext
+                .Categories.Where(x => x.Status != GeneralStatus.Deleted)
+                .FirstOrDefaultAsync(x => x.CategoryId == categoryId);
+
+            if (category is null)
+            {
+                return new Return<Category>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.CategoryNotFound,
+                    TotalRecord = 0,
+                };
+            }
+
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"Categories\" WHERE public.\"Categories\".\"categoryId\" = {0} FOR UPDATE",
+                categoryId
+            );
+
+            return new Return<Category>
+            {
+                Data = category,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<Category>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
 
     public async Task<Return<Category>> UpdateCategoryAsync(Category category)
     {
