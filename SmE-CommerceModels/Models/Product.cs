@@ -64,9 +64,6 @@ public partial class Product
     [Column("metaDescription")]
     public string? MetaDescription { get; set; }
 
-    [Column("keywords", TypeName = "character varying[]")]
-    public List<string> Keywords { get; set; } = null!;
-
     [Column("isTopSeller")]
     public bool IsTopSeller { get; set; }
 
@@ -78,14 +75,16 @@ public partial class Product
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
+        new List<ContentProduct>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("ProductCreateBies")]
     public virtual User? CreateBy { get; set; }
 
     [InverseProperty("Product")]
-    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
+        new List<DiscountProduct>();
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("ProductModifiedBies")]
@@ -95,16 +94,19 @@ public partial class Product
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
+    public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } =
+        new List<ProductAttribute>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } =
+        new List<ProductCategory>();
 
     [InverseProperty("Product")]
     public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } =
+        new List<ProductVariant>();
 
     [InverseProperty("Product")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();

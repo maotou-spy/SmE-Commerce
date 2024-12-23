@@ -59,7 +59,6 @@ public class ProductService(
                     Slug = result.Data.Slug,
                     MetaTitle = result.Data.MetaTitle,
                     MetaDescription = result.Data.MetaDescription,
-                    Keywords = result.Data.Keywords,
                     Status = result.Data.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto
@@ -142,7 +141,6 @@ public class ProductService(
                     Slug = result.Data.Slug,
                     MetaTitle = result.Data.MetaTitle,
                     MetaDescription = result.Data.MetaDescription,
-                    Keywords = result.Data.Keywords,
                     Status = result.Data.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto
@@ -224,18 +222,6 @@ public class ProductService(
                     IsSuccess = false,
                     StatusCode = ErrorCode.ValidationError,
                 };
-
-            if (req.Slug != null)
-            {
-                var productSlug = await productRepository.GetProductSlugAsync(req.Slug);
-                if (productSlug.IsSuccess)
-                    return new Return<GetProductDetailsResDto>
-                    {
-                        Data = null,
-                        IsSuccess = false,
-                        StatusCode = ErrorCode.SlugAlreadyExists,
-                    };
-            }
 
             // Initialize the product
             var prdResult = await AddProductPrivateAsync(req, currentUser.Data.UserId);
@@ -320,11 +306,9 @@ public class ProductService(
             productResult.Data.StockQuantity = req.StockQuantity;
             productResult.Data.SoldQuantity = req.SoldQuantity;
             productResult.Data.IsTopSeller = req.IsTopSeller;
-            productResult.Data.Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim();
+            productResult.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
             productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
             productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
-            if (req.MetaKeywords != null)
-                productResult.Data.Keywords = req.MetaKeywords;
             productResult.Data.Status =
                 req.StockQuantity > 0
                     ? req.Status != ProductStatus.Inactive
@@ -385,7 +369,6 @@ public class ProductService(
                     Slug = result.Data.Slug,
                     MetaTitle = result.Data.MetaTitle,
                     MetaDescription = result.Data.MetaDescription,
-                    Keywords = result.Data.Keywords,
                     Status = result.Data.Status,
                 },
                 IsSuccess = true,
@@ -994,6 +977,16 @@ public class ProductService(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
+            // Check if the product name is unique
+            var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
+            if (exitedProductResult.IsSuccess)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNameAlreadyExists,
+                };
+
             // Initialize the product
             var product = new Product
             {
@@ -1004,10 +997,9 @@ public class ProductService(
                 StockQuantity = req.StockQuantity,
                 SoldQuantity = req.SoldQuantity,
                 IsTopSeller = req.IsTopSeller,
-                Slug = (req.Slug ?? SlugUtil.GenerateSlug(req.Name)).Trim(),
+                Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
                 MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
                 MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
-                Keywords = req.MetaKeywords,
                 Status =
                     req.StockQuantity > 0
                         ? req.Status != ProductStatus.Inactive
@@ -1115,7 +1107,6 @@ public class ProductService(
                     Slug = product.Slug,
                     MetaTitle = product.MetaTitle,
                     MetaDescription = product.MetaDescription,
-                    Keywords = product.Keywords,
                     Status = product.Status,
                     Images = result
                         .Data.ProductImages.Select(image => new GetProductImageResDto

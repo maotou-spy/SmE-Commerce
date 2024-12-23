@@ -74,9 +74,6 @@ public partial class Content
     [Column("metaDescription")]
     public string MetaDescription { get; set; } = null!;
 
-    [Column("keywords", TypeName = "character varying[]")]
-    public List<string> Keywords { get; set; } = null!;
-
     [Column("viewCount")]
     public int? ViewCount { get; set; }
 
@@ -84,13 +81,15 @@ public partial class Content
     public string ShortDescription { get; set; } = null!;
 
     [InverseProperty("Content")]
-    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
+    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } =
+        new List<ContentCategoryMap>();
 
     [InverseProperty("Content")]
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();
 
     [InverseProperty("Content")]
-    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
+        new List<ContentProduct>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("ContentCreateBies")]

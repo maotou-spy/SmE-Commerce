@@ -14,7 +14,6 @@ public class GetProductDetailsResDto
     public string? Slug { get; set; } = null!;
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
-    public List<string>? Keywords { get; set; }
     public bool IsTopSeller { get; set; }
     public List<GetProductImageResDto>? Images { get; set; } = [];
     public List<GetProductAttributeResDto>? Attributes { get; set; } = [];

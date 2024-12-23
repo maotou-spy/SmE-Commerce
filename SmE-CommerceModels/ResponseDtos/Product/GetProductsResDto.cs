@@ -1,6 +1,4 @@
-﻿using SmE_CommerceModels.ResponseDtos.Category;
-
-namespace SmE_CommerceModels.ResponseDtos.Product;
+﻿namespace SmE_CommerceModels.ResponseDtos.Product;
 
 public class GetProductsResDto
 {
@@ -16,5 +14,5 @@ public class GetProductsResDto
 
     public string? ProductSlug { get; set; }
 
-    public List<GetCategoryDetailResDto>? Categories { get; set; }
+    public List<Dictionary<Guid, string>>? Categories { get; set; }
 }

@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
@@ -129,16 +128,16 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
-    public async Task<Return<string>> GetProductSlugAsync(string slug)
+    public async Task<Return<Product>> GetProductByNameAsync(string productName)
     {
         try
         {
             var product = await dbContext
-                .Products.Where(x => x.Status != ProductStatus.Deleted)
-                .FirstOrDefaultAsync(x => x.Slug == slug);
+                .Products.Where(x => x.Status == ProductStatus.Active)
+                .FirstOrDefaultAsync(x => x.Name == productName);
 
             if (product is null)
-                return new Return<string>
+                return new Return<Product>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -146,9 +145,9 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     TotalRecord = 0,
                 };
 
-            return new Return<string>
+            return new Return<Product>
             {
-                Data = product.Slug,
+                Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
@@ -156,7 +155,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
         catch (Exception ex)
         {
-            return new Return<string>
+            return new Return<Product>
             {
                 Data = null,
                 IsSuccess = false,

@@ -33,11 +33,7 @@ public class AddProductReqDto
 
     public string Status { get; set; } = ProductStatus.Active;
 
-    public string? Slug { get; set; }
-
     public string? MetaTitle { get; set; }
 
     public string? MetaDescription { get; set; }
-
-    public List<string> MetaKeywords { get; set; } = [];
 }

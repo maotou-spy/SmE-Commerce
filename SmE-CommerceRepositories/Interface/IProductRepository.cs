@@ -6,7 +6,7 @@ namespace SmE_CommerceRepositories.Interface;
 public interface IProductRepository
 {
     Task<Return<Product>> GetProductByIdAsync(Guid productId);
-    Task<Return<string>> GetProductSlugAsync(string slug);
+    Task<Return<Product>> GetProductByNameAsync(string productName);
     Task<Return<Product>> AddProductAsync(Product product);
     Task<Return<Product>> GetProductByIdForUpdateAsync(Guid productId);
 
