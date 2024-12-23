@@ -2,6 +2,7 @@
 using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category.Custumer;
+using SmE_CommerceModels.ResponseDtos.Category.Manager;
 using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceServices.Interface
@@ -13,7 +14,7 @@ namespace SmE_CommerceServices.Interface
         Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber,
             int pageSize);
 
-        Task<Return<IEnumerable<Category>>> GetCategoriesForManagerAsync(string? name, int pageNumber,
+        Task<Return<IEnumerable<ManagerGetCategoryResDto>>> GetCategoriesForManagerAsync(string? name, int pageNumber,
             int pageSize);
 
         Task<Return<GetCategoryDetailResDto?>> GetCategoryDetailForCustomerAsync(Guid id);
