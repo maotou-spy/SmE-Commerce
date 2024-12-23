@@ -14,4 +14,5 @@ public interface IDiscountRepository
     Task<Return<DiscountCode>> AddDiscountCodeAsync(DiscountCode discountCode);
     Task<Return<DiscountCode>> UpdateDiscountCodeAsync(DiscountCode discountCode);
     Task<Return<DiscountCode>> GetDiscountCodeByCodeAsync(string code);
+    Task<Return<DiscountCode>> GetDiscountCodeByIdForUpdateAsync(Guid id);
 }

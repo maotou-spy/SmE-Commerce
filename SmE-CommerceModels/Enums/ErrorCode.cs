@@ -26,6 +26,7 @@ public static class ErrorCode
     public const int ProductImageNotFound = 108;
     public const int ProductAttributeNotFound = 109;
     public const int VariantAttributeNotFound = 110;
+    public const int DiscountCodeNotFound = 111;
 
     // Already exists
     public const int EmailAlreadyExists = 201;

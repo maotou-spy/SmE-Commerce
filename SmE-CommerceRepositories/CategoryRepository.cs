@@ -80,8 +80,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
         }
     }
 
-    public async Task<Return<IEnumerable<Category>>> GetCategoriesAsync(string? name, string? status,
-        int? pageNumber, int? pageSize)
+    public async Task<Return<IEnumerable<Category>>> GetCategoriesAsync(string? name, string? status, int? pageNumber, int? pageSize)
     {
         try
         {

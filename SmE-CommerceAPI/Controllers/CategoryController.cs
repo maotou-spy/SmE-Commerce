@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Category;
-using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
@@ -173,11 +172,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete category: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<dynamic>>
-                {
-                    StatusCode = ErrorCode.InternalServerError
-                });
+            return Helper.GetErrorResponse(500);
         }
     }
 }

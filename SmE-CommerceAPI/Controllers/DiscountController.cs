@@ -61,11 +61,9 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             });
         }
     }
-
     #endregion
 
     #region DiscountCode
-
     [HttpPost("{id:guid}/codes")]
     [Authorize]
     public async Task<IActionResult> AddDiscountCodeAsync([FromRoute] Guid id, [FromBody] AddDiscountCodeReqDto req)
@@ -112,6 +110,29 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             });
         }
     }
+    
+    [HttpPut("codes/{codeId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateDiscountCodeAsync([FromRoute] Guid codeId, [FromBody] AddDiscountCodeReqDto req)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            var result = await discountService.UpdateDiscountCodeAsync(codeId, req);
 
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update discount code: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update discount code: {e}", ex);
+            return StatusCode(500, new Return<bool>
+            {
+                StatusCode = ErrorCode.InternalServerError
+            });
+        }
+    }
     #endregion
 }

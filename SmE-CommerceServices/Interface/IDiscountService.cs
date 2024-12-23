@@ -13,4 +13,5 @@ public interface IDiscountService
 
     Task<Return<bool>> AddDiscountCodeAsync(Guid id, AddDiscountCodeReqDto req);
     Task<Return<GetDiscountCodeByCodeResDto>> GetDiscounCodeByCodeAsync(string code);
+    Task<Return<bool>> UpdateDiscountCodeAsync(Guid codeId, AddDiscountCodeReqDto req);
 }
