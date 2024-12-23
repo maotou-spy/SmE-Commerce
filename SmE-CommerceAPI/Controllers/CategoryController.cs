@@ -30,10 +30,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at create category user: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(500);
         }
     }
 
@@ -53,10 +50,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at get categories for customer: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<dynamic>>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(500);
         }
     }
 
@@ -77,11 +71,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at get categories for manager: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<dynamic>>
-                {
-                    StatusCode = ErrorCode.InternalServerError
-                });
+            return Helper.GetErrorResponse(500);
         }
     }
 
@@ -125,11 +115,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at get category detail for manager: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<dynamic>>
-                {
-                    StatusCode = ErrorCode.InternalServerError
-                });
+            return Helper.GetErrorResponse(500);
         }
     }
 
@@ -149,9 +135,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         catch (Exception ex)
         {
             logger.LogInformation("Error at update category detail: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<dynamic>>
-                    { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(500);
         }
     }
 

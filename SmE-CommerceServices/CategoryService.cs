@@ -1,8 +1,10 @@
 ﻿using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
+using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category.Custumer;
+using SmE_CommerceModels.ResponseDtos.Category.Manager;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -116,7 +118,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
         }
     }
 
-    public async Task<Return<IEnumerable<Category>>> GetCategoriesForManagerAsync(
+    public async Task<Return<IEnumerable<ManagerGetCategoryResDto>>> GetCategoriesForManagerAsync(
         string? name,
         int pageNumber,
         int pageSize
@@ -126,38 +128,50 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
         {
             var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
-                return new Return<IEnumerable<Category>>
+                return new Return<IEnumerable<ManagerGetCategoryResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentCustomer.StatusCode
                 };
 
-            var result = await categoryRepository.GetCategoriesAsync(
-                name,
-                null,
-                pageNumber,
-                pageSize
-            );
+            var result = await categoryRepository.GetCategoriesAsync(name, null, pageNumber, pageSize);
             if (!result.IsSuccess)
-                return new Return<IEnumerable<Category>>
+                return new Return<IEnumerable<ManagerGetCategoryResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode
                 };
 
-            return new Return<IEnumerable<Category>>
-            {
-                Data = result.Data,
-                IsSuccess = true,
-                TotalRecord = result.TotalRecord,
-                StatusCode = result.StatusCode
-            };
+            var categories = result.Data;
+                return new Return<IEnumerable<ManagerGetCategoryResDto>>
+                {
+                    Data = categories!.Select(category => new ManagerGetCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Name,
+                        Description = category.Description,
+                        Status = category.Status,
+                        Slug = category.Slug,
+                        AuditMetadata = new AuditMetadata
+                        {
+                            CreatedById = category.CreateById,
+                            CreatedAt = category.CreatedAt,
+                            CreatedBy = category.CreateBy?.FullName,
+                            ModifiedById = category.ModifiedById,
+                            ModifiedAt = category.ModifiedAt,
+                            ModifiedBy = category.ModifiedBy?.FullName
+                        }
+                    }),
+                    IsSuccess = true,
+                    TotalRecord = result.TotalRecord,
+                    StatusCode = result.StatusCode
+                };
         }
         catch (Exception ex)
         {
-            return new Return<IEnumerable<Category>>
+            return new Return<IEnumerable<ManagerGetCategoryResDto>>
             {
                 Data = null,
                 IsSuccess = false,
