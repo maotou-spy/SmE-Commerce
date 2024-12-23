@@ -1,6 +1,7 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category;
+using SmE_CommerceModels.ResponseDtos.Category.Custumer;
 using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceServices.Interface

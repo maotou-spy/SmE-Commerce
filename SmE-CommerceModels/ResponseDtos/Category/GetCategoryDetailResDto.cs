@@ -7,6 +7,4 @@ public class GetCategoryDetailResDto
     public required string CategoryName { get; set; }
 
     public string? Description { get; set; }
-
-    public string? CategoryImage { get; set; }
 }

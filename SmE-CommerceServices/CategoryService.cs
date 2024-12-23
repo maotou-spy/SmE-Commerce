@@ -2,9 +2,11 @@
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category;
+using SmE_CommerceModels.ResponseDtos.Category.Custumer;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
@@ -28,7 +30,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.NameAlreadyExists,
+                    StatusCode = ErrorCode.NameAlreadyExists
                 };
 
             // Add category
@@ -37,8 +39,9 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Name = req.Name,
                 Description = req.Description,
                 Status = GeneralStatus.Active,
+                Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
                 CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now
             };
 
             var result = await categoryRepository.AddCategoryAsync(category);
@@ -47,14 +50,14 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     InternalErrorMessage = result.InternalErrorMessage,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -63,51 +66,33 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             {
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
 
-    public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(
-        string? name,
-        int pageNumber,
-        int pageSize
-    )
+    public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber, int pageSize)
     {
         try
         {
-            var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(
-                RoleEnum.Customer
-            );
-            if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
-                return new Return<IEnumerable<GetCategoryResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = currentCustomer.StatusCode,
-                };
-
-            var result = await categoryRepository.GetCategoriesAsync(
-                name,
-                UserStatus.Active,
-                pageNumber,
-                pageSize
-            );
+            var result = await categoryRepository.GetCategoriesAsync( name, GeneralStatus.Active, pageNumber, pageSize);
             if (!result.IsSuccess)
                 return new Return<IEnumerable<GetCategoryResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
-
+            
             List<GetCategoryResDto>? categories = null;
             if (result.Data != null)
                 categories = result
                     .Data.Select(category => new GetCategoryResDto
                     {
                         CategoryId = category.CategoryId,
-                        CategoryName = category.Name,
+                        Name = category.Name,
+                        Description = category.Description,
+                        Slug = category.Slug
                     })
                     .ToList();
 
@@ -116,7 +101,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = categories,
                 IsSuccess = true,
                 TotalRecord = result.TotalRecord,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -126,7 +111,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = null,
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -145,7 +130,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = currentCustomer.StatusCode,
+                    StatusCode = currentCustomer.StatusCode
                 };
 
             var result = await categoryRepository.GetCategoriesAsync(
@@ -159,7 +144,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<IEnumerable<Category>>
@@ -167,7 +152,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = result.Data,
                 IsSuccess = true,
                 TotalRecord = result.TotalRecord,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -177,7 +162,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = null,
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -194,7 +179,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = currentCustomer.StatusCode,
+                    StatusCode = currentCustomer.StatusCode
                 };
 
             var result = await categoryRepository.GetCategoryByIdAsync(id);
@@ -203,7 +188,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             if (result.Data.Status != GeneralStatus.Active)
@@ -211,14 +196,14 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.NotForCustomer,
+                    StatusCode = ErrorCode.NotForCustomer
                 };
 
             var categories = new GetCategoryDetailResDto
             {
                 CategoryId = result.Data!.CategoryId,
                 CategoryName = result.Data.Name,
-                Description = result.Data.Description,
+                Description = result.Data.Description
             };
 
             return new Return<GetCategoryDetailResDto?>
@@ -226,7 +211,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = categories,
                 IsSuccess = true,
                 TotalRecord = result.TotalRecord,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -235,7 +220,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             {
                 InternalErrorMessage = ex,
                 Data = null,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -250,7 +235,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = currentManager.StatusCode,
+                    StatusCode = currentManager.StatusCode
                 };
 
             var result = await categoryRepository.GetCategoryByIdAsync(id);
@@ -259,7 +244,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             if (result.Data.Status == GeneralStatus.Deleted)
@@ -267,7 +252,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.CategoryNotFound,
+                    StatusCode = ErrorCode.CategoryNotFound
                 };
 
             return new Return<Category>
@@ -275,7 +260,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = result.Data,
                 IsSuccess = true,
                 TotalRecord = result.TotalRecord,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -285,7 +270,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Data = null,
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -300,7 +285,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = currentUser.StatusCode,
+                    StatusCode = currentUser.StatusCode
                 };
 
             var oldCategory = await categoryRepository.GetCategoryByIdAsync(id);
@@ -309,7 +294,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = oldCategory.StatusCode,
+                    StatusCode = oldCategory.StatusCode
                 };
 
             oldCategory.Data.Description = req.Description;
@@ -324,14 +309,14 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -340,7 +325,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             {
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -355,7 +340,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = currentUser.StatusCode,
+                    StatusCode = currentUser.StatusCode
                 };
 
             var category = await categoryRepository.GetCategoryByIdAsync(id);
@@ -364,7 +349,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = category.StatusCode,
+                    StatusCode = category.StatusCode
                 };
 
             // Check if the category still has products
@@ -374,7 +359,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = ErrorCode.CategoryHasProducts,
+                    StatusCode = ErrorCode.CategoryHasProducts
                 };
 
             if (category.Data.Status == GeneralStatus.Deleted)
@@ -382,7 +367,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = ErrorCode.CategoryNotFound,
+                    StatusCode = ErrorCode.CategoryNotFound
                 };
 
             category.Data.Status = GeneralStatus.Deleted;
@@ -395,14 +380,14 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 {
                     IsSuccess = false,
                     Data = false,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = result.StatusCode,
+                StatusCode = result.StatusCode
             };
         }
         catch (Exception ex)
@@ -411,7 +396,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             {
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
