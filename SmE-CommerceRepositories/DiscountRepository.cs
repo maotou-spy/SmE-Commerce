@@ -10,7 +10,6 @@ namespace SmE_CommerceRepositories;
 public class DiscountRepository(SmECommerceContext dbContext) : IDiscountRepository
 {
     #region Discount
-
     public async Task<Return<Discount>> AddDiscountAsync(Discount discount)
     {
         try
@@ -72,7 +71,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -82,6 +81,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
     {
         try
         {
+            var discount = await dbContext.Discounts.Where(d => d.DiscountId == id).FirstOrDefaultAsync();
             // 1. Fetching the discount data
             var discount = await dbContext
                 .Discounts.Where(d => d.DiscountId == id)
@@ -94,7 +94,6 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     StatusCode = ErrorCode.DiscountNotFound,
                 };
 
-            // 2. Ensuring that the record is locked for update
             await dbContext.Database.ExecuteSqlRawAsync(
                 "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE",
                 id
@@ -182,11 +181,9 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
-
     #endregion
 
     #region DiscountCode
-
     public async Task<Return<DiscountCode>> AddDiscountCodeAsync(DiscountCode discountCode)
     {
         try
@@ -217,6 +214,46 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         }
     }
 
+    // GetDiscountCodeByIdForUpdateAsync to using FOR UPDATE
+    public async Task<Return<DiscountCode>> GetDiscountCodeByIdForUpdateAsync(Guid id)
+    {
+        try
+        {
+            var code = await dbContext.DiscountCodes.Where(d => d.CodeId == id).FirstOrDefaultAsync();
+            if (code == null)
+
+            {
+                return new Return<DiscountCode>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.DiscountNotFound
+                };
+            }
+
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE", id);
+
+            return new Return<DiscountCode>
+            {
+                Data = code,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
+    
     public async Task<Return<DiscountCode>> UpdateDiscountCodeAsync(DiscountCode discountCode)
     {
         try
@@ -254,6 +291,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 x.Code == code
             );
             if (discountCode == null)
+            {
                 return new Return<DiscountCode>
                 {
                     Data = null,
@@ -261,13 +299,14 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     StatusCode = ErrorCode.DiscountNotFound,
                     TotalRecord = 0,
                 };
+            }
 
             return new Return<DiscountCode>
             {
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -282,6 +321,5 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
-
     #endregion
 }

@@ -674,5 +674,146 @@ public class DiscountService(
         }
     }
 
+    public async Task<Return<bool>> UpdateDiscountCodeAsync(Guid codeId, AddDiscountCodeReqDto req)
+    {
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    StatusCode = currentUser.StatusCode
+                };
+            }
+            
+            // Check codeId is valid
+            var discountCode = await discountRepository.GetDiscountCodeByIdForUpdateAsync(codeId);
+            if (!discountCode.IsSuccess || discountCode.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = discountCode.StatusCode
+                };
+            }
+            
+            // Check if discountId is valid
+            var discount = await discountRepository.GetDiscountByIdForUpdateAsync(discountCode.Data.DiscountId);
+            if (!discount.IsSuccess || discount.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = discount.StatusCode
+                };
+            }
+            
+            // Check if DiscountCode is valid
+            if (req.DiscountCode.Length is < 4 or > 20 || !Regex.IsMatch(req.DiscountCode, "^[a-zA-Z0-9]+$"))
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidDiscountCode
+                };
+            }
+            
+            // Check if UserId is valid
+            if (req.UserId.HasValue)
+            {
+                var existedUser = await userRepository.GetUserByIdAsync(req.UserId.Value);
+                if (!existedUser.IsSuccess || existedUser.Data == null)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = existedUser.StatusCode
+                    };
+                }
+            }
+            
+            // Check if FromDate and ToDate is valid
+            if (req is { FromDate: not null, ToDate: not null } || req.FromDate != null || req.ToDate != null)
+            {
+                if (req.FromDate > req.ToDate)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidDate
+                    };
+                }
+                
+                if (req.FromDate < DateTime.Now)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidDate
+                    };
+                }
+                
+                if (req.FromDate < discount.Data.FromDate || req.ToDate > discount.Data.ToDate)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidDate
+                    };
+                }
+            }
+            
+            // Check if code is existed
+            var existedCode = await discountRepository.GetDiscountCodeByCodeAsync(req.DiscountCode.ToUpper());
+            if (existedCode is { IsSuccess: true, Data: not null })
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.DiscountCodeAlreadyExists
+                };
+            }
+            
+            discountCode.Data.Code = req.DiscountCode.ToUpper().Trim();
+            discountCode.Data.UserId = req.UserId;
+            discountCode.Data.FromDate = req.FromDate ?? DateTime.Today; 
+            discountCode.Data.ToDate = req.ToDate ?? discount.Data.ToDate;
+            discountCode.Data.Status = discountCode.Data.Status;                // can not update this field   
+            discountCode.Data.ModifiedAt = DateTime.Now;
+            discountCode.Data.ModifiedById = currentUser.Data.UserId;
+            
+            var result = await discountRepository.UpdateDiscountCodeAsync(discountCode.Data);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+            
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
     #endregion
 }
