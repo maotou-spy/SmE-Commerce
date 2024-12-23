@@ -74,51 +74,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
             return Helper.GetErrorResponse(500);
         }
     }
-
-    [HttpGet("{id:guid}/active")]
-    [Authorize]
-    public async Task<IActionResult> GetCategoryDetailForCustomerAsync([FromRoute] Guid id)
-    {
-        try
-        {
-            var result = await categoryService.GetCategoryDetailForCustomerAsync(id);
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get category detail for customer: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get category detail for customer: {e}", ex);
-            return StatusCode(500,
-                new Return<IEnumerable<dynamic>>
-                {
-                    StatusCode = ErrorCode.InternalServerError
-                });
-        }
-    }
-
-    [HttpGet("{id:guid}")]
-    [Authorize]
-    public async Task<IActionResult> GetCategoryDetailForManagerAsync([FromRoute] Guid id)
-    {
-        try
-        {
-            var result = await categoryService.GetCategoryDetailForManagerAsync(id);
-            if (result.IsSuccess) return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get category detail for manager: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get category detail for manager: {e}", ex);
-            return Helper.GetErrorResponse(500);
-        }
-    }
-
+    
     [HttpPut("{id:guid}")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryDetailAsync([FromRoute] Guid id, [FromBody] AddCategoryReqDto req)
