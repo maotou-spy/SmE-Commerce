@@ -315,4 +315,59 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             };
         }
     }
+
+    public async Task<Return<bool>> UpdateCategoryStatusAsync(Guid id)
+    {
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Data = false,
+                    StatusCode = currentUser.StatusCode
+                };
+
+            var category = await categoryRepository.GetCategoryByIdForUpdateAsync(id);
+            if (category.Data == null || !category.IsSuccess)
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Data = false,
+                    StatusCode = category.StatusCode
+                };
+            
+            category.Data.Status = category.Data.Status == GeneralStatus.Active
+                ? GeneralStatus.Inactive
+                : GeneralStatus.Active;
+            category.Data.ModifiedAt = DateTime.Now;
+            category.Data.ModifiedById = currentUser.Data.UserId;
+
+            var result = await categoryRepository.UpdateCategoryAsync(category.Data);
+            if (result.Data == null || !result.IsSuccess)
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    Data = false,
+                    StatusCode = result.StatusCode
+                };
+
+            return new Return<bool>
+            {
+                IsSuccess = true,
+                Data = true,
+                StatusCode = result.StatusCode
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
 }

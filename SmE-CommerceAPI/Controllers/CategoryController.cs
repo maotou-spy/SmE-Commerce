@@ -148,4 +148,26 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpPut("{id:guid}/status")]
+    [Authorize]
+    public async Task<IActionResult> UpdateCategoryStatusAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            var result = await categoryService.UpdateCategoryStatusAsync(id);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update category status: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update category status: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 }

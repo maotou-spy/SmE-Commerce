@@ -17,4 +17,5 @@ public interface ICategoryService
 
     Task<Return<bool>> UpdateCategoryDetailAsync(Guid id, AddCategoryReqDto req);
     Task<Return<bool>> DeleteCategoryAsync(Guid id);
+    Task<Return<bool>> UpdateCategoryStatusAsync(Guid id);
 }
