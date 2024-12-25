@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class Address
+public class Address
 {
     [Key]
     [Column("addressId")]
@@ -37,7 +37,7 @@ public partial class Address
     public string City { get; set; } = null!;
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

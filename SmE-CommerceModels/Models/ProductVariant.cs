@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class ProductVariant
+public class ProductVariant
 {
     [Key]
     [Column("productVariantId")]
@@ -43,9 +43,6 @@ public partial class ProductVariant
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    [Column("variantNameId")]
-    public Guid VariantNameId { get; set; }
-
     [ForeignKey("CreateById")]
     [InverseProperty("ProductVariantCreateBies")]
     public virtual User? CreateBy { get; set; }
@@ -64,8 +61,4 @@ public partial class ProductVariant
     [InverseProperty("ProductVariant")]
     public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
         new List<VariantAttribute>();
-
-    [ForeignKey("VariantNameId")]
-    [InverseProperty("ProductVariants")]
-    public virtual VariantName VariantName { get; set; } = null!;
 }

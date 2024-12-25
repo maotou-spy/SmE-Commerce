@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SmE_CommerceModels.Models;
 
@@ -494,7 +492,7 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<ProductAttribute>(entity =>
         {
-            entity.HasKey(e => e.AttributeId).HasName("productattributes_pk");
+            entity.HasKey(e => e.AttributeId).HasName("productAttributes_pk");
 
             entity.Property(e => e.AttributeId).HasDefaultValueSql("gen_random_uuid()");
 
@@ -539,7 +537,7 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<ProductVariant>(entity =>
         {
-            entity.HasKey(e => e.ProductVariantId).HasName("productvariants_pk");
+            entity.HasKey(e => e.ProductVariantId).HasName("productVariants_pk");
 
             entity.Property(e => e.ProductVariantId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
@@ -560,12 +558,6 @@ public partial class SmECommerceContext : DbContext
                 .WithMany(p => p.ProductVariants)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("productvariants_products_productid_fk");
-
-            entity
-                .HasOne(d => d.VariantName)
-                .WithMany(p => p.ProductVariants)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("productvariants_variantNames_variantNameId_fk");
         });
 
         modelBuilder.Entity<Review>(entity =>
@@ -652,11 +644,17 @@ public partial class SmECommerceContext : DbContext
                 .WithMany(p => p.VariantAttributes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("VariantAttributes_productVariantId_fkey");
+
+            entity
+                .HasOne(d => d.VariantName)
+                .WithMany(p => p.VariantAttributes)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("variantAttributes_variantNames_variantNameId_fk");
         });
 
         modelBuilder.Entity<VariantName>(entity =>
         {
-            entity.HasKey(e => e.VariantNameId).HasName("variantattributes_pk");
+            entity.HasKey(e => e.VariantNameId).HasName("variantAttributes_pk");
 
             entity.Property(e => e.VariantNameId).HasDefaultValueSql("gen_random_uuid()");
 

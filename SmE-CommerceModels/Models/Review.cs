@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class Review
+public class Review
 {
     [Key]
     [Column("reviewId")]
@@ -25,7 +25,7 @@ public partial class Review
     public string? Comment { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class PaymentMethod
+public class PaymentMethod
 {
     [Key]
     [Column("paymentMethodId")]
@@ -14,7 +14,7 @@ public partial class PaymentMethod
     public string Name { get; set; } = null!;
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class VariantName
+public class VariantName
 {
     [Key]
     [Column("variantNameId")]
@@ -34,6 +34,6 @@ public partial class VariantName
     public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("VariantName")]
-    public virtual ICollection<ProductVariant> ProductVariants { get; set; } =
-        new List<ProductVariant>();
+    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
+        new List<VariantAttribute>();
 }

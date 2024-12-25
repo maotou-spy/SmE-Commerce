@@ -167,14 +167,15 @@ public class VariantNameService(
                     InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
 
-            // Check if the attribute is used in any product variant
-            if (existingVariant.Data.ProductVariants.Count != 0)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.VariantNameConflict,
-                };
+            // TODO: Need to double check this
+            // // Check if the attribute is used in any product variant
+            // if (existingVariant.Data.ProductVariants.Count != 0)
+            //     return new Return<bool>
+            //     {
+            //         Data = false,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.VariantNameConflict,
+            //     };
 
             return await variantRepository.DeleteVariantNamesAsync(existingVariant.Data);
         }

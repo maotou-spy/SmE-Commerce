@@ -7,7 +7,7 @@ namespace SmE_CommerceModels.Models;
 [Index("OrderCode", Name = "Orders_orderCode_key", IsUnique = true)]
 [Index("Status", Name = "idx_orders_status")]
 [Index("UserId", Name = "idx_orders_userid")]
-public partial class Order
+public class Order
 {
     [Key]
     [Column("orderId")]
@@ -33,7 +33,7 @@ public partial class Order
     public int PointsEarned { get; set; }
 
     /// <summary>
-    /// Values: pending, processing, completed, cancelled, rejected, returned
+    ///     Values: pending, processing, completed, cancelled, rejected, returned
     /// </summary>
     [Column("status")]
     [StringLength(50)]

@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class ProductAttribute
+public class ProductAttribute
 {
     [Key]
-    [Column("attributeid")]
+    [Column("attributeId")]
     public Guid AttributeId { get; set; }
 
-    [Column("productid")]
+    [Column("productId")]
     public Guid ProductId { get; set; }
 
-    [Column("attributename")]
+    [Column("attributeName")]
     [StringLength(100)]
     public string AttributeName { get; set; } = null!;
 
-    [Column("attributevalue")]
+    [Column("attributeValue")]
     [StringLength(255)]
     public string AttributeValue { get; set; } = null!;
 

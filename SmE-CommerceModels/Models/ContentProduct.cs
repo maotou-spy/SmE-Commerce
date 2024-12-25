@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class ContentProduct
+public class ContentProduct
 {
     [Key]
     [Column("contentProductId")]

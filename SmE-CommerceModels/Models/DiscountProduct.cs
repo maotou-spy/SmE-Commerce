@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SmE_CommerceModels.Models;
 
 [Table("DiscountProduct")]
-public partial class DiscountProduct
+public class DiscountProduct
 {
     [Key]
     [Column("discountProductId")]

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class VariantAttribute
+public class VariantAttribute
 {
     [Key]
     [Column("attributeId")]
@@ -15,10 +15,6 @@ public partial class VariantAttribute
     [Column("value")]
     [StringLength(255)]
     public string Value { get; set; } = null!;
-
-    [Column("variantImage")]
-    [StringLength(255)]
-    public string? VariantImage { get; set; }
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
@@ -32,6 +28,13 @@ public partial class VariantAttribute
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
+    [Column("variantImage")]
+    [StringLength(255)]
+    public string? VariantImage { get; set; }
+
+    [Column("variantNameId")]
+    public Guid VariantNameId { get; set; }
+
     [ForeignKey("CreatedById")]
     [InverseProperty("VariantAttributeCreatedBies")]
     public virtual User? CreatedBy { get; set; }
@@ -43,4 +46,8 @@ public partial class VariantAttribute
     [ForeignKey("ProductVariantId")]
     [InverseProperty("VariantAttributes")]
     public virtual ProductVariant ProductVariant { get; set; } = null!;
+
+    [ForeignKey("VariantNameId")]
+    [InverseProperty("VariantAttributes")]
+    public virtual VariantName VariantName { get; set; } = null!;
 }

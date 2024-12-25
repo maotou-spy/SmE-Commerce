@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class ProductCategory
+public class ProductCategory
 {
     [Key]
     [Column("productCategoryId")]

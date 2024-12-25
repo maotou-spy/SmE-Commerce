@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace SmE_CommerceModels.Models;
 
 [Index("Status", Name = "idx_products_status")]
-public partial class Product
+public class Product
 {
     [Key]
     [Column("productId")]
@@ -33,7 +33,7 @@ public partial class Product
     public int SoldQuantity { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

@@ -1,8 +1,7 @@
-﻿namespace SmE_CommerceModels.Enums
+﻿namespace SmE_CommerceModels.Enums;
+
+public class ContentType
 {
-    public class ContentType
-    {
-        public const string ExternalTypeBlog = "blog";
-        public const string ExternalTypeFacebook = "facebook";
-    }
+    public const string ExternalTypeBlog = "blog";
+    public const string ExternalTypeFacebook = "facebook";
 }

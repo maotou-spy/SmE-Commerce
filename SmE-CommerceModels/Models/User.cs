@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace SmE_CommerceModels.Models;
 
 [Index("Email", Name = "Users_email_key", IsUnique = true)]
-public partial class User
+public class User
 {
     [Key]
     [Column("userId")]
@@ -35,7 +35,7 @@ public partial class User
     public int Point { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, suspended
+    ///     Values: active, inactive, suspended
     /// </summary>
     [Column("status")]
     [StringLength(50)]

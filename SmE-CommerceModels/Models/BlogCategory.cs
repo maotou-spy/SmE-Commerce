@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class BlogCategory
+public class BlogCategory
 {
     [Key]
     [Column("blogCategoryId")]
@@ -18,7 +18,7 @@ public partial class BlogCategory
     public string? Description { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

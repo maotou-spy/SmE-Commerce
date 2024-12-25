@@ -44,11 +44,5 @@ public interface IProductRepository
 
     Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid attributeId);
 
-    Task<Return<bool>> AddProductVariantAsync(ProductVariant productVariant);
-
-    Task<Return<ProductVariant>> GetProductVariantByIdAsync(Guid variantNameId);
-
-    Task<Return<bool>> IsProductVariantExistAsync(string variantValue, Guid productId);
-
     Task<Return<bool>> UpdateProductVariantAsync(ProductVariant productVariant);
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SmE_CommerceModels.Models;
 
 [Table("ContentCategoryMap")]
-public partial class ContentCategoryMap
+public class ContentCategoryMap
 {
     [Key]
     [Column("contentCategoryMapId")]

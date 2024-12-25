@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class Discount
+public class Discount
 {
     [Key]
     [Column("discountId")]
@@ -40,7 +40,7 @@ public partial class Discount
     public DateTime? ToDate { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

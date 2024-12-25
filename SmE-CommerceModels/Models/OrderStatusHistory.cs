@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SmE_CommerceModels.Models;
 
 [Table("OrderStatusHistory")]
-public partial class OrderStatusHistory
+public class OrderStatusHistory
 {
     [Key]
     [Column("historyId")]

@@ -1279,140 +1279,140 @@ public class ProductService(
     //     }
     // }
 
-    public async Task<Return<bool>> UpdateProductVariantAsync(
-        Guid variantId,
-        UpdateProductVariantReqDto req
-    )
-    {
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        try
-        {
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            if (!currentUser.IsSuccess || currentUser.Data == null)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
-                };
-
-            var productVariant = await productRepository.GetProductVariantByIdAsync(variantId);
-            if (!productVariant.IsSuccess || productVariant.Data == null)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = productVariant.StatusCode,
-                    InternalErrorMessage = productVariant.InternalErrorMessage,
-                };
-
-            if (productVariant.Data.Status == GeneralStatus.Deleted)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductVariantNotFound,
-                };
-
-            // No change
-            if (
-                productVariant.Data.Sku == req.Sku
-                && productVariant.Data.Price == req.Price
-                && productVariant.Data.StockQuantity == req.StockQuantity
-                && productVariant.Data.Status == req.Status
-            )
-                return new Return<bool>
-                {
-                    Data = true,
-                    IsSuccess = true,
-                    StatusCode = ErrorCode.Ok,
-                };
-
-            var product = await productRepository.GetProductByIdAsync(
-                productVariant.Data.ProductId
-            );
-            if (product is not { IsSuccess: true, Data: not null })
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = product.StatusCode,
-                    InternalErrorMessage = product.InternalErrorMessage,
-                };
-
-            if (product.Data.Status == ProductStatus.Deleted)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                };
-
-            var variant = await variantNameRepository.GetVariantNameByIdAsync(
-                productVariant.Data.VariantNameId
-            );
-            if (!variant.IsSuccess || variant.Data == null)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = variant.StatusCode,
-                    InternalErrorMessage = variant.InternalErrorMessage,
-                };
-
-            var isVariantExisted = await productRepository.IsProductVariantExistAsync(
-                req.VariantValue,
-                productVariant.Data.ProductId
-            );
-            if (isVariantExisted is { IsSuccess: true, Data: true })
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductVariantAlreadyExists,
-                };
-
-            productVariant.Data.Sku = req.Sku;
-            productVariant.Data.Price = req.Price;
-            productVariant.Data.StockQuantity = req.StockQuantity;
-            productVariant.Data.Status =
-                req.StockQuantity > 0
-                    ? req.Status ?? ProductStatus.Active
-                    : ProductStatus.OutOfStock;
-            productVariant.Data.ModifiedById = currentUser.Data.UserId;
-            productVariant.Data.ModifiedAt = DateTime.Now;
-
-            var result = await productRepository.UpdateProductVariantAsync(productVariant.Data);
-            if (!result.IsSuccess || result.Data == false)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
-                };
-
-            transaction.Complete();
-
-            return new Return<bool>
-            {
-                Data = true,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<bool>
-            {
-                Data = false,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
-            };
-        }
-    }
+    // public async Task<Return<bool>> UpdateProductVariantAsync(
+    //     Guid variantId,
+    //     UpdateProductVariantReqDto req
+    // )
+    // {
+    //     using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+    //     try
+    //     {
+    //         var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+    //         if (!currentUser.IsSuccess || currentUser.Data == null)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = currentUser.StatusCode,
+    //                 InternalErrorMessage = currentUser.InternalErrorMessage,
+    //             };
+    //
+    //         var productVariant = await productRepository.GetProductVariantByIdAsync(variantId);
+    //         if (!productVariant.IsSuccess || productVariant.Data == null)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = productVariant.StatusCode,
+    //                 InternalErrorMessage = productVariant.InternalErrorMessage,
+    //             };
+    //
+    //         if (productVariant.Data.Status == GeneralStatus.Deleted)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = ErrorCode.ProductVariantNotFound,
+    //             };
+    //
+    //         // No change
+    //         if (
+    //             productVariant.Data.Sku == req.Sku
+    //             && productVariant.Data.Price == req.Price
+    //             && productVariant.Data.StockQuantity == req.StockQuantity
+    //             && productVariant.Data.Status == req.Status
+    //         )
+    //             return new Return<bool>
+    //             {
+    //                 Data = true,
+    //                 IsSuccess = true,
+    //                 StatusCode = ErrorCode.Ok,
+    //             };
+    //
+    //         var product = await productRepository.GetProductByIdAsync(
+    //             productVariant.Data.ProductId
+    //         );
+    //         if (product is not { IsSuccess: true, Data: not null })
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = product.StatusCode,
+    //                 InternalErrorMessage = product.InternalErrorMessage,
+    //             };
+    //
+    //         if (product.Data.Status == ProductStatus.Deleted)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = ErrorCode.ProductNotFound,
+    //             };
+    //
+    //         var variant = await variantNameRepository.GetVariantNameByIdAsync(
+    //             productVariant.Data.VariantNameId
+    //         );
+    //         if (!variant.IsSuccess || variant.Data == null)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = variant.StatusCode,
+    //                 InternalErrorMessage = variant.InternalErrorMessage,
+    //             };
+    //
+    //         var isVariantExisted = await productRepository.IsProductVariantExistAsync(
+    //             req.VariantValue,
+    //             productVariant.Data.ProductId
+    //         );
+    //         if (isVariantExisted is { IsSuccess: true, Data: true })
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = ErrorCode.ProductVariantAlreadyExists,
+    //             };
+    //
+    //         productVariant.Data.Sku = req.Sku;
+    //         productVariant.Data.Price = req.Price;
+    //         productVariant.Data.StockQuantity = req.StockQuantity;
+    //         productVariant.Data.Status =
+    //             req.StockQuantity > 0
+    //                 ? req.Status ?? ProductStatus.Active
+    //                 : ProductStatus.OutOfStock;
+    //         productVariant.Data.ModifiedById = currentUser.Data.UserId;
+    //         productVariant.Data.ModifiedAt = DateTime.Now;
+    //
+    //         var result = await productRepository.UpdateProductVariantAsync(productVariant.Data);
+    //         if (!result.IsSuccess || result.Data == false)
+    //             return new Return<bool>
+    //             {
+    //                 Data = false,
+    //                 IsSuccess = false,
+    //                 StatusCode = result.StatusCode,
+    //                 InternalErrorMessage = result.InternalErrorMessage,
+    //             };
+    //
+    //         transaction.Complete();
+    //
+    //         return new Return<bool>
+    //         {
+    //             Data = true,
+    //             IsSuccess = true,
+    //             StatusCode = ErrorCode.Ok,
+    //         };
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return new Return<bool>
+    //         {
+    //             Data = false,
+    //             IsSuccess = false,
+    //             StatusCode = ErrorCode.InternalServerError,
+    //             InternalErrorMessage = ex,
+    //         };
+    //     }
+    // }
 
     #endregion
 }

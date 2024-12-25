@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class AuditLog
+public class AuditLog
 {
     [Key]
     [Column("logId")]

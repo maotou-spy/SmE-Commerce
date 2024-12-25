@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class OrderItem
+public class OrderItem
 {
     [Key]
     [Column("orderItemId")]
@@ -24,7 +24,7 @@ public partial class OrderItem
     public decimal Price { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -49,7 +49,7 @@ public partial class OrderItem
     [InverseProperty("OrderItems")]
     public virtual Product Product { get; set; } = null!;
 
-    [ForeignKey("VariantNameId")]
+    [ForeignKey("VariantId")]
     [InverseProperty("OrderItems")]
     public virtual ProductVariant Variant { get; set; } = null!;
 }

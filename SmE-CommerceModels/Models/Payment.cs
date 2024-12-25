@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class Payment
+public class Payment
 {
     [Key]
     [Column("paymentId")]
@@ -21,7 +21,7 @@ public partial class Payment
     public decimal Amount { get; set; }
 
     /// <summary>
-    /// Values: pending, paid, completed
+    ///     Values: pending, paid, completed
     /// </summary>
     [Column("status")]
     [StringLength(50)]
