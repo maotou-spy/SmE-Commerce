@@ -297,11 +297,9 @@ public class DiscountService(
         }
     }
 
-    public async Task<Return<bool>> UpdateDiscountAsync(Guid id, AddDiscountReqDto req)
+    public async Task<Return<bool>> UpdateDiscountAsync(Guid id, UpdateDiscountReqDto req)
     {
-        using var transaction = new TransactionScope(TransactionScopeOption.Required, 
-            new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, 
-            TransactionScopeAsyncFlowOption.Enabled);
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
             // Validate user
@@ -319,7 +317,7 @@ public class DiscountService(
             var discount = await discountRepository.GetDiscountByIdForUpdateAsync(id);
             if (!discount.IsSuccess || discount.Data == null)
             {
-                return new Return<bool>
+                return new Return<bool> 
                 {
                     IsSuccess = false,
                     StatusCode = discount.StatusCode
@@ -411,13 +409,10 @@ public class DiscountService(
             
             discount.Data.DiscountName = req.DiscountName;
             discount.Data.Description = req.Description;
-            discount.Data.IsPercentage = discount.Data.IsPercentage;   // can not update this field
-            discount.Data.DiscountValue = discount.Data.DiscountValue; // can not update this field
             discount.Data.MinimumOrderAmount = req.MinimumOrderAmount;
             discount.Data.MaximumDiscount = req.MaximumDiscount;
             discount.Data.FromDate = req.FromDate != discount.Data.FromDate ? req.FromDate : discount.Data.FromDate;
             discount.Data.ToDate = req.ToDate != discount.Data.ToDate ? req.ToDate : discount.Data.ToDate;
-            discount.Data.Status = discount.Data.Status;               // can not update this field
             discount.Data.UsageLimit = req.UsageLimit;
             discount.Data.MinQuantity = req.MinQuantity;
             discount.Data.MaxQuantity = req.MaxQuantity;
@@ -449,25 +444,20 @@ public class DiscountService(
                 }).ToList();
                 needUpdate = true;
             }
-            
-            if (!needUpdate)
-                return new Return<bool>
-                {
-                    Data = true,
-                    IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
-                };
-            var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
-            if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
+
+            if (needUpdate)
             {
-                return new Return<bool>
+                var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
+                if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
                 {
-                    IsSuccess = false,
-                    InternalErrorMessage = addProductsResult.InternalErrorMessage,
-                    StatusCode = addProductsResult.StatusCode
-                };
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        InternalErrorMessage = addProductsResult.InternalErrorMessage,
+                        StatusCode = addProductsResult.StatusCode
+                    };
+                }
             }
-            
             transaction.Complete();
 
             return new Return<bool>

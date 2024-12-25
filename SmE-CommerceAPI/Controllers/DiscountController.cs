@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Discount;
-using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
@@ -31,39 +30,41 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         catch (Exception ex)
         {
             logger.LogInformation("Error at create discount: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
-    
+
     [HttpPut("{id:guid}")]
     [Authorize]
-    public async Task<IActionResult> UpdateDiscountAsync([FromRoute] Guid id, [FromBody] AddDiscountReqDto req)
+    public async Task<IActionResult> UpdateDiscountAsync([FromRoute] Guid id,
+        [FromBody] UpdateDiscountReqDto updateDiscountReqDto)
     {
         try
         {
-            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            var result = await discountService.UpdateDiscountAsync(id, req);
+            if (!ModelState.IsValid)
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            var result = await discountService.UpdateDiscountAsync(id, updateDiscountReqDto);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at update discount: {ex}", result.InternalErrorMessage);
+
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update discount: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+
     #endregion
 
     #region DiscountCode
+
     [HttpPost("{id:guid}/codes")]
     [Authorize]
     public async Task<IActionResult> AddDiscountCodeAsync([FromRoute] Guid id, [FromBody] AddDiscountCodeReqDto req)
@@ -81,10 +82,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         catch (Exception ex)
         {
             logger.LogInformation("Error at create discount code: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -104,16 +102,14 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         catch (Exception ex)
         {
             logger.LogInformation("Error at get discount code: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
-    
+
     [HttpPut("codes/{codeId:guid}")]
     [Authorize]
-    public async Task<IActionResult> UpdateDiscountCodeAsync([FromRoute] Guid codeId, [FromBody] AddDiscountCodeReqDto req)
+    public async Task<IActionResult> UpdateDiscountCodeAsync([FromRoute] Guid codeId,
+        [FromBody] AddDiscountCodeReqDto req)
     {
         try
         {
@@ -128,11 +124,9 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         catch (Exception ex)
         {
             logger.LogInformation("Error at update discount code: {e}", ex);
-            return StatusCode(500, new Return<bool>
-            {
-                StatusCode = ErrorCode.InternalServerError
-            });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+
     #endregion
 }
