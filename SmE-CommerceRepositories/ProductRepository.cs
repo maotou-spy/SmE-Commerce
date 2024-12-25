@@ -611,4 +611,135 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
     }
 
     #endregion
+
+    #region Product Variant
+
+    public async Task<Return<ProductVariant>> GetProductVariantByIdAsync(Guid variantNameId)
+    {
+        try
+        {
+            var productVariant = await dbContext.ProductVariants.FirstOrDefaultAsync(x =>
+                x.VariantNameId == variantNameId
+            );
+
+            if (productVariant is null)
+                return new Return<ProductVariant>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    TotalRecord = 0,
+                };
+
+            return new Return<ProductVariant>
+            {
+                Data = productVariant,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<ProductVariant>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    // TODO: Need to double check
+    public async Task<Return<bool>> IsProductVariantExistAsync(string variantValue, Guid productId)
+    {
+        try
+        {
+            var productVariant = await dbContext
+                .ProductVariants.Where(x => x.Status != GeneralStatus.Deleted)
+                .FirstOrDefaultAsync(x =>
+                    // x.VariantValue == variantValue &&
+                    x.ProductId == productId
+                );
+
+            return new Return<bool>
+            {
+                Data = productVariant != null,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> AddProductVariantAsync(ProductVariant productVariant)
+    {
+        try
+        {
+            await dbContext.ProductVariants.AddAsync(productVariant);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> UpdateProductVariantAsync(ProductVariant productVariant)
+    {
+        try
+        {
+            dbContext.ProductVariants.Update(productVariant);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    #endregion
 }

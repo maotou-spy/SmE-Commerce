@@ -25,8 +25,8 @@ public static class ErrorCode
     public const string CartNotFound = "107";
     public const string ProductImageNotFound = "108";
     public const string ProductAttributeNotFound = "109";
-    public const string VariantAttributeNotFound = "110";
-    public const string DiscountCodeNotFound = "111";
+    public const string VariantNameNotFound = "110";
+    public const string ProductVariantNotFound = "111";
 
     // Already exists
     public const string EmailAlreadyExists = "201";
@@ -37,14 +37,15 @@ public static class ErrorCode
     public const string DiscountCodeAlreadyExists = "206";
     public const string UserAlreadyExists = "207";
     public const string CategoryHasProducts = "208";
-    public const string VariantAttributeAlreadyExists = "209";
+    public const string VariantNameAlreadyExists = "209";
     public const string ProductNameAlreadyExists = "210";
+    public const string ProductVariantAlreadyExists = "211";
 
     // Conflict
     public const string OutOfStock = "301";
     public const string ProductImageMinimum = "302";
     public const string OverStockQuantity = "303";
-    public const string VariantAttributeConflict = "304";
+    public const string VariantNameConflict = "304";
 
     // Authorization
     public const string NotAuthority = "401";

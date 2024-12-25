@@ -20,9 +20,6 @@ public class UpdateProductReqDto
     [RegularExpression(@"^\d+$", ErrorMessage = "Invalid stock quantity")]
     public int StockQuantity { get; set; } = 0;
 
-    [RegularExpression(@"^\d+$", ErrorMessage = "Invalid sold quantity")]
-    public int SoldQuantity { get; set; } = 0;
-
     public bool IsTopSeller { get; set; } = false;
 
     public string Status { get; set; } = ProductStatus.Active;

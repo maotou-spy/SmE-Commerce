@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-[Index("Slug", Name = "Contents_slug_key", IsUnique = true)]
 [Index("Status", Name = "idx_contents_status")]
 public partial class Content
 {

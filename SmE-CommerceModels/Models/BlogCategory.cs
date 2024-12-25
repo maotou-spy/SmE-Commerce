@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
@@ -40,7 +37,8 @@ public partial class BlogCategory
     public Guid? ModifiedById { get; set; }
 
     [InverseProperty("BlogCategory")]
-    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
+    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } =
+        new List<ContentCategoryMap>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("BlogCategoryCreateBies")]

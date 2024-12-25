@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,13 +12,6 @@ public partial class ProductVariant
 
     [Column("productId")]
     public Guid ProductId { get; set; }
-
-    [Column("variantId")]
-    public Guid VariantId { get; set; }
-
-    [Column("attributeValue")]
-    [StringLength(100)]
-    public string AttributeValue { get; set; } = null!;
 
     [Column("sku")]
     [StringLength(50)]
@@ -52,9 +43,8 @@ public partial class ProductVariant
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    [ForeignKey("ProductVariantId")]
-    [InverseProperty("ProductVariants")]
-    public virtual VariantAttribute Attribute { get; set; } = null!;
+    [Column("variantNameId")]
+    public Guid VariantNameId { get; set; }
 
     [ForeignKey("CreateById")]
     [InverseProperty("ProductVariantCreateBies")]
@@ -70,4 +60,12 @@ public partial class ProductVariant
     [ForeignKey("ProductId")]
     [InverseProperty("ProductVariants")]
     public virtual Product Product { get; set; } = null!;
+
+    [InverseProperty("ProductVariant")]
+    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
+        new List<VariantAttribute>();
+
+    [ForeignKey("VariantNameId")]
+    [InverseProperty("ProductVariants")]
+    public virtual VariantName VariantName { get; set; } = null!;
 }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Product;
-using SmE_CommerceModels.RequestDtos.VariantAttribute;
+using SmE_CommerceModels.RequestDtos.VariantName;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
@@ -13,7 +13,7 @@ namespace SmE_CommerceAPI.Controllers;
 [Authorize(AuthenticationSchemes = "Defaut")]
 public class ProductController(
     IProductService productService,
-    IVariantAttributeService variantAttributeService,
+    IVariantNameService variantNameService,
     ILogger<AuthController> logger
 ) : ControllerBase
 {
@@ -340,11 +340,11 @@ public class ProductController(
     // Variant Attributes
     [HttpGet("variant-attributes")]
     [Authorize]
-    public async Task<IActionResult> GetVariantAttributesAsync()
+    public async Task<IActionResult> GetVariantNamesAsync()
     {
         try
         {
-            var result = await variantAttributeService.GetVariantAttributesAsync();
+            var result = await variantNameService.GetVariantNamesAsync();
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
@@ -361,40 +361,10 @@ public class ProductController(
         }
     }
 
-    [HttpPost("variant-attributes")]
-    [Authorize]
-    public async Task<IActionResult> CreateVariantAttributeAsync(
-        [FromBody] List<VariantReqDto> reqs
-    )
-    {
-        try
-        {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
-            var result = await variantAttributeService.BulkCreateVariantAttributeAsync(reqs);
-
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError(
-                    "Error at create variant attribute: {ex}",
-                    result.InternalErrorMessage
-                );
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at create variant attribute: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
-        }
-    }
-
     [HttpPut("variant-attributes/{variantId:guid}")]
     [Authorize]
-    public async Task<IActionResult> UpdateVariantAttributeAsync(
-        [FromBody] VariantReqDto req,
+    public async Task<IActionResult> UpdateVariantNameAsync(
+        [FromBody] VariantNameReqDto req,
         Guid variantId
     )
     {
@@ -403,7 +373,7 @@ public class ProductController(
             if (!ModelState.IsValid)
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
 
-            var result = await variantAttributeService.UpdateVariantAttributeAsync(variantId, req);
+            var result = await variantNameService.UpdateVariantNameAsync(variantId, req);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -424,11 +394,11 @@ public class ProductController(
 
     [HttpDelete("variant-attributes/{variantId:guid}")]
     [Authorize]
-    public async Task<IActionResult> DeleteVariantAttributeAsync(Guid variantId)
+    public async Task<IActionResult> DeleteVariantNameAsync(Guid variantId)
     {
         try
         {
-            var result = await variantAttributeService.DeleteVariantAttributeAsync(variantId);
+            var result = await variantNameService.DeleteVariantNameAsync(variantId);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);

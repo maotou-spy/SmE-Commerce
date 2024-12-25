@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-[Index("Slug", Name = "Categories_slug_key", IsUnique = true)]
 public partial class Category
 {
     [Key]
@@ -42,7 +38,7 @@ public partial class Category
 
     [Column("slug")]
     [StringLength(255)]
-    public string Slug { get; set; } = null!;
+    public string? Slug { get; set; }
 
     [ForeignKey("CreateById")]
     [InverseProperty("CategoryCreateBies")]

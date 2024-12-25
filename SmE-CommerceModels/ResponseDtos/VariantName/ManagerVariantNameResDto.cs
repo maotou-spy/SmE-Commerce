@@ -1,6 +1,6 @@
-﻿namespace SmE_CommerceModels.ResponseDtos.VariantAttribute;
+﻿namespace SmE_CommerceModels.ResponseDtos.VariantName;
 
-public class ManagerVariantAttributeResDto
+public class ManagerVariantNameResDto
 {
     public Guid AttributeId { get; set; }
 

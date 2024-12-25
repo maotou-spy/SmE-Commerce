@@ -20,9 +20,6 @@ public class AddProductReqDto
     [RegularExpression(@"^\d+$", ErrorMessage = "Invalid stock quantity")]
     public int StockQuantity { get; set; } = 0;
 
-    [RegularExpression(@"^\d+$", ErrorMessage = "Invalid sold quantity")]
-    public int SoldQuantity { get; set; } = 0;
-
     public bool IsTopSeller { get; set; } = false;
 
     public List<AddProductImageReqDto> Images { get; set; } = [];

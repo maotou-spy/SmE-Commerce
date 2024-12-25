@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -83,7 +81,8 @@ public partial class Discount
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     [InverseProperty("Discount")]
-    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
+        new List<DiscountProduct>();
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("DiscountModifiedBies")]

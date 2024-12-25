@@ -3,22 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class VariantAttribute
+public partial class VariantName
 {
     [Key]
-    [Column("attributeId")]
-    public Guid AttributeId { get; set; }
+    [Column("variantNameId")]
+    public Guid VariantNameId { get; set; }
 
-    [Column("productVariantId")]
-    public Guid ProductVariantId { get; set; }
-
-    [Column("value")]
-    [StringLength(255)]
-    public string Value { get; set; } = null!;
-
-    [Column("variantImage")]
-    [StringLength(255)]
-    public string? VariantImage { get; set; }
+    [Column("variantName")]
+    [StringLength(100)]
+    public string Name { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }
@@ -33,14 +26,14 @@ public partial class VariantAttribute
     public Guid? ModifiedById { get; set; }
 
     [ForeignKey("CreatedById")]
-    [InverseProperty("VariantAttributeCreatedBies")]
+    [InverseProperty("VariantNameCreatedBies")]
     public virtual User? CreatedBy { get; set; }
 
     [ForeignKey("ModifiedById")]
-    [InverseProperty("VariantAttributeModifiedBies")]
+    [InverseProperty("VariantNameModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
 
-    [ForeignKey("ProductVariantId")]
-    [InverseProperty("VariantAttributes")]
-    public virtual ProductVariant ProductVariant { get; set; } = null!;
+    [InverseProperty("VariantName")]
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } =
+        new List<ProductVariant>();
 }

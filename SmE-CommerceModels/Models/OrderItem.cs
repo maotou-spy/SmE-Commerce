@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +49,7 @@ public partial class OrderItem
     [InverseProperty("OrderItems")]
     public virtual Product Product { get; set; } = null!;
 
-    [ForeignKey("ProductVariantId")]
+    [ForeignKey("VariantNameId")]
     [InverseProperty("OrderItems")]
     public virtual ProductVariant Variant { get; set; } = null!;
 }

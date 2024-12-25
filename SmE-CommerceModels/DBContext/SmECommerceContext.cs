@@ -67,6 +67,8 @@ public partial class SmECommerceContext : DbContext
 
     public virtual DbSet<VariantAttribute> VariantAttributes { get; set; }
 
+    public virtual DbSet<VariantName> VariantNames { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
@@ -544,12 +546,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.StockQuantity).HasDefaultValue(0);
 
             entity
-                .HasOne(d => d.Attribute)
-                .WithMany(p => p.ProductVariants)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("productvariants_variantAttributes_attributeId_fk");
-
-            entity
                 .HasOne(d => d.CreateBy)
                 .WithMany(p => p.ProductVariantCreateBies)
                 .HasConstraintName("ProductVariants_createById_fk");
@@ -564,6 +560,12 @@ public partial class SmECommerceContext : DbContext
                 .WithMany(p => p.ProductVariants)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("productvariants_products_productid_fk");
+
+            entity
+                .HasOne(d => d.VariantName)
+                .WithMany(p => p.ProductVariants)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("productvariants_variantNames_variantNameId_fk");
         });
 
         modelBuilder.Entity<Review>(entity =>
@@ -631,18 +633,41 @@ public partial class SmECommerceContext : DbContext
 
         modelBuilder.Entity<VariantAttribute>(entity =>
         {
-            entity.HasKey(e => e.VariantId).HasName("variantattributes_pk");
+            entity.HasKey(e => e.AttributeId).HasName("VariantAttributes_pkey");
 
-            entity.Property(e => e.VariantId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.AttributeId).HasDefaultValueSql("gen_random_uuid()");
 
             entity
                 .HasOne(d => d.CreatedBy)
                 .WithMany(p => p.VariantAttributeCreatedBies)
-                .HasConstraintName("VariantAttributes_createById_fk");
+                .HasConstraintName("VariantAttributes_createdById_fkey");
 
             entity
                 .HasOne(d => d.ModifiedBy)
                 .WithMany(p => p.VariantAttributeModifiedBies)
+                .HasConstraintName("VariantAttributes_modifiedById_fkey");
+
+            entity
+                .HasOne(d => d.ProductVariant)
+                .WithMany(p => p.VariantAttributes)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("VariantAttributes_productVariantId_fkey");
+        });
+
+        modelBuilder.Entity<VariantName>(entity =>
+        {
+            entity.HasKey(e => e.VariantNameId).HasName("variantattributes_pk");
+
+            entity.Property(e => e.VariantNameId).HasDefaultValueSql("gen_random_uuid()");
+
+            entity
+                .HasOne(d => d.CreatedBy)
+                .WithMany(p => p.VariantNameCreatedBies)
+                .HasConstraintName("VariantAttributes_createById_fk");
+
+            entity
+                .HasOne(d => d.ModifiedBy)
+                .WithMany(p => p.VariantNameModifiedBies)
                 .HasConstraintName("VariantAttributes_modifyById_fk");
         });
         modelBuilder.HasSequence("product_code_seq").StartsAt(4L);

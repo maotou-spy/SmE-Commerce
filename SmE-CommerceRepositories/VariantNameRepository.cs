@@ -7,15 +7,15 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariantAttributeRepository
+public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameRepository
 {
-    public async Task<Return<List<VariantAttribute>>> GetVariantAttributes()
+    public async Task<Return<List<VariantName>>> GetVariantNamesAsync()
     {
         try
         {
-            var variants = await dbContext.VariantAttributes.ToListAsync();
+            var variants = await dbContext.VariantNames.ToListAsync();
 
-            return new Return<List<VariantAttribute>>
+            return new Return<List<VariantName>>
             {
                 Data = variants,
                 IsSuccess = true,
@@ -25,7 +25,7 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
         catch (Exception ex)
         {
-            return new Return<List<VariantAttribute>>
+            return new Return<List<VariantName>>
             {
                 Data = null,
                 IsSuccess = false,
@@ -36,15 +36,15 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<VariantAttribute>> GetVariantAttributeById(Guid id)
+    public async Task<Return<VariantName>> GetVariantNameByIdAsync(Guid id)
     {
         try
         {
-            var variant = await dbContext
-                .VariantAttributes.Include(x => x.ProductVariants)
-                .FirstOrDefaultAsync(x => x.VariantId == id);
+            var variant = await dbContext.VariantNames.FirstOrDefaultAsync(x =>
+                x.VariantNameId == id
+            );
 
-            return new Return<VariantAttribute>
+            return new Return<VariantName>
             {
                 Data = variant,
                 IsSuccess = true,
@@ -54,7 +54,7 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
         catch (Exception ex)
         {
-            return new Return<VariantAttribute>
+            return new Return<VariantName>
             {
                 Data = null,
                 IsSuccess = false,
@@ -65,42 +65,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<List<VariantAttribute>>> GetVariantAttributesByIds(
-        List<Guid> variantIds
-    )
+    public async Task<Return<bool>> BulkCreateVariantName(List<VariantName> variants)
     {
         try
         {
-            var variants = await dbContext
-                .VariantAttributes.Where(x => variantIds.Contains(x.VariantId))
-                .ToListAsync();
-
-            return new Return<List<VariantAttribute>>
-            {
-                Data = variants,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = variants.Count,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<List<VariantAttribute>>
-            {
-                Data = null,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
-                TotalRecord = 0,
-            };
-        }
-    }
-
-    public async Task<Return<bool>> BulkCreateVariantAttribute(List<VariantAttribute> variants)
-    {
-        try
-        {
-            await dbContext.VariantAttributes.AddRangeAsync(variants);
+            await dbContext.VariantNames.AddRangeAsync(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>
@@ -124,11 +93,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<bool>> UpdateVariantAttribute(VariantAttribute variants)
+    public async Task<Return<bool>> UpdateVariantNameAsync(VariantName variants)
     {
         try
         {
-            dbContext.VariantAttributes.Update(variants);
+            dbContext.VariantNames.Update(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>
@@ -152,11 +121,11 @@ public class VariantAttributeRepository(SmECommerceContext dbContext) : IVariant
         }
     }
 
-    public async Task<Return<bool>> DeleteVariantAttributes(VariantAttribute variants)
+    public async Task<Return<bool>> DeleteVariantNamesAsync(VariantName variants)
     {
         try
         {
-            dbContext.VariantAttributes.Remove(variants);
+            dbContext.VariantNames.Remove(variants);
             await dbContext.SaveChangesAsync();
 
             return new Return<bool>
