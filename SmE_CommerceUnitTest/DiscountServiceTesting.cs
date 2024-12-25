@@ -14,7 +14,6 @@ public class DiscountServiceTesting
     private readonly Mock<IDiscountRepository> _discountRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
     private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly DiscountService _discountService;
 
     public DiscountServiceTesting()
@@ -22,13 +21,13 @@ public class DiscountServiceTesting
         _discountRepositoryMock = new Mock<IDiscountRepository>();
         _helperServiceMock = new Mock<IHelperService>();
         _productRepositoryMock = new Mock<IProductRepository>();
-        _userRepositoryMock = new Mock<IUserRepository>();
+        Mock<IUserRepository> userRepositoryMock = new();
 
         _discountService = new DiscountService(
             _discountRepositoryMock.Object,
             _helperServiceMock.Object,
             _productRepositoryMock.Object,
-            _userRepositoryMock.Object
+            userRepositoryMock.Object
         );
     }
 
@@ -45,11 +44,9 @@ public class DiscountServiceTesting
             DiscountValue = 10,
             IsPercentage = true
         };
-        var discountReq = new AddDiscountReqDto
+        var discountReq = new UpdateDiscountReqDto
         {
-            DiscountName = "Discount 1",
-            DiscountValue = 10,
-            IsPercentage = true
+            DiscountName = "Discount 1"
         };
 
         _helperServiceMock.Setup(x => x.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager))).ReturnsAsync(

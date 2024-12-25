@@ -82,22 +82,26 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
     {
         try
         {
-            // 1. Fetching the discount data
-            var discount = await dbContext.Discounts.Where(d => d.DiscountId == id).FirstOrDefaultAsync();
-            if (discount == null)
+            var discount = await dbContext.Discounts
+                .Include(x => x.DiscountProducts)
+                .ThenInclude(x => x.Product)   
+                .FirstOrDefaultAsync(x => x.DiscountId == id);
 
+            if (discount == null)
             {
                 return new Return<Discount>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.DiscountNotFound
+                    StatusCode = ErrorCode.DiscountNotFound,
+                    TotalRecord = 0
                 };
             }
 
-            // 2. Ensuring that the record is locked for update
             await dbContext.Database.ExecuteSqlRawAsync(
-                "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE", id);
+                "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE",
+                id
+            );
 
             return new Return<Discount>
             {
@@ -114,7 +118,8 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
+                TotalRecord = 0
             };
         }
     }
@@ -140,7 +145,6 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             {
                 Data = null,
                 IsSuccess = false,
-
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e
             };
