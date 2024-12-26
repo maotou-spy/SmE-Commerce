@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Discount;
+using SmE_CommerceModels.RequestDtos.Discount.DiscountCode;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
@@ -109,7 +110,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     [HttpPut("codes/{codeId:guid}")]
     [Authorize]
     public async Task<IActionResult> UpdateDiscountCodeAsync([FromRoute] Guid codeId,
-        [FromBody] AddDiscountCodeReqDto req)
+        [FromBody] UpdateDiscountCodeReqDto req)
     {
         try
         {

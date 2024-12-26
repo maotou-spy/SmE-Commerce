@@ -3,6 +3,7 @@ using System.Transactions;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Discount;
+using SmE_CommerceModels.RequestDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ResponseDtos.Discount;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
@@ -258,22 +259,18 @@ public class DiscountService(
                 needUpdate = true;
             }
 
-            if (!needUpdate)
-                return new Return<bool>
-                {
-                    Data = true,
-                    IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
-                };
-            var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
-            if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
+            if (needUpdate)
             {
-                return new Return<bool>
+                var addProductsResult = await discountRepository.UpdateDiscountAsync(result.Data);
+                if (!addProductsResult.IsSuccess || addProductsResult.Data == null)
                 {
-                    IsSuccess = false,
-                    InternalErrorMessage = addProductsResult.InternalErrorMessage,
-                    StatusCode = addProductsResult.StatusCode
-                };
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        InternalErrorMessage = addProductsResult.InternalErrorMessage,
+                        StatusCode = addProductsResult.StatusCode
+                    };
+                }
             }
 
             transaction.Complete();
@@ -313,7 +310,7 @@ public class DiscountService(
                     StatusCode = currentUser.StatusCode
                 };
             }
-            
+
             var discount = await discountRepository.GetDiscountByIdForUpdateAsync(id);
             if (!discount.IsSuccess || discount.Data == null)
             {
@@ -510,7 +507,7 @@ public class DiscountService(
             }
 
             // Check if DiscountId is valid
-            var discount = await discountRepository.GetDiscountByIdAsync(id);
+            var discount = await discountRepository.GetDiscountByIdForUpdateAsync(id);
             if (!discount.IsSuccess || discount.Data == null)
             {
                 return new Return<bool>
@@ -664,7 +661,7 @@ public class DiscountService(
         }
     }
 
-    public async Task<Return<bool>> UpdateDiscountCodeAsync(Guid codeId, AddDiscountCodeReqDto req)
+    public async Task<Return<bool>> UpdateDiscountCodeAsync(Guid codeId, UpdateDiscountCodeReqDto req)
     {
         try
         {
@@ -712,20 +709,6 @@ public class DiscountService(
                 };
             }
             
-            // Check if UserId is valid
-            if (req.UserId.HasValue)
-            {
-                var existedUser = await userRepository.GetUserByIdAsync(req.UserId.Value);
-                if (!existedUser.IsSuccess || existedUser.Data == null)
-                {
-                    return new Return<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = existedUser.StatusCode
-                    };
-                }
-            }
-            
             // Check if FromDate and ToDate is valid
             if (req is { FromDate: not null, ToDate: not null } || req.FromDate != null || req.ToDate != null)
             {
@@ -769,10 +752,8 @@ public class DiscountService(
             }
             
             discountCode.Data.Code = req.DiscountCode.ToUpper().Trim();
-            discountCode.Data.UserId = req.UserId;
             discountCode.Data.FromDate = req.FromDate ?? DateTime.Today; 
             discountCode.Data.ToDate = req.ToDate ?? discount.Data.ToDate;
-            discountCode.Data.Status = discountCode.Data.Status;                // can not update this field   
             discountCode.Data.ModifiedAt = DateTime.Now;
             discountCode.Data.ModifiedById = currentUser.Data.UserId;
             

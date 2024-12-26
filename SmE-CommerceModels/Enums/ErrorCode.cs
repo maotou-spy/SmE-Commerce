@@ -27,6 +27,7 @@ public static class ErrorCode
     public const string ProductAttributeNotFound = "109";
     public const string VariantNameNotFound = "110";
     public const string ProductVariantNotFound = "111";
+    public const string DiscountCodeNotFound = "112";
 
     // Already exists
     public const string EmailAlreadyExists = "201";
