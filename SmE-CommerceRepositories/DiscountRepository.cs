@@ -288,10 +288,54 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         }
     }
 
-    public Task<Return<DiscountCode>> GetDiscountCodeByIdForUpdateAsync(Guid id)
+    public async Task<Return<DiscountCode>> GetDiscountCodeByIdForUpdateAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            // Lấy discount code từ cơ sở dữ liệu cùng các liên kết liên quan (nếu có)
+            var discountCode = await dbContext.DiscountCodes
+                .FirstOrDefaultAsync(x => x.CodeId == id);
+
+            // Nếu không tìm thấy discount code
+            if (discountCode == null)
+            {
+                return new Return<DiscountCode>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.DiscountCodeNotFound,
+                    TotalRecord = 0
+                };
+            }
+
+            // Đánh dấu bản ghi FOR UPDATE để thực hiện đồng bộ
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"DiscountCodes\" WHERE \"codeId\" = {0} FOR UPDATE",
+                id
+            );
+
+            // Trả về dữ liệu thành công
+            return new Return<DiscountCode>
+            {
+                Data = discountCode,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            // Xử lý lỗi và trả về thông tin lỗi
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                TotalRecord = 0
+            };
+        }
     }
+
 
     #endregion
 }

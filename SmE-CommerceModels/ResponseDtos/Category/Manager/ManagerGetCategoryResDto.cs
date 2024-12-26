@@ -1,6 +1,4 @@
-﻿using SmE_CommerceModels.ResponseDtos.Category.Custumer;
-
-namespace SmE_CommerceModels.ResponseDtos.Category.Manager;
+﻿namespace SmE_CommerceModels.ResponseDtos.Category.Manager;
 
 public class ManagerGetCategoryResDto : GetCategoryResDto
 {

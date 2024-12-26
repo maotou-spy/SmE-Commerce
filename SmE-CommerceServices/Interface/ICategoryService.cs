@@ -1,5 +1,5 @@
 ﻿using SmE_CommerceModels.RequestDtos.Category;
-using SmE_CommerceModels.ResponseDtos.Category.Custumer;
+using SmE_CommerceModels.ResponseDtos.Category;
 using SmE_CommerceModels.ResponseDtos.Category.Manager;
 using SmE_CommerceModels.ReturnResult;
 
