@@ -1,8 +1,8 @@
 ﻿namespace SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 
-public class GetDiscountCodeByCodeResDto
+public class GetDiscountCodeResDto
 {
-    public Guid? UserId { get; set; }
+    public Guid? CodeId { get; set; }
 
     public required string DiscountCode { get; set; }
 

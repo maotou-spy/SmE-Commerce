@@ -618,14 +618,14 @@ public class DiscountService(
         }
     }
 
-    public async Task<Return<GetDiscountCodeByCodeResDto>> GetDiscounCodeByCodeAsync(string code)
+    public async Task<Return<GetDiscountCodeResDto>> GetDiscounCodeByCodeAsync(string code)
     {
         try
         {
             var result = await discountRepository.GetDiscountCodeByCodeAsync(code.ToUpper());
             if (!result.IsSuccess)
             {
-                return new Return<GetDiscountCodeByCodeResDto>
+                return new Return<GetDiscountCodeResDto>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = result.InternalErrorMessage,
@@ -634,9 +634,9 @@ public class DiscountService(
             }
 
             var res = result.Data != null
-                ? new GetDiscountCodeByCodeResDto
+                ? new GetDiscountCodeResDto
                 {
-                    UserId = result.Data.UserId,
+                    CodeId = result.Data.CodeId,
                     DiscountCode = result.Data.Code,
                     FromDate = result.Data.FromDate,
                     ToDate = result.Data.ToDate,
@@ -644,7 +644,7 @@ public class DiscountService(
                 }
                 : null;
 
-            return new Return<GetDiscountCodeByCodeResDto>
+            return new Return<GetDiscountCodeResDto>
             {
                 Data = res,
                 IsSuccess = true,
@@ -654,7 +654,7 @@ public class DiscountService(
         }
         catch (Exception e)
         {
-            return new Return<GetDiscountCodeByCodeResDto>
+            return new Return<GetDiscountCodeResDto>
             {
                 Data = null,
                 IsSuccess = false,
@@ -868,7 +868,7 @@ public class DiscountService(
                     FromDate = result.Data.FromDate,
                     ToDate = result.Data.ToDate,
                     Status = result.Data.Status,
-                    Code = result.Data.Code
+                    DiscountCode = result.Data.Code
                 }
                 : null;
 
@@ -945,6 +945,62 @@ public class DiscountService(
             return new Return<bool>
             {
                 Data = false,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+
+    public async Task<Return<IEnumerable<GetDiscountCodeResDto>>> GetDiscountCodeByDiscountIdAsync(Guid discountId, int? pageNumber, int? pageSize)
+    {
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<IEnumerable<GetDiscountCodeResDto>>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    StatusCode = currentUser.StatusCode
+                };
+            }
+
+            var result = await discountRepository.GetDiscountCodesByDiscountIdAsync(discountId, pageNumber, pageSize);
+            if (!result.IsSuccess)
+            {
+                return new Return<IEnumerable<GetDiscountCodeResDto>>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+            
+            var res = result.Data!.Select(x => new GetDiscountCodeResDto
+            {
+                CodeId = x.CodeId,
+                DiscountCode = x.Code,
+                FromDate = x.FromDate,
+                ToDate = x.ToDate,
+                Status = x.Status
+            }).ToList();
+            
+            return new Return<IEnumerable<GetDiscountCodeResDto>>
+            {
+                Data = res,
+                IsSuccess = true,
+                TotalRecord = res.Count,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<GetDiscountCodeResDto>>
+            {
+                Data = null,
                 IsSuccess = false,
                 InternalErrorMessage = e,
                 StatusCode = ErrorCode.InternalServerError

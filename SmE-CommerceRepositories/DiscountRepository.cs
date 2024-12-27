@@ -419,5 +419,42 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
+
+    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsync(Guid id, int? pageNumber, int? pageSize)
+    {
+        try
+        {
+            var query = dbContext.DiscountCodes
+                .Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
+                .AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            if (pageNumber.HasValue && pageSize.HasValue)
+            {
+                query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var result = await query.ToListAsync();
+
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords
+            };
+        } catch (Exception e)
+        {
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0
+            };
+        }
+    }
     #endregion
 }

@@ -1,4 +1,5 @@
-﻿using SmE_CommerceModels.Models;
+﻿using System.Collections;
+using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.RequestDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ResponseDtos.Discount;
@@ -16,8 +17,9 @@ public interface IDiscountService
     Task<Return<IEnumerable<ManagerGetDiscountsResDto>>> GetDiscountsForManagerAsync(string? name, int? pageNumber, int? pageSize);
 
     Task<Return<bool>> AddDiscountCodeAsync(Guid id, AddDiscountCodeReqDto req);
-    Task<Return<GetDiscountCodeByCodeResDto>> GetDiscounCodeByCodeAsync(string code);
+    Task<Return<GetDiscountCodeResDto>> GetDiscounCodeByCodeAsync(string code);
     Task<Return<bool>> UpdateDiscountCodeAsync(Guid codeId, UpdateDiscountCodeReqDto req);
     Task<Return<GetDiscountCodeByIdResDto>> GetDiscountCodeByIdAsync(Guid codeId);
     Task<Return<bool>> DeleteDiscountCodeAsync(Guid userId);
+    Task<Return<IEnumerable<GetDiscountCodeResDto>>> GetDiscountCodeByDiscountIdAsync(Guid discountId, int? pageNumber, int? pageSize);
 }
