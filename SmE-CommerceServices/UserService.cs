@@ -2,7 +2,6 @@
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
-using SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ResponseDtos.User;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
@@ -33,7 +32,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    StatusCode = currentUser.StatusCode,
+                    StatusCode = currentUser.StatusCode
                 };
 
             var users = await userRepository.GetAllUsersAsync(
@@ -48,7 +47,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    StatusCode = users.StatusCode,
+                    StatusCode = users.StatusCode
                 };
 
             return new Return<IEnumerable<User>>
@@ -87,7 +86,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.UserAlreadyExists,
+                    StatusCode = ErrorCode.UserAlreadyExists
                 };
 
             User newManager = new()
@@ -98,7 +97,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Role = req.Role,
                 Status = UserStatus.Active,
                 CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now
             };
 
             var createResult = await userRepository.CreateNewUser(newManager);
@@ -151,14 +150,14 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = currentUser.Data.Point,
                 Dob = currentUser.Data.DateOfBirth,
                 Gender = currentUser.Data.Gender,
-                Avatar = currentUser.Data.Avatar,
+                Avatar = currentUser.Data.Avatar
             };
 
             return new Return<GetUserProfileResDto>
             {
                 IsSuccess = true,
                 Data = user,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -194,7 +193,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode,
+                    StatusCode = user.StatusCode
                 };
 
             var userProfileDto = new GetUserProfileResDto
@@ -205,7 +204,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = user.Data?.Point,
                 Dob = user.Data?.DateOfBirth,
                 Gender = user.Data?.Gender,
-                Avatar = user.Data?.Avatar,
+                Avatar = user.Data?.Avatar
             };
 
             return new Return<GetUserProfileResDto>
@@ -250,7 +249,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode,
+                    StatusCode = user.StatusCode
                 };
 
             var existedPhone = await userRepository.GetUserByPhoneAsync(req.Phone);
@@ -290,7 +289,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode,
+                    StatusCode = updateResult.StatusCode
                 };
 
             scope.Complete();
@@ -299,7 +298,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -308,7 +307,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -324,7 +323,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    StatusCode = currentUser.StatusCode,
+                    StatusCode = currentUser.StatusCode
                 };
 
             var user = await userRepository.GetUserByIdAsync(id);
@@ -333,7 +332,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode,
+                    StatusCode = user.StatusCode
                 };
 
             user.Data.Status = UserStatus.Deleted;
@@ -346,7 +345,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode,
+                    StatusCode = updateResult.StatusCode
                 };
 
             scope.Complete();
@@ -355,7 +354,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -366,7 +365,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -382,7 +381,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    StatusCode = currentUser.StatusCode,
+                    StatusCode = currentUser.StatusCode
                 };
 
             var user = await userRepository.GetUserByIdAsync(id);
@@ -391,7 +390,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode,
+                    StatusCode = user.StatusCode
                 };
 
             user.Data.Status =
@@ -405,7 +404,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode,
+                    StatusCode = updateResult.StatusCode
                 };
 
             scope.Complete();
@@ -414,7 +413,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -425,7 +424,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
