@@ -15,6 +15,7 @@ public interface IDiscountService
     Task<Return<bool>> AddDiscountAsync(AddDiscountReqDto discount);
     Task<Return<bool>> UpdateDiscountAsync(Guid id, UpdateDiscountReqDto discount);
     Task<Return<IEnumerable<ManagerGetDiscountsResDto>>> GetDiscountsForManagerAsync(string? name, int? pageNumber, int? pageSize);
+    Task<Return<bool>> DeleteDiscountAsync(Guid id);
 
     Task<Return<bool>> AddDiscountCodeAsync(Guid id, AddDiscountCodeReqDto req);
     Task<Return<GetDiscountCodeResDto>> GetDiscounCodeByCodeAsync(string code);

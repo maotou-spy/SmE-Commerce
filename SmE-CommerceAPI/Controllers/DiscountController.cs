@@ -97,6 +97,31 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
     }
 
+    [HttpDelete("{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteDiscountAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
+
+            var result = await discountService.DeleteDiscountAsync(id);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at delete discount: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete discount: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
     #endregion
 
     #region DiscountCode
