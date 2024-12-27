@@ -2,6 +2,7 @@
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
+using SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ResponseDtos.User;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
@@ -43,7 +44,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = true,
                 StatusCode = users.StatusCode,
                 Data = users.Data,
-                TotalRecord = users.TotalRecord,
+                TotalRecord = users.TotalRecord
             };
         }
         catch (Exception ex)
@@ -52,7 +53,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -101,7 +102,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     StatusCode = createResult.StatusCode,
-                    InternalErrorMessage = createResult.InternalErrorMessage,
+                    InternalErrorMessage = createResult.InternalErrorMessage
                 };
             }
 
@@ -109,7 +110,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 StatusCode = createResult.StatusCode,
-                Data = true,
+                Data = true
             };
         }
         catch (Exception ex)
@@ -119,7 +120,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -136,7 +137,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
             }
 
@@ -166,7 +167,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -183,7 +184,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
             }
 
@@ -214,7 +215,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = true,
                 Data = userProfileDto,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = user.TotalRecord,
+                TotalRecord = user.TotalRecord
             };
         }
         catch (Exception ex)
@@ -225,7 +226,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -243,7 +244,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
             }
 
@@ -264,7 +265,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.PhoneAlreadyExists,
+                    StatusCode = ErrorCode.PhoneAlreadyExists
                 };
             }
 
@@ -284,7 +285,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 {
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    Data = true,
+                    Data = true
                 };
             }
 
@@ -449,6 +450,57 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+    
+    public async Task<Return<IEnumerable<UserGetTheirDiscountResDto>>> UserGetTheirDiscountsAsync()
+    {
+        try
+        {
+            var user = await helperService.GetCurrentUser();
+            if (!user.IsSuccess || user.Data == null)
+            {
+                return new Return<IEnumerable<UserGetTheirDiscountResDto>>
+                {
+                    IsSuccess = false,
+                    StatusCode = user.StatusCode
+                };
+            }
+            
+            var result = await userRepository.UserGetDiscountsByUserIdAsync(user.Data.UserId);
+            if (!result.IsSuccess)
+            {
+                return new Return<IEnumerable<UserGetTheirDiscountResDto>>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+            
+            var res = result.Data!.Select(x => new UserGetTheirDiscountResDto
+            {
+                CodeId = x.CodeId,
+                DiscountName = x.Discount.DiscountName
+            }).ToList();
+            
+            return new Return<IEnumerable<UserGetTheirDiscountResDto>>
+            {
+                Data = res,
+                IsSuccess = true,
+                TotalRecord = res.Count,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<UserGetTheirDiscountResDto>>
+            {
+                Data = null,
+                IsSuccess = false,
+                InternalErrorMessage = e,
                 StatusCode = ErrorCode.InternalServerError
             };
         }

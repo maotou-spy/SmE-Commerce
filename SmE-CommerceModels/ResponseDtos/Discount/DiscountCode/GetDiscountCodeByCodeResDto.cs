@@ -1,4 +1,4 @@
-﻿namespace SmE_CommerceModels.ResponseDtos.Discount;
+﻿namespace SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 
 public class GetDiscountCodeByCodeResDto
 {

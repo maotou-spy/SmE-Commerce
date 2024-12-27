@@ -29,12 +29,12 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                query = query.Where(x => x.Email != null && x.Email.Contains(email));
+                query = query.Where(x => x.Email.Contains(email));
             }
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                query = query.Where(x => x.FullName != null && x.FullName.Contains(name));
+                query = query.Where(x => x.FullName.Contains(name));
             }
 
             var totalRecord = await query.CountAsync();
@@ -274,6 +274,37 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+    
+    public async Task<Return<IEnumerable<DiscountCode>>> UserGetDiscountsByUserIdAsync(Guid cusId)
+    {
+        try
+        {
+            var discountCodes = await dbContext.DiscountCodes
+                .Include(x => x.User)
+                .Include(x => x.Discount)
+                .Where(x => x.UserId == cusId || x.UserId == null && x.Status == GeneralStatus.Active)
+                .ToListAsync();
+
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = discountCodes,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = discountCodes.Count
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
                 TotalRecord = 0
             };
         }

@@ -4,7 +4,8 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.RequestDtos.Discount.DiscountCode;
-using SmE_CommerceModels.ResponseDtos.Discount;
+using SmE_CommerceModels.ResponseDtos.Discount.Discount;
+using SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -475,6 +476,8 @@ public class DiscountService(
             };
         }
     }
+    
+    
 
     #endregion
 
@@ -768,6 +771,168 @@ public class DiscountService(
                 };
             }
             
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+    
+    public async Task<Return<IEnumerable<ManagerGetDiscountsResDto>>> GetDiscountsForManagerAsync (string? name, int? pageNumber, int? pageSize)
+    {
+        try
+        {
+            var result = await discountRepository.GetDiscountsAsync(name, pageNumber, pageSize);
+            if (!result.IsSuccess)
+            {
+                return new Return<IEnumerable<ManagerGetDiscountsResDto>>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+
+            var res = result.Data!.Select(x => new ManagerGetDiscountsResDto
+            {
+                discountId = x.DiscountId,
+                discountName = x.DiscountName,
+                description = x.Description,
+                isPercentage = x.IsPercentage,
+                discountValude = x.DiscountValue,
+                minimumOrderAmount = x.MinimumOrderAmount,
+                maximumDiscount = x.MaximumDiscount,
+                fromDate = x.FromDate,
+                toDate = x.ToDate,
+                status = x.Status,
+                usageLimit = x.UsageLimit,
+                usageCount = x.UsedCount,
+                minQuantity = x.MinQuantity,
+                maxQuantity = x.MaxQuantity,
+                isFirstOrder = x.IsFirstOrder
+            }).ToList();
+
+            return new Return<IEnumerable<ManagerGetDiscountsResDto>>
+            {
+                Data = res,
+                IsSuccess = true,
+                TotalRecord = res.Count,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<ManagerGetDiscountsResDto>>
+            {
+                Data = null,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+
+    public async Task<Return<GetDiscountCodeByIdResDto>> GetDiscountCodeByIdAsync(Guid codeId)
+    {
+        try
+        {
+            var result = await discountRepository.GetDiscountCodeByIdAsync(codeId);
+            if (!result.IsSuccess)
+            {
+                return new Return<GetDiscountCodeByIdResDto>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+    
+            var res = result.Data != null
+                ? new GetDiscountCodeByIdResDto
+                {
+                    CodeId = result.Data.CodeId,
+                    DiscountName = result.Data.Discount.DiscountName,
+                    Description = result.Data.Discount.Description,
+                    FromDate = result.Data.FromDate,
+                    ToDate = result.Data.ToDate,
+                    Status = result.Data.Status,
+                    Code = result.Data.Code
+                }
+                : null;
+
+            return new Return<GetDiscountCodeByIdResDto>
+            {
+                Data = res,
+                IsSuccess = true,
+                TotalRecord = res != null ? 1 : 0,
+                StatusCode = res != null ? ErrorCode.Ok : ErrorCode.DiscountNotFound
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<GetDiscountCodeByIdResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                InternalErrorMessage = e,
+                StatusCode = ErrorCode.InternalServerError
+            };
+        }
+    }
+    
+    public async Task<Return<bool>> DeleteDiscountCodeAsync(Guid codeId)
+    {
+        try
+        {
+            // Validate user
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    StatusCode = currentUser.StatusCode
+                };
+            }
+            
+            var discountCode = await discountRepository.GetDiscountCodeByIdForUpdateAsync(codeId);
+            if (!discountCode.IsSuccess || discountCode.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = discountCode.StatusCode
+                };
+            }
+
+            discountCode.Data.Status = DiscountCodeStatus.Deleted;
+            discountCode.Data.ModifiedAt = DateTime.Now;
+            discountCode.Data.ModifiedById = currentUser.Data.UserId;
+            
+            var result = await discountRepository.UpdateDiscountCodeAsync(discountCode.Data);
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return new Return<bool>
+                {
+                    IsSuccess = false,
+                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = result.StatusCode
+                };
+            }
+
             return new Return<bool>
             {
                 Data = true,

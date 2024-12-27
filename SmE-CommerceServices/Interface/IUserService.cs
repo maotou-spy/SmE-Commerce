@@ -1,5 +1,6 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
+using SmE_CommerceModels.ResponseDtos.Discount.DiscountCode;
 using SmE_CommerceModels.ResponseDtos.User;
 using SmE_CommerceModels.ReturnResult;
 
@@ -16,4 +17,7 @@ public interface IUserService
     Task<Return<bool>> UpdateProfileAsync(UpdateUserProfileReqDto req);
     Task<Return<bool>> DeleteUserAsync(Guid id);
     Task<Return<bool>> ChangeUserStatusAsync(Guid id);
+    
+    
+    Task<Return<IEnumerable<UserGetTheirDiscountResDto>>> UserGetTheirDiscountsAsync();
 }
