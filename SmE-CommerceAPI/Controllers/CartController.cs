@@ -7,7 +7,10 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[Route("api/carts")]
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/carts")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
 public class CartController(ICartService cartService, ILogger<CartController> logger)
     : ControllerBase
 {

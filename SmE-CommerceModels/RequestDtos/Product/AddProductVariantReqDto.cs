@@ -4,7 +4,8 @@ namespace SmE_CommerceModels.RequestDtos.Product;
 
 public class AddProductVariantReqDto
 {
-    public string? Sku { get; set; }
+    // This version do not allow to add SKU
+    // public string? Sku { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Price must be non-negative.")]
     public decimal Price { get; set; } = 0;

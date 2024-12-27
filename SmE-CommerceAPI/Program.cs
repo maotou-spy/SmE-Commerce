@@ -4,6 +4,9 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmE_CommerceModels.DBContext;
@@ -39,6 +42,28 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+
+#region ApiVersioning
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("x-api-version"),
+        new MediaTypeApiVersionReader("x-api-version")
+    );
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+#endregion
 
 #region Timezone
 
@@ -100,7 +125,7 @@ builder
         option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(
-        "Defaut",
+        "JwtScheme",
         options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
@@ -182,8 +207,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//Hello World
-app.MapGet("/", [AllowAnonymous] () => "Hello World! Welcome to SmE-Commerce API");
+// //Hello World
+// app.MapGet(
+//     "api/v{version:apiVersion}/hello",
+//     [AllowAnonymous]
+//     ([FromRoute] ApiVersion version) =>
+//         $"Hello World! Welcome to SmE-Commerce API version {version}"
+// );
 
 app.UseAuthentication();
 

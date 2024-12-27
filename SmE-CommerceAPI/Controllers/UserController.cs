@@ -10,10 +10,15 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[Route("api/users")]
-[Authorize(AuthenticationSchemes = "Defaut")]
-public class UserController(IUserService userService, IAddressService addressService, ILogger<AuthController> logger)
-    : ControllerBase
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/users")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
+public class UserController(
+    IUserService userService,
+    IAddressService addressService,
+    ILogger<AuthController> logger
+) : ControllerBase
 {
     // [HttpPost]
     // [Authorize]
@@ -50,18 +55,20 @@ public class UserController(IUserService userService, IAddressService addressSer
         {
             var result = await userService.GetUserProfileAsync();
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at get user profile: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -73,41 +80,51 @@ public class UserController(IUserService userService, IAddressService addressSer
         {
             var result = await userService.GetUserProfileByManagerAsync(id);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
-                logger.LogError("Error at get user profile by manager: {ex}", result.InternalErrorMessage);
-            }
+                logger.LogError(
+                    "Error at get user profile by manager: {ex}",
+                    result.InternalErrorMessage
+                );
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile by manager: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
     [HttpGet("addresses")]
     [Authorize]
-    public async Task<IActionResult> GetUserAddresses([FromQuery] int pageSize, [FromQuery] int pageNumber)
+    public async Task<IActionResult> GetUserAddresses(
+        [FromQuery] int pageSize,
+        [FromQuery] int pageNumber
+    )
     {
         try
         {
             var result = await addressService.GetUserAddressesAsync(pageSize, pageNumber);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at get user addresses: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user addresses: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -118,52 +135,55 @@ public class UserController(IUserService userService, IAddressService addressSer
         try
         {
             if (!ModelState.IsValid)
-            {
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            }
 
             var result = await addressService.AddAddressAsync(req);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at add address: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at add address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
     [HttpPut("addresses/{addressId:guid}")]
     [Authorize]
-    public async Task<IActionResult> UpdateAddress([FromRoute] Guid addressId, [FromBody] AddressReqDto req)
+    public async Task<IActionResult> UpdateAddress(
+        [FromRoute] Guid addressId,
+        [FromBody] AddressReqDto req
+    )
     {
         try
         {
             if (!ModelState.IsValid)
-            {
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            }
 
             var result = await addressService.UpdateAddressAsync(addressId, req);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at update address: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at update address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -175,18 +195,20 @@ public class UserController(IUserService userService, IAddressService addressSer
         {
             var result = await addressService.DeleteAddressAsync(addressId);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at delete address: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -198,18 +220,20 @@ public class UserController(IUserService userService, IAddressService addressSer
         {
             var result = await addressService.SetDefaultAddressAsync(addressId);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at set default address: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at set default address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -220,17 +244,14 @@ public class UserController(IUserService userService, IAddressService addressSer
         try
         {
             if (!ModelState.IsValid)
-            {
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
-            }
 
             var result = await userService.UpdateProfileAsync(req);
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at update user profile: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
@@ -243,25 +264,40 @@ public class UserController(IUserService userService, IAddressService addressSer
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllUsers([FromQuery] string? status, [FromQuery] int? pageSize,
-        [FromQuery] int? pageNumber, [FromQuery] string? phone, [FromQuery] string? email, [FromQuery] string name)
+    public async Task<IActionResult> GetAllUsers(
+        [FromQuery] string? status,
+        [FromQuery] int? pageSize,
+        [FromQuery] int? pageNumber,
+        [FromQuery] string? phone,
+        [FromQuery] string? email,
+        [FromQuery] string name
+    )
     {
         try
         {
-            var result = await userService.GetAllUsersAsync(status, pageSize, pageNumber, phone, email, name);
+            var result = await userService.GetAllUsersAsync(
+                status,
+                pageSize,
+                pageNumber,
+                phone,
+                email,
+                name
+            );
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at get all users: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at get all users: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -272,18 +308,20 @@ public class UserController(IUserService userService, IAddressService addressSer
         try
         {
             var result = await userService.DeleteUserAsync(id);
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at delete user: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete user: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
+            return StatusCode(
+                500,
+                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -294,18 +332,20 @@ public class UserController(IUserService userService, IAddressService addressSer
         try
         {
             var result = await userService.ChangeUserStatusAsync(id);
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-            {
                 logger.LogError("Error at change user status: {ex}", result.InternalErrorMessage);
-            }
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
             logger.LogInformation("Error at change user status: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> {StatusCode = ErrorCode.InternalServerError});
+            return StatusCode(
+                500,
+                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
+            );
         }
     }
 
@@ -315,10 +355,12 @@ public class UserController(IUserService userService, IAddressService addressSer
     {
         try
         {
-            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            if (!ModelState.IsValid)
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await userService.UserGetTheirDiscountsAsync();
 
-            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError("Error at get discount code: {ex}", result.InternalErrorMessage);
             return Helper.GetErrorResponse(result.StatusCode);

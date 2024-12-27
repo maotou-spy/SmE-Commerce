@@ -7,8 +7,10 @@ using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[Route("api/products")]
-[Authorize(AuthenticationSchemes = "Defaut")]
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/products")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
 public class ProductController(IProductService productService, ILogger<AuthController> logger)
     : ControllerBase
 {

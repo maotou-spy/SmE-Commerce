@@ -7,8 +7,10 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[Route("api/variants")]
-[Authorize(AuthenticationSchemes = "Defaut")]
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/variants")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
 public class VariantController(
     IVariantNameService variantNameService,
     ILogger<AuthController> logger

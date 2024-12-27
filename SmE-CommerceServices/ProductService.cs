@@ -1320,7 +1320,7 @@ public class ProductService(
             var productVariants = req.Select(x => new ProductVariant
                 {
                     ProductId = productId,
-                    Sku = x.Sku,
+                    // Sku = x.Sku,
                     Price = x.Price,
                     StockQuantity = x.StockQuantity,
                     VariantImage = x.VariantImage,

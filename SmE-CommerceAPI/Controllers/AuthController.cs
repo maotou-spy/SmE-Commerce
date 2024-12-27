@@ -5,54 +5,55 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Auth;
 using SmE_CommerceServices.Interface;
 
-namespace SmE_CommerceAPI.Controllers
+namespace SmE_CommerceAPI.Controllers;
+
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/auths")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
+public class AuthController(IAuthService authService, ILogger<AuthController> logger) : Controller
 {
-    [Route("api/auths")]
-    public class AuthController(IAuthService authService, ILogger<AuthController> logger) : Controller
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginWithAccountReqDto reqDto)
     {
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginWithAccountReqDto reqDto)
+        try
         {
-            try
-            {
-                var result = await authService.LoginWithAccount(reqDto);
+            var result = await authService.LoginWithAccount(reqDto);
 
-                if (result.IsSuccess) return StatusCode(200, result);
-                if (result.InternalErrorMessage is not null)
-                {
-                    logger.LogError("Error at login: {ex}", result.InternalErrorMessage);
-                }
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at login: {ex}", result.InternalErrorMessage);
 
-                return Helper.GetErrorResponse(result.StatusCode);
-            } catch (Exception ex)
-            {
-                logger.LogError("Error at login: {ex}", ex);
-                return Helper.GetErrorResponse(ErrorCode.InternalServerError);
-            }
+            return Helper.GetErrorResponse(result.StatusCode);
         }
-
-        [HttpPost("register")]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterWithAccountReqDto reqDto)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await authService.RegisterWithAccount(reqDto);
+            logger.LogError("Error at login: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 
-                if (result.IsSuccess) return StatusCode(200, result);
-                if (result.InternalErrorMessage is not null)
-                {
-                    logger.LogError("Error at register: {ex}", result.InternalErrorMessage);
-                }
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterWithAccountReqDto reqDto)
+    {
+        try
+        {
+            var result = await authService.RegisterWithAccount(reqDto);
 
-                return Helper.GetErrorResponse(result.StatusCode);
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Error at register: {ex}", e);
-                return Helper.GetErrorResponse(ErrorCode.InternalServerError);
-            }
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at register: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception e)
+        {
+            logger.LogError("Error at register: {ex}", e);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 }

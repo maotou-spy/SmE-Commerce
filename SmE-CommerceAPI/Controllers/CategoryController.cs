@@ -9,8 +9,10 @@ using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
 namespace SmE_CommerceAPI.Controllers;
 
-[Route("api/categories")]
-[Authorize(AuthenticationSchemes = "Defaut")]
+[ApiVersion("1.0")]
+[ApiController]
+[Route("api/v{version:apiVersion}/categories")]
+[Authorize(AuthenticationSchemes = "JwtScheme")]
 public class CategoryController(ICategoryService categoryService, ILogger<AuthController> logger)
     : ControllerBase
 {
@@ -148,7 +150,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
-    
+
     [HttpPut("{id:guid}/status")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryStatusAsync([FromRoute] Guid id)
@@ -160,7 +162,10 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at update category status: {ex}", result.InternalErrorMessage);
+                logger.LogError(
+                    "Error at update category status: {ex}",
+                    result.InternalErrorMessage
+                );
 
             return Helper.GetErrorResponse(result.StatusCode);
         }
