@@ -230,8 +230,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
-
-
+    
     #endregion
 
     #region DiscountCode
@@ -456,5 +455,44 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
+    
+    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsyncForUpdate(Guid id)
+    {
+        try
+        {
+            // Lọc các bản ghi theo DiscountId và trạng thái không bị xóa
+            var query = dbContext.DiscountCodes
+                .Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
+                .AsQueryable();
+
+            // Đếm tổng số bản ghi sau khi áp dụng các bộ lọc
+            var totalRecords = await query.CountAsync();
+
+            // Truy vấn toàn bộ kết quả
+            var result = await query.ToListAsync();
+
+            // Trả về kết quả thành công
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords
+            };
+        }
+        catch (Exception e)
+        {
+            // Xử lý lỗi và trả về thông tin lỗi
+            return new Return<IEnumerable<DiscountCode>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0
+            };
+        }
+    }
+
     #endregion
 }
