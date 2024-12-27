@@ -7,6 +7,8 @@ public interface IProductRepository
 {
     Task<Return<Product>> GetProductByIdAsync(Guid productId);
 
+    Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds);
+
     Task<Return<Product>> GetProductByNameAsync(string productName);
 
     Task<Return<Product>> AddProductAsync(Product product);
@@ -40,9 +42,15 @@ public interface IProductRepository
 
     Task<Return<ProductAttribute>> AddProductAttributeAsync(ProductAttribute productAttribute);
 
+    Task<Return<bool>> BulkAddProductVariantAsync(List<ProductVariant> productVariants);
+
     Task<Return<ProductAttribute>> UpdateProductAttributeAsync(ProductAttribute productAttributes);
 
     Task<Return<ProductAttribute>> DeleteProductAttributeAsync(Guid attributeId);
 
     Task<Return<bool>> UpdateProductVariantAsync(ProductVariant productVariant);
+
+    Task<Return<List<ProductVariant>>> GetProductVariantsByProductIdAsync(Guid productId);
+
+    Task<Return<bool>> BulkAddVariantAttributeAsync(List<VariantAttribute> variantAttributes);
 }

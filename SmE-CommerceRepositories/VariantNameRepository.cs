@@ -40,9 +40,9 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
     {
         try
         {
-            var variant = await dbContext.VariantNames.FirstOrDefaultAsync(x =>
-                x.VariantNameId == id
-            );
+            var variant = await dbContext
+                .VariantNames.Include(x => x.VariantAttributes)
+                .FirstOrDefaultAsync(x => x.VariantNameId == id);
 
             return new Return<VariantName>
             {
@@ -55,6 +55,35 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
         catch (Exception ex)
         {
             return new Return<VariantName>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<List<VariantName>>> GetVariantNamesByIdsAsync(List<Guid> ids)
+    {
+        try
+        {
+            var variants = await dbContext
+                .VariantNames.Where(x => ids.Contains(x.VariantNameId))
+                .ToListAsync();
+
+            return new Return<List<VariantName>>
+            {
+                Data = variants,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = variants.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<VariantName>>
             {
                 Data = null,
                 IsSuccess = false,

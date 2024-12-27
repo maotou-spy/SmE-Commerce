@@ -27,6 +27,10 @@ public class ProductVariant
     [Column("soldQuantity")]
     public int SoldQuantity { get; set; }
 
+    [Column("variantImage")]
+    [StringLength(255)]
+    public string? VariantImage { get; set; }
+
     [Column("status")]
     [StringLength(50)]
     public string Status { get; set; } = null!;

@@ -219,7 +219,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ValidationError,
+                    StatusCode = ErrorCode.BadRequest,
                 };
 
             if (req.CategoryIds.Count == 0)
@@ -227,7 +227,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ValidationError,
+                    StatusCode = ErrorCode.BadRequest,
                 };
 
             // Initialize the product
@@ -303,7 +303,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ValidationError,
+                    StatusCode = ErrorCode.BadRequest,
                 };
 
             // Check if the product name is unique except the current product
@@ -1176,108 +1176,224 @@ public class ProductService(
 
     #region Product Variation
 
-    // public async Task<Return<bool>> AddProductVariantAsync(AddProductVariantReqDto req)
-    // {
-    //     using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-    //     try
-    //     {
-    //         var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-    //         if (!currentUser.IsSuccess || currentUser.Data == null)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = currentUser.StatusCode,
-    //                 InternalErrorMessage = currentUser.InternalErrorMessage,
-    //             };
-    //
-    //         var product = await productRepository.GetProductByIdAsync(req.ProductId);
-    //         if (product is not { IsSuccess: true, Data: not null })
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = product.StatusCode,
-    //                 InternalErrorMessage = product.InternalErrorMessage,
-    //             };
-    //
-    //         if (product.Data.Status == ProductStatus.Deleted)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = ErrorCode.ProductNotFound,
-    //             };
-    //
-    //         var variantName = await variantNameRepository.GetVariantNameByIdAsync(
-    //             req.VariantNameId
-    //         );
-    //         if (!variantName.IsSuccess || variantName.Data == null)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = variantName.StatusCode,
-    //                 InternalErrorMessage = variantName.InternalErrorMessage,
-    //             };
-    //
-    //         var isVariantExisted = await productRepository.IsProductVariantExistAsync(
-    //             req.VariantValue,
-    //             req.ProductId
-    //         );
-    //         if (isVariantExisted is { IsSuccess: true, Data: true })
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = ErrorCode.ProductVariantAlreadyExists,
-    //             };
-    //
-    //         var productVariant = new ProductVariant
-    //         {
-    //             ProductId = req.ProductId,
-    //             VariantNameId = req.VariantNameId,
-    //             Sku = req.Sku,
-    //             Price = req.Price,
-    //             StockQuantity = req.StockQuantity,
-    //             SoldQuantity = req.SoldQuantity,
-    //             Status =
-    //                 req.StockQuantity > 0
-    //                     ? req.Status ?? ProductStatus.Active
-    //                     : ProductStatus.OutOfStock,
-    //             CreateById = currentUser.Data.UserId,
-    //             CreatedAt = DateTime.Now,
-    //         };
-    //
-    //         var result = await productRepository.AddProductVariantAsync(productVariant);
-    //         if (!result.IsSuccess || result.Data == false)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = result.StatusCode,
-    //                 InternalErrorMessage = result.InternalErrorMessage,
-    //             };
-    //
-    //         transaction.Complete();
-    //         return new Return<bool>
-    //         {
-    //             Data = true,
-    //             IsSuccess = true,
-    //             StatusCode = ErrorCode.Ok,
-    //         };
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return new Return<bool>
-    //         {
-    //             Data = false,
-    //             IsSuccess = false,
-    //             StatusCode = ErrorCode.InternalServerError,
-    //             InternalErrorMessage = ex,
-    //         };
-    //     }
-    // }
+    public async Task<Return<bool>> BulkProductVariantAsync(
+        Guid productId,
+        List<AddProductVariantReqDto> req
+    )
+    {
+        if (req.Count == 0)
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                };
+
+            // Ensure all variants have the same number and type of attributes
+            var expectedAttributes = req.First()
+                .VariantValues.Select(v => v.VariantNameId)
+                .ToHashSet();
+
+            if (
+                req.Any(x =>
+                    !expectedAttributes.SetEquals(x.VariantValues.Select(v => v.VariantNameId))
+                )
+            )
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+            // Fetch existing variants for the product
+            var existingVariants = await productRepository.GetProductVariantsByProductIdAsync(
+                productId
+            );
+
+            if (existingVariants is { IsSuccess: true, Data: not null })
+            {
+                var existingVariantKeys = existingVariants
+                    .Data.Select(x =>
+                        string.Join(
+                            "-",
+                            x.VariantAttributes.OrderBy(v => v.VariantNameId).Select(v => v.Value)
+                        )
+                    )
+                    .ToHashSet();
+
+                var joinedStrings = req.Select(x =>
+                        string.Join(
+                            "-",
+                            x.VariantValues.OrderBy(v => v.VariantNameId)
+                                .Select(v => v.VariantValue)
+                        )
+                    )
+                    .ToList();
+
+                if (
+                    req.Any(x =>
+                        existingVariantKeys.Contains(
+                            string.Join(
+                                "-",
+                                x.VariantValues.OrderBy(v => v.VariantNameId)
+                                    .Select(v => v.VariantValue)
+                            )
+                        )
+                    )
+                )
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductVariantAlreadyExists,
+                    };
+            }
+
+            // Ensure no duplicate variants
+            var uniqueVariants = new HashSet<string>();
+            if (
+                req.Select(x =>
+                        string.Join(
+                            "-",
+                            x.VariantValues.Select(v => v.VariantValue).OrderBy(v => v)
+                        )
+                    )
+                    .Any(variantKey => !uniqueVariants.Add(variantKey))
+            )
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+
+            // Ensure all variantNames exist
+            var variantNameIds = req.SelectMany(x => x.VariantValues.Select(v => v.VariantNameId))
+                .Distinct()
+                .ToList();
+
+            var variantNames = await variantNameRepository.GetVariantNamesByIdsAsync(
+                variantNameIds
+            );
+            if (!variantNames.IsSuccess || variantNames.Data?.Count != variantNameIds.Count)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.VariantNameNotFound,
+                };
+
+            // Fetch and validate products
+            var product = await productRepository.GetProductByIdAsync(productId);
+
+            if (!product.IsSuccess || product.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    InternalErrorMessage = product.InternalErrorMessage,
+                };
+
+            if (product.Data.Status == ProductStatus.Deleted)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                };
+
+            // Map product variants
+            var productVariants = req.Select(x => new ProductVariant
+                {
+                    ProductId = productId,
+                    Sku = x.Sku,
+                    Price = x.Price,
+                    StockQuantity = x.StockQuantity,
+                    VariantImage = x.VariantImage,
+                    Status =
+                        x.StockQuantity > 0
+                            ? x.Status
+                                ? ProductStatus.Active
+                                : ProductStatus.Inactive
+                            : ProductStatus.OutOfStock,
+                    CreateById = currentUser.Data.UserId,
+                    CreatedAt = DateTime.Now,
+                })
+                .ToList();
+
+            // Save product variants
+            var addResult = await productRepository.BulkAddProductVariantAsync(productVariants);
+            if (!addResult.IsSuccess)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = addResult.StatusCode,
+                    InternalErrorMessage = addResult.InternalErrorMessage,
+                };
+
+            // Map and save variant attributes
+            var variantAttributes = productVariants
+                .Zip(
+                    req,
+                    (productVariant, x) =>
+                        x.VariantValues.Select(v => new VariantAttribute
+                        {
+                            ProductVariantId = productVariant.ProductVariantId,
+                            VariantNameId = v.VariantNameId,
+                            Value = v.VariantValue,
+                            CreatedById = currentUser.Data.UserId,
+                            CreatedAt = DateTime.Now,
+                        })
+                )
+                .SelectMany(attributes => attributes)
+                .ToList();
+
+            var addVariantAttributesResult = await productRepository.BulkAddVariantAttributeAsync(
+                variantAttributes
+            );
+            if (!addVariantAttributesResult.IsSuccess)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = addVariantAttributesResult.StatusCode,
+                    InternalErrorMessage = addVariantAttributesResult.InternalErrorMessage,
+                };
+
+            transaction.Complete();
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
 
     // public async Task<Return<bool>> UpdateProductVariantAsync(
     //     Guid variantId,

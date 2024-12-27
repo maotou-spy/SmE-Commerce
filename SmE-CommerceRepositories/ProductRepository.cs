@@ -54,6 +54,39 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    public async Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds)
+    {
+        try
+        {
+            var products = await dbContext
+                .Products.Where(x => productIds.Contains(x.ProductId))
+                .Include(x => x.ProductCategories)
+                .ThenInclude(x => x.Category)
+                .Include(x => x.ProductImages)
+                .Include(x => x.ProductAttributes)
+                .ToListAsync();
+
+            return new Return<List<Product>>
+            {
+                Data = products,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = products.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Product>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<Product>> GetProductByIdForUpdateAsync(Guid productId)
     {
         try
@@ -642,6 +675,34 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    public async Task<Return<bool>> BulkAddProductVariantAsync(List<ProductVariant> productVariants)
+    {
+        try
+        {
+            await dbContext.ProductVariants.AddRangeAsync(productVariants);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = productVariants.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<bool>> UpdateProductVariantAsync(ProductVariant productVariant)
     {
         try
@@ -655,6 +716,72 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    #endregion
+
+    #region Variant Attribute
+
+    public async Task<Return<List<ProductVariant>>> GetProductVariantsByProductIdAsync(
+        Guid productId
+    )
+    {
+        try
+        {
+            var productVariants = await dbContext
+                .ProductVariants.Where(x => x.ProductId == productId)
+                .Include(x => x.VariantAttributes)
+                .ToListAsync();
+
+            return new Return<List<ProductVariant>>
+            {
+                Data = productVariants,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = productVariants.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<ProductVariant>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> BulkAddVariantAttributeAsync(
+        List<VariantAttribute> variantAttributes
+    )
+    {
+        try
+        {
+            await dbContext.VariantAttributes.AddRangeAsync(variantAttributes);
+            await dbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = variantAttributes.Count,
             };
         }
         catch (Exception ex)

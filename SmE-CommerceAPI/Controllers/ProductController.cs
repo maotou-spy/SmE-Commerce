@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Product;
-using SmE_CommerceModels.RequestDtos.VariantName;
-using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
@@ -11,11 +9,8 @@ namespace SmE_CommerceAPI.Controllers;
 
 [Route("api/products")]
 [Authorize(AuthenticationSchemes = "Defaut")]
-public class ProductController(
-    IProductService productService,
-    IVariantNameService variantNameService,
-    ILogger<AuthController> logger
-) : ControllerBase
+public class ProductController(IProductService productService, ILogger<AuthController> logger)
+    : ControllerBase
 {
     [HttpPost]
     [Authorize]
@@ -36,7 +31,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -65,7 +60,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -94,7 +89,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -125,7 +120,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product category user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -161,7 +156,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -186,7 +181,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product attribute user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -218,7 +213,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -243,7 +238,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product image user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -271,7 +266,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -293,7 +288,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete product user: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -313,7 +308,7 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -333,39 +328,16 @@ public class ProductController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get product by id: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
-    // Variant Attributes
-    [HttpGet("variant-attributes")]
+    // Product Variant
+    [HttpPost("{productId:guid}/variants")]
     [Authorize]
-    public async Task<IActionResult> GetVariantNamesAsync()
-    {
-        try
-        {
-            var result = await variantNameService.GetVariantNamesAsync();
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError(
-                    "Error at get variant attributes: {ex}",
-                    result.InternalErrorMessage
-                );
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get variant attributes: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
-        }
-    }
-
-    [HttpPut("variant-attributes/{variantId:guid}")]
-    [Authorize]
-    public async Task<IActionResult> UpdateVariantNameAsync(
-        [FromBody] VariantNameReqDto req,
-        Guid variantId
+    public async Task<IActionResult> BulkProductVariantAsync(
+        [FromBody] List<AddProductVariantReqDto> req,
+        Guid productId
     )
     {
         try
@@ -373,13 +345,13 @@ public class ProductController(
             if (!ModelState.IsValid)
                 return StatusCode(400, Helper.GetValidationErrors(ModelState));
 
-            var result = await variantNameService.UpdateVariantNameAsync(variantId, req);
+            var result = await productService.BulkProductVariantAsync(productId, req);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
                 logger.LogError(
-                    "Error at update variant attribute: {ex}",
+                    "Error at create product variant user: {ex}",
                     result.InternalErrorMessage
                 );
 
@@ -387,33 +359,8 @@ public class ProductController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update variant attribute: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
-        }
-    }
-
-    [HttpDelete("variant-attributes/{variantId:guid}")]
-    [Authorize]
-    public async Task<IActionResult> DeleteVariantNameAsync(Guid variantId)
-    {
-        try
-        {
-            var result = await variantNameService.DeleteVariantNameAsync(variantId);
-
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError(
-                    "Error at delete variant attribute: {ex}",
-                    result.InternalErrorMessage
-                );
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at delete variant attribute: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            logger.LogInformation("Error at create product variant user: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 }

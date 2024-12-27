@@ -11,33 +11,45 @@ using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class UserService(IUserRepository userRepository, IHelperService helperService) : IUserService
+public class UserService(IUserRepository userRepository, IHelperService helperService)
+    : IUserService
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(string? status, int? pageSize, int? pageNumber,
-        string? phone, string? email, string? name)
+    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(
+        string? status,
+        int? pageSize,
+        int? pageNumber,
+        string? phone,
+        string? email,
+        string? name
+    )
     {
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(
+                nameof(RoleEnum.Manager)
+            );
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    StatusCode = currentUser.StatusCode
+                    StatusCode = currentUser.StatusCode,
                 };
-            }
 
-            var users = await userRepository.GetAllUsersAsync(status, pageSize, pageNumber, phone, email, name);
+            var users = await userRepository.GetAllUsersAsync(
+                status,
+                pageSize,
+                pageNumber,
+                phone,
+                email,
+                name
+            );
             if (!users.IsSuccess || users.Data == null)
-            {
                 return new Return<IEnumerable<User>>
                 {
                     IsSuccess = false,
-                    StatusCode = users.StatusCode
+                    StatusCode = users.StatusCode,
                 };
-            }
 
             return new Return<IEnumerable<User>>
             {
@@ -63,26 +75,20 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         try
         {
             // Validate user
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(
+                nameof(RoleEnum.Manager)
+            );
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
-                return new Return<bool>
-                {
-                    IsSuccess = false,
-                    StatusCode = currentUser.StatusCode
-                };
-            }
+                return new Return<bool> { IsSuccess = false, StatusCode = currentUser.StatusCode };
 
             // Check if email already exists
             var existedManager = await userRepository.GetUserByEmailAsync(req.Email);
             if (existedManager is { IsSuccess: true, Data: not null })
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.UserAlreadyExists
+                    StatusCode = ErrorCode.UserAlreadyExists,
                 };
-            }
 
             User newManager = new()
             {
@@ -92,19 +98,17 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Role = req.Role,
                 Status = UserStatus.Active,
                 CreateById = currentUser.Data.UserId,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
             };
 
             var createResult = await userRepository.CreateNewUser(newManager);
             if (!createResult.IsSuccess || createResult.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     StatusCode = createResult.StatusCode,
                     InternalErrorMessage = createResult.InternalErrorMessage
                 };
-            }
 
             return new Return<bool>
             {
@@ -132,14 +136,12 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             // Validate user
             var currentUser = await helperService.GetCurrentUser();
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage
                 };
-            }
 
             var user = new GetUserProfileResDto
             {
@@ -149,14 +151,14 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = currentUser.Data.Point,
                 Dob = currentUser.Data.DateOfBirth,
                 Gender = currentUser.Data.Gender,
-                Avatar = currentUser.Data.Avatar
+                Avatar = currentUser.Data.Avatar,
             };
 
             return new Return<GetUserProfileResDto>
             {
                 IsSuccess = true,
                 Data = user,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -179,25 +181,21 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             // Validate user
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage
                 };
-            }
 
             var user = await userRepository.GetUserByIdAsync(id);
             if (!user.IsSuccess)
-            {
                 return new Return<GetUserProfileResDto>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode
+                    StatusCode = user.StatusCode,
                 };
-            }
 
             var userProfileDto = new GetUserProfileResDto
             {
@@ -207,7 +205,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = user.Data?.Point,
                 Dob = user.Data?.DateOfBirth,
                 Gender = user.Data?.Gender,
-                Avatar = user.Data?.Avatar
+                Avatar = user.Data?.Avatar,
             };
 
             return new Return<GetUserProfileResDto>
@@ -239,55 +237,45 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             // Validate user
             var currentUser = await helperService.GetCurrentUser();
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage
                 };
-            }
 
             var user = await userRepository.GetUserByIdAsync(currentUser.Data.UserId);
             if (!user.IsSuccess || user.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode
+                    StatusCode = user.StatusCode,
                 };
-            }
 
             var existedPhone = await userRepository.GetUserByPhoneAsync(req.Phone);
             if (existedPhone is { IsSuccess: true, Data: not null })
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     StatusCode = ErrorCode.PhoneAlreadyExists
                 };
-            }
 
             if (req.Dob > DateOnly.FromDateTime(DateTime.Now))
-            {
-                return new Return<bool>
-                {
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ValidationError
-                };
-            }
+                return new Return<bool> { IsSuccess = false, StatusCode = ErrorCode.BadRequest };
 
-            if (req.Phone.Equals(user.Data.Phone) && req.FullName.Equals(user.Data.FullName) &&
-                req.Dob.Equals(user.Data.DateOfBirth) && req.Gender.Equals(user.Data.Gender))
-            {
+            if (
+                req.Phone.Equals(user.Data.Phone)
+                && req.FullName.Equals(user.Data.FullName)
+                && req.Dob.Equals(user.Data.DateOfBirth)
+                && req.Gender.Equals(user.Data.Gender)
+            )
                 return new Return<bool>
                 {
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
                     Data = true
                 };
-            }
 
             user.Data.FullName = req.FullName;
             user.Data.Phone = req.Phone;
@@ -298,14 +286,12 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             var updateResult = await userRepository.UpdateUser(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode
+                    StatusCode = updateResult.StatusCode,
                 };
-            }
 
             scope.Complete();
 
@@ -313,7 +299,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -322,7 +308,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = false,
                 InternalErrorMessage = ex,
-                StatusCode = ErrorCode.InternalServerError
+                StatusCode = ErrorCode.InternalServerError,
             };
         }
     }
@@ -334,25 +320,21 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         {
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    StatusCode = currentUser.StatusCode
+                    StatusCode = currentUser.StatusCode,
                 };
-            }
 
             var user = await userRepository.GetUserByIdAsync(id);
             if (!user.IsSuccess || user.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode
+                    StatusCode = user.StatusCode,
                 };
-            }
 
             user.Data.Status = UserStatus.Deleted;
             user.Data.ModifiedAt = DateTime.Now;
@@ -360,14 +342,12 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             var updateResult = await userRepository.UpdateUser(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode
+                    StatusCode = updateResult.StatusCode,
                 };
-            }
 
             scope.Complete();
 
@@ -375,7 +355,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -386,7 +366,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                StatusCode = ErrorCode.InternalServerError
+                StatusCode = ErrorCode.InternalServerError,
             };
         }
     }
@@ -398,40 +378,35 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
         {
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
-                    StatusCode = currentUser.StatusCode
+                    StatusCode = currentUser.StatusCode,
                 };
-            }
 
             var user = await userRepository.GetUserByIdAsync(id);
             if (!user.IsSuccess || user.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = user.InternalErrorMessage,
-                    StatusCode = user.StatusCode
+                    StatusCode = user.StatusCode,
                 };
-            }
 
-            user.Data.Status = user.Data.Status == UserStatus.Active ? UserStatus.Inactive : UserStatus.Active;
+            user.Data.Status =
+                user.Data.Status == UserStatus.Active ? UserStatus.Inactive : UserStatus.Active;
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 
             var updateResult = await userRepository.UpdateUser(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
-            {
                 return new Return<bool>
                 {
                     IsSuccess = false,
                     InternalErrorMessage = updateResult.InternalErrorMessage,
-                    StatusCode = updateResult.StatusCode
+                    StatusCode = updateResult.StatusCode,
                 };
-            }
 
             scope.Complete();
 
@@ -439,7 +414,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             {
                 IsSuccess = true,
                 Data = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -450,7 +425,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 IsSuccess = false,
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
-                StatusCode = ErrorCode.InternalServerError
+                StatusCode = ErrorCode.InternalServerError,
             };
         }
     }

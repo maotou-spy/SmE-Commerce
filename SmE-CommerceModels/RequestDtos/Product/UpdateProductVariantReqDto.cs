@@ -15,7 +15,7 @@ public class UpdateProductVariantReqDto
     public required int StockQuantity { get; set; }
 
     [Required(ErrorMessage = "Variant values are required")]
-    public required List<ProductVariantValue> VariantValues { get; set; }
+    public required List<ProductVariantValueReqDto> VariantValues { get; set; }
 
     public string? Status { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using SmE_CommerceModels.Enums;
+using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.VariantName;
 using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.VariantName;
@@ -143,7 +144,7 @@ public class VariantNameService(
         }
     }
 
-    public async Task<Return<bool>> DeleteVariantNameAsync(Guid variantId)
+    public async Task<Return<bool>> DeleteVariantNameAsync(Guid nameId)
     {
         try
         {
@@ -157,7 +158,7 @@ public class VariantNameService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            var existingVariant = await variantRepository.GetVariantNameByIdAsync(variantId);
+            var existingVariant = await variantRepository.GetVariantNameByIdAsync(nameId);
             if (!existingVariant.IsSuccess || existingVariant.Data == null)
                 return new Return<bool>
                 {
@@ -167,15 +168,14 @@ public class VariantNameService(
                     InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
 
-            // TODO: Need to double check this
             // // Check if the attribute is used in any product variant
-            // if (existingVariant.Data.ProductVariants.Count != 0)
-            //     return new Return<bool>
-            //     {
-            //         Data = false,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.VariantNameConflict,
-            //     };
+            if (existingVariant.Data.VariantAttributes.Count != 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.VariantNameConflict,
+                };
 
             return await variantRepository.DeleteVariantNamesAsync(existingVariant.Data);
         }

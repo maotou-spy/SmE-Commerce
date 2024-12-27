@@ -6,7 +6,7 @@ public static class ErrorCode
     public const string Ok = "000";
 
     // Invalid input
-    public const string ValidationError = "001";
+    public const string BadRequest = "001";
     public const string InvalidEmail = "002";
     public const string InvalidPassword = "003";
     public const string InvalidToken = "004";

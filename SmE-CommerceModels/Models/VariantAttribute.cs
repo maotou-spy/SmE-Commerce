@@ -28,10 +28,6 @@ public class VariantAttribute
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
 
-    [Column("variantImage")]
-    [StringLength(255)]
-    public string? VariantImage { get; set; }
-
     [Column("variantNameId")]
     public Guid VariantNameId { get; set; }
 

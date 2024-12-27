@@ -26,7 +26,7 @@ public static class Helper
         {
             ValidationErrors = errors,
             IsSuccess = false,
-            StatusCode = ErrorCode.ValidationError,
+            StatusCode = ErrorCode.BadRequest,
         };
     }
 
