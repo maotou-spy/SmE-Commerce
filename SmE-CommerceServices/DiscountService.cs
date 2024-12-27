@@ -476,8 +476,102 @@ public class DiscountService(
             };
         }
     }
-    
-    
+
+    public async Task<Return<bool>> DeleteDiscountAsync(Guid id)
+{
+    using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+    try
+    {
+        // Validate user
+        var currentUser = await helperService.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager));
+        if (!currentUser.IsSuccess || currentUser.Data == null)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                InternalErrorMessage = currentUser.InternalErrorMessage,
+                StatusCode = currentUser.StatusCode
+            };
+        }
+
+        var discount = await discountRepository.GetDiscountByIdForUpdateAsync(id);
+        if (!discount.IsSuccess || discount.Data == null)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                StatusCode = discount.StatusCode
+            };
+        }
+
+        var discountCodes = await discountRepository.GetDiscountCodesByDiscountIdAsyncForUpdate(id);
+        if (!discountCodes.IsSuccess)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                StatusCode = discountCodes.StatusCode
+            };
+        }
+
+        if (discountCodes.Data != null && discountCodes.Data.Any())
+        {
+            foreach (var discountCode in discountCodes.Data)
+            {
+                discountCode.Status = GeneralStatus.Deleted;
+                discountCode.ModifiedAt = DateTime.Now;
+                discountCode.ModifiedById = currentUser.Data.UserId;
+
+                var updateResult = await discountRepository.UpdateDiscountCodeAsync(discountCode);
+                if (!updateResult.IsSuccess)
+                {
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        InternalErrorMessage = updateResult.InternalErrorMessage,
+                        StatusCode = updateResult.StatusCode
+                    };
+                }
+            }
+
+        }
+
+        discount.Data.Status = GeneralStatus.Deleted;
+        discount.Data.ModifiedAt = DateTime.Now;
+        discount.Data.ModifiedById = currentUser.Data.UserId;
+
+        var updateDiscountResult = await discountRepository.UpdateDiscountAsync(discount.Data);
+        if (!updateDiscountResult.IsSuccess)
+        {
+            return new Return<bool>
+            {
+                IsSuccess = false,
+                InternalErrorMessage = updateDiscountResult.InternalErrorMessage,
+                StatusCode = updateDiscountResult.StatusCode
+            };
+        }
+
+        transaction.Complete();
+
+        return new Return<bool>
+        {
+            Data = true,
+            IsSuccess = true,
+            StatusCode = ErrorCode.Ok
+        };
+    }
+    catch (Exception e)
+    {
+        return new Return<bool>
+        {
+            Data = false,
+            IsSuccess = false,
+            StatusCode = ErrorCode.InternalServerError,
+            InternalErrorMessage = e
+        };
+    }
+}
+
 
     #endregion
 
