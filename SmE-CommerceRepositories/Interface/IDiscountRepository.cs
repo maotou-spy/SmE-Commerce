@@ -18,4 +18,5 @@ public interface IDiscountRepository
     Task<Return<DiscountCode>> GetDiscountCodeByCodeAsync(string code);
     Task<Return<DiscountCode>> GetDiscountCodeByIdForUpdateAsync(Guid id);
     Task<Return<DiscountCode>> GetDiscountCodeByIdAsync(Guid id);
+    Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsync(Guid id, int? pageNumber, int? pageSize);
 }

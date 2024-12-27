@@ -193,5 +193,25 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpGet("{id:guid}/codes")]
+    [Authorize]
+    public async Task<IActionResult> GetDiscountCodesByDiscountIdAsync([FromRoute] Guid id, [FromQuery] int? pageNumber, [FromQuery] int? pageSize)
+    {
+        try
+        {
+            var result = await discountService.GetDiscountCodeByDiscountIdAsync(id, pageNumber, pageSize);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get discount codes: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get discount codes: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
     #endregion
 }
