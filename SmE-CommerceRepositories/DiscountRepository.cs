@@ -188,6 +188,50 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         }
     }
 
+    public async Task<Return<IEnumerable<Discount>>> GetDiscountsAsync(string? name, int? pageNumber, int? pageSize)
+    {
+        try
+        {
+            var query = dbContext.Discounts.AsQueryable();
+
+            query = query.Where(x => x.Status != GeneralStatus.Deleted);
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(x => x.DiscountName.Contains(name));
+            }
+
+            var totalRecords = await query.CountAsync();
+
+            if (pageNumber.HasValue && pageSize.HasValue)
+            {
+                query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var result = await query.ToListAsync();
+
+            return new Return<IEnumerable<Discount>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<Discount>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0
+            };
+        }
+    }
+
+
     #endregion
 
     #region DiscountCode
@@ -331,11 +375,49 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
                 TotalRecord = 0
             };
         }
     }
+    
+    public async Task<Return<DiscountCode>> GetDiscountCodeByIdAsync(Guid id)
+    {
+        try
+        {
+            var discountCode = await dbContext.DiscountCodes
+                .Include(x => x.Discount)
+                .FirstOrDefaultAsync(x => x.CodeId == id);
+            if (discountCode == null)
+            {
+                return new Return<DiscountCode>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.DiscountCodeNotFound,
+                    TotalRecord = 0
+                };
+            }
 
+            return new Return<DiscountCode>
+            {
+                Data = discountCode,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<DiscountCode>
+            {
+                Data = null,
+                IsSuccess = false,
 
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
     #endregion
 }

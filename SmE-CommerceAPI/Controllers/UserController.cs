@@ -61,7 +61,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -84,7 +84,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user profile by manager: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -107,7 +107,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get user addresses: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -135,7 +135,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at add address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -163,7 +163,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at update address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -186,7 +186,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -209,7 +209,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at set default address: {e}", ex);
-            return StatusCode(500, new Return<dynamic> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<dynamic> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -237,7 +237,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at update user profile: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -261,7 +261,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at get all users: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -283,7 +283,7 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete user: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError });
+            return StatusCode(500, new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError });
         }
     }
 
@@ -305,7 +305,28 @@ public class UserController(IUserService userService, IAddressService addressSer
         catch (Exception ex)
         {
             logger.LogInformation("Error at change user status: {e}", ex);
-            return StatusCode(500, new Return<IEnumerable<User>> {StatusCode = SmE_CommerceModels.Enums.ErrorCode.InternalServerError});
+            return StatusCode(500, new Return<IEnumerable<User>> {StatusCode = ErrorCode.InternalServerError});
+        }
+    }
+
+    [HttpGet("codes")]
+    [Authorize]
+    public async Task<IActionResult> GetDiscountCodesForCustomerAsync()
+    {
+        try
+        {
+            if (!ModelState.IsValid) return StatusCode(400, Helper.GetValidationErrors(ModelState));
+            var result = await userService.UserGetTheirDiscountsAsync();
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get discount code: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get discount code: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 }

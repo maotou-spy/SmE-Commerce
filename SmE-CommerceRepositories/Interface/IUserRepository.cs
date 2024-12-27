@@ -14,4 +14,6 @@ public interface IUserRepository
     Task<Return<User>> GetUserByEmailOrPhone(string emailOrPhone);
     Task<Return<User>> CreateNewUser(User user);
     Task<Return<User>> UpdateUser(User user);
+    
+    Task<Return<IEnumerable<DiscountCode>>> UserGetDiscountsByUserIdAsync(Guid cusId);
 }

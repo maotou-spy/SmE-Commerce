@@ -61,6 +61,25 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetDiscountsForManagerAsync([FromQuery] string? name,[FromQuery] int? pageNumber,[FromQuery] int? pageSize)
+    {
+        try
+        {
+            var result = await discountService.GetDiscountsForManagerAsync(name, pageNumber, pageSize);
+
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get discounts: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get discounts: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 
     #endregion
 
@@ -128,6 +147,51 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpGet("codes/{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetDiscountCodeByIdAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            var result = await discountService.GetDiscountCodeByIdAsync(id);
 
+            if (result.IsSuccess) return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get discount codes: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get discount codes: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+    
+    [HttpDelete("codes/{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteDiscountCodeAsync([FromRoute] Guid id)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return StatusCode(400, Helper.GetValidationErrors(ModelState));
+
+            var result = await discountService.DeleteDiscountCodeAsync(id);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at delete discount code: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete discount code: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
     #endregion
 }
