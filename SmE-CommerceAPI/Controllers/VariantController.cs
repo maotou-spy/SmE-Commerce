@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.VariantName;
-using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
@@ -34,7 +33,32 @@ public class VariantController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get variant attributes: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> BulkCreateVariantNameAsync([FromBody] List<string> req)
+    {
+        try
+        {
+            var result = await variantNameService.BulkVariantNameAsync(req);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError(
+                    "Error at bulk create variant attribute: {ex}",
+                    result.InternalErrorMessage
+                );
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at bulk create variant attribute: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -65,7 +89,7 @@ public class VariantController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update variant attribute: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -90,7 +114,7 @@ public class VariantController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at delete variant attribute: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 }

@@ -11,6 +11,8 @@ public interface IVariantNameRepository
 
     Task<Return<List<VariantName>>> GetVariantNamesByIdsAsync(List<Guid> ids);
 
+    Task<Return<bool>> BulkCreateVariantNameAsync(List<VariantName> variants);
+
     Task<Return<bool>> UpdateVariantNameAsync(VariantName variants);
 
     Task<Return<bool>> DeleteVariantNamesAsync(VariantName variants);

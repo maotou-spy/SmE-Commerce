@@ -94,7 +94,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
         }
     }
 
-    public async Task<Return<bool>> BulkCreateVariantName(List<VariantName> variants)
+    public async Task<Return<bool>> BulkCreateVariantNameAsync(List<VariantName> variants)
     {
         try
         {

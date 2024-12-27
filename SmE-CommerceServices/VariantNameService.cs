@@ -76,6 +76,43 @@ public class VariantNameService(
         }
     }
 
+    public async Task<Return<bool>> BulkVariantNameAsync(List<string> req)
+    {
+        try
+        {
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                };
+
+            var variants = req.Select(variant => new VariantName
+                {
+                    Name = variant,
+                    CreatedAt = DateTime.Now,
+                    CreatedById = currentUser.Data.UserId,
+                })
+                .ToList();
+
+            return await variantRepository.BulkCreateVariantNameAsync(variants);
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<bool>> UpdateVariantNameAsync(
         Guid variantNameId,
         VariantNameReqDto variantNameReq
