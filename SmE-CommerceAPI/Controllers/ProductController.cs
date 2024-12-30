@@ -20,8 +20,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await productService.AddProductAsync(req);
 
             if (result.IsSuccess)
@@ -46,8 +44,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await productService.AddProductAttributeAsync(productId, req);
 
             if (result.IsSuccess)
@@ -75,8 +71,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await productService.AddProductImageAsync(productId, req);
 
             if (result.IsSuccess)
@@ -104,9 +98,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await productService.UpdateProductCategoryAsync(productId, categoryIds);
 
             if (result.IsSuccess)
@@ -136,9 +127,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await productService.UpdateProductAttributeAsync(
                 productId,
                 attributeId,
@@ -197,9 +185,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await productService.UpdateProductImageAsync(productId, imageId, req);
 
             if (result.IsSuccess)
@@ -253,9 +238,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await productService.UpdateProductAsync(productId, req);
 
             if (result.IsSuccess)
@@ -344,9 +326,6 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await productService.BulkProductVariantAsync(productId, req);
 
             if (result.IsSuccess)

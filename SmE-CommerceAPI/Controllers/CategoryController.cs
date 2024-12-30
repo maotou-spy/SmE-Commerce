@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Category;
-using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
 
@@ -22,8 +21,6 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await categoryService.AddCategoryAsync(req);
 
             if (result.IsSuccess)

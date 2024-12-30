@@ -28,7 +28,7 @@ public class UserController(
     //     {
     //         if (!ModelState.IsValid)
     //         {
-    //             return ErrorCode(400, Helper.GetValidationErrors(ModelState));
+    //             return ErrorCode(400, Helper.ReturnValidationErrors(ModelState));
     //         }
     //         var result = await userService.CreateUser(req);
     //
@@ -134,9 +134,6 @@ public class UserController(
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await addressService.AddAddressAsync(req);
 
             if (result.IsSuccess)
@@ -165,9 +162,6 @@ public class UserController(
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await addressService.UpdateAddressAsync(addressId, req);
 
             if (result.IsSuccess)
@@ -243,9 +237,6 @@ public class UserController(
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await userService.UpdateProfileAsync(req);
 
             if (result.IsSuccess)
@@ -258,7 +249,7 @@ public class UserController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at update user profile: {e}", ex);
-            return StatusCode(500, new Return<bool> { StatusCode = ErrorCode.InternalServerError });
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
 
@@ -355,8 +346,6 @@ public class UserController(
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await userService.UserGetTheirDiscountsAsync();
 
             if (result.IsSuccess)
@@ -368,6 +357,28 @@ public class UserController(
         catch (Exception ex)
         {
             logger.LogInformation("Error at get discount code: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpPut("password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordReqDto req)
+    {
+        try
+        {
+            var result = await userService.ChangePassword(req);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at change password: {ex}", result.InternalErrorMessage);
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at change password: {e}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

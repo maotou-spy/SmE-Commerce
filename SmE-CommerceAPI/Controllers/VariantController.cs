@@ -73,9 +73,6 @@ public class VariantController(
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await variantNameService.UpdateVariantNameAsync(variantId, req);
 
             if (result.IsSuccess)

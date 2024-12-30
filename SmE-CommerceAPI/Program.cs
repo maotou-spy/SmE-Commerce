@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmE_CommerceModels.DBContext;
+using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
@@ -42,6 +43,32 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+
+#region ModelState Validation
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context
+            .ModelState.Where(entry => entry.Value != null && entry.Value.Errors.Any())
+            .ToDictionary(
+                entry => entry.Key,
+                entry => entry.Value?.Errors.Select(error => error.ErrorMessage).ToList()
+            );
+
+        return new BadRequestObjectResult(
+            new
+            {
+                IsSuccess = false,
+                Data = false,
+                ValidationErrors = errors,
+            }
+        );
+    };
+});
+
+#endregion
 
 #region ApiVersioning
 

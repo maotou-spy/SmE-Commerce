@@ -42,9 +42,6 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await cartService.AddToCartAsync(request);
 
             if (result.IsSuccess)

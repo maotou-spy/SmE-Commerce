@@ -9,28 +9,6 @@ namespace SmE_CommerceAPI.HelperClass;
 public static class Helper
 {
     /// <summary>
-    /// Return error response from model state.
-    /// </summary>
-    public static Return<Dictionary<string, List<string>?>> GetValidationErrors(
-        ModelStateDictionary modelState
-    )
-    {
-        var errors = modelState
-            .Where(entry => entry.Value != null && entry.Value.Errors.Any())
-            .ToDictionary(
-                entry => entry.Key,
-                entry => entry.Value?.Errors.Select(error => error.ErrorMessage).ToList()
-            );
-
-        return new Return<Dictionary<string, List<string>?>>
-        {
-            ValidationErrors = errors,
-            IsSuccess = false,
-            StatusCode = ErrorCode.BadRequest,
-        };
-    }
-
-    /// <summary>
     /// Return error response with status code.
     /// </summary>
     public static IActionResult GetErrorResponse(string statusCode)

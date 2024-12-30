@@ -23,8 +23,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await discountService.AddDiscountAsync(req);
 
             if (result.IsSuccess)
@@ -49,9 +47,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await discountService.UpdateDiscountAsync(id, updateDiscountReqDto);
 
             if (result.IsSuccess)
@@ -103,9 +98,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await discountService.DeleteDiscountAsync(id);
 
             if (result.IsSuccess)
@@ -122,6 +114,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+
     #endregion
 
     #region DiscountCode
@@ -135,8 +128,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await discountService.AddDiscountCodeAsync(id, req);
 
             if (result.IsSuccess)
@@ -182,8 +173,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
             var result = await discountService.UpdateDiscountCodeAsync(codeId, req);
 
             if (result.IsSuccess)
@@ -226,9 +215,6 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     {
         try
         {
-            if (!ModelState.IsValid)
-                return StatusCode(400, Helper.GetValidationErrors(ModelState));
-
             var result = await discountService.DeleteDiscountCodeAsync(id);
 
             if (result.IsSuccess)
