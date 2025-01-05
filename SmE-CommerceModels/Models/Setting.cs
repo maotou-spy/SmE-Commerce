@@ -26,21 +26,11 @@ public class Setting
     [StringLength(255)]
     public string? Description { get; set; }
 
-    [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
-
-    [Column("createById")]
-    public Guid? CreateById { get; set; }
-
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("SettingCreateBies")]
-    public virtual User? CreateBy { get; set; }
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("SettingModifiedBies")]

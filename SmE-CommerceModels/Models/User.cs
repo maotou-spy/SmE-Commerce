@@ -189,9 +189,6 @@ public class User
     [InverseProperty("User")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    [InverseProperty("CreateBy")]
-    public virtual ICollection<Setting> SettingCreateBies { get; set; } = new List<Setting>();
-
     [InverseProperty("ModifiedBy")]
     public virtual ICollection<Setting> SettingModifiedBies { get; set; } = new List<Setting>();
 

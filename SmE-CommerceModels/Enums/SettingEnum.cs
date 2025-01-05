@@ -6,8 +6,11 @@ public class SettingEnum
     public const string Address = "Address";
     public const string Phone = "Phone";
     public const string Email = "Email";
-    public const string MaximumTopReview = "MaximumTopReview";
+    public const string Facebook = "Facebook";
+    public const string Zalo = "Zalo";
+    public const string ShippingFee = "ShippingFee";
     public const string PrivacyPolicy = "PrivacyPolicy";
     public const string TermsOfService = "TermsOfService";
     public const string PointsConversionRate = "PointsConversionRate";
+    public const string PointsToMoneyRate = "PointsToMoneyRate";
 }

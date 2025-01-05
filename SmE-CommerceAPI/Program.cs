@@ -4,13 +4,11 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmE_CommerceModels.DBContext;
-using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
@@ -18,6 +16,7 @@ using SmE_CommerceServices.Firebase;
 using SmE_CommerceServices.Helper;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -127,6 +126,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IVariantNameService, VariantNameService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<BearerTokenUtil>();
 
 #endregion
@@ -140,6 +140,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<IVariantNameRepository, VariantNameRepository>();
+builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 
 #endregion
 
@@ -207,6 +208,8 @@ builder.Services.AddSwaggerGen(c =>
             },
         }
     );
+
+    c.OperationFilter<AllowAnonymousOperationFilter>();
 });
 
 // Add CORS
@@ -251,3 +254,16 @@ app.MapControllers();
 app.UseCors("AllowAll");
 
 app.Run();
+
+// Custom operation filter
+public class AllowAnonymousOperationFilter : IOperationFilter
+{
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
+        var hasAllowAnonymous = context
+            .ApiDescription.CustomAttributes()
+            .Any(attr => attr is AllowAnonymousAttribute);
+        if (hasAllowAnonymous)
+            operation.Security.Clear();
+    }
+}

@@ -592,11 +592,6 @@ public partial class SmECommerceContext : DbContext
                 );
 
             entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.SettingCreateBies)
-                .HasConstraintName("Settings_createById_fk");
-
-            entity
                 .HasOne(d => d.ModifiedBy)
                 .WithMany(p => p.SettingModifiedBies)
                 .HasConstraintName("Settings_modifiedById_fk");
