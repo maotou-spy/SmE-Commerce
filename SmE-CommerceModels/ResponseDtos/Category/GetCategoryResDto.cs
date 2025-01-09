@@ -8,5 +8,5 @@ public class GetCategoryResDto
 
     public string? Description { get; set; }
 
-    public required string Slug { get; set; }
+    public required string? Slug { get; set; }
 }
