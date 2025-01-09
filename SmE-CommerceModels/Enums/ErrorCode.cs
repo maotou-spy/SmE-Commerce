@@ -29,6 +29,7 @@ public static class ErrorCode
     public const string ProductVariantNotFound = "111";
     public const string DiscountCodeNotFound = "112";
     public const string SettingNotFound = "113";
+    public const string BankInfoNotFound = "114";
 
     // Already exists
     public const string EmailAlreadyExists = "201";
@@ -42,6 +43,9 @@ public static class ErrorCode
     public const string VariantNameAlreadyExists = "209";
     public const string ProductNameAlreadyExists = "210";
     public const string ProductVariantAlreadyExists = "211";
+    public const string BankCodeAlreadyExists = "212";
+    public const string BankNameAlreadyExists = "213";
+    public const string AccountNumberAlreadyExists = "214";
 
     // Conflict
     public const string OutOfStock = "301";
