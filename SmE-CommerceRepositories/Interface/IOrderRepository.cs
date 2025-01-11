@@ -6,4 +6,6 @@ namespace SmE_CommerceRepositories.Interface;
 public interface IOrderRepository
 {
     Task<Return<Order>> CreateOrderAsync(Order order);
+    
+    Task<Return<Order>> GetOrderByIdAsync(Guid orderId);
 }

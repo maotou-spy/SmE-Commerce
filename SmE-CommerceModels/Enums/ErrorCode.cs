@@ -14,6 +14,7 @@ public static class ErrorCode
     public const string InvalidPercentage = "006";
     public const string InvalidNumber = "007";
     public const string InvalidDiscountCode = "008";
+    public const string InvalidAmount = "009";
 
     // Not found
     public const string ProductNotFound = "101";
@@ -30,7 +31,7 @@ public static class ErrorCode
     public const string DiscountCodeNotFound = "112";
     public const string SettingNotFound = "113";
     public const string BankInfoNotFound = "114";
-
+    public const string PaymentMethodNotFound = "115";
     // Already exists
     public const string EmailAlreadyExists = "201";
     public const string PhoneAlreadyExists = "202";
