@@ -56,6 +56,7 @@ public class BankInfoController (ILogger<AuthController> logger, IBankInfoServic
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllBankInfo()
     {
         try
