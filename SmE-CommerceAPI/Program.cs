@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 using SmE_CommerceModels.DBContext;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
@@ -16,7 +16,6 @@ using SmE_CommerceServices.Firebase;
 using SmE_CommerceServices.Helper;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -175,43 +174,28 @@ builder
         }
     );
 
-builder.Services.AddSwaggerGen(c =>
+// Register the NSwag services
+builder.Services.AddOpenApiDocument(document =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SmE-Commerce API", Version = "v1" });
+    document.Title = "SmE-Commerce API";
+    document.Version = "v1";
+    document.Description = "API for SmE-Commerce";
 
-    // Add security definition and requirement for bearer token
-    c.AddSecurityDefinition(
+    document.AddSecurity(
         "Bearer",
         new OpenApiSecurityScheme
         {
             Description =
                 "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
             Name = "Authorization",
-            In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
+            In = OpenApiSecurityApiKeyLocation.Header,
+            Type = OpenApiSecuritySchemeType.Http,
             Scheme = "Bearer",
             BearerFormat = "JWT",
         }
     );
 
-    c.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    },
-                },
-                []
-            },
-        }
-    );
-
-    c.OperationFilter<AllowAnonymousOperationFilter>();
+    document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 });
 
 // Add CORS
@@ -233,19 +217,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SmE-Commerce"));
+    app.UseOpenApi();
+    app.UseSwaggerUi(settings =>
+    {
+        settings.Path = $"/swagger";
+        settings.DocExpansion = "list"; // none, list or full
+    });
 }
 
 app.UseHttpsRedirection();
-
-// //Hello World
-// app.MapGet(
-//     "api/v{version:apiVersion}/hello",
-//     [AllowAnonymous]
-//     ([FromRoute] ApiVersion version) =>
-//         $"Hello World! Welcome to SmE-Commerce API version {version}"
-// );
 
 app.UseAuthentication();
 
@@ -256,16 +236,3 @@ app.MapControllers();
 app.UseCors("AllowAll");
 
 app.Run();
-
-// Custom operation filter
-public class AllowAnonymousOperationFilter : IOperationFilter
-{
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
-    {
-        var hasAllowAnonymous = context
-            .ApiDescription.CustomAttributes()
-            .Any(attr => attr is AllowAnonymousAttribute);
-        if (hasAllowAnonymous)
-            operation.Security.Clear();
-    }
-}

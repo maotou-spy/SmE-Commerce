@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.VariantName;
@@ -17,6 +18,7 @@ public class VariantController(
 ) : ControllerBase
 {
     [HttpGet]
+    [OpenApiOperation("GetVariantNames", "Get all variant names")]
     [Authorize]
     public async Task<IActionResult> GetVariantNamesAsync()
     {
@@ -40,6 +42,7 @@ public class VariantController(
     }
 
     [HttpPost]
+    [OpenApiOperation("CreateVariantName", "Create a new variant name")]
     [Authorize]
     public async Task<IActionResult> BulkCreateVariantNameAsync([FromBody] List<string> req)
     {
@@ -65,6 +68,7 @@ public class VariantController(
     }
 
     [HttpPut("{variantId:guid}")]
+    [OpenApiOperation("UpdateVariantName", "Update a variant name")]
     [Authorize]
     public async Task<IActionResult> UpdateVariantNameAsync(
         [FromBody] VariantNameReqDto req,
@@ -93,6 +97,7 @@ public class VariantController(
     }
 
     [HttpDelete("{variantId:guid}")]
+    [OpenApiOperation("DeleteVariantName", "Delete a variant name")]
     [Authorize]
     public async Task<IActionResult> DeleteVariantNameAsync(Guid variantId)
     {

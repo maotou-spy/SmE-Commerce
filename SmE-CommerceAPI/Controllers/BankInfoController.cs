@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.BankInfo;
@@ -11,9 +12,11 @@ namespace SmE_CommerceAPI.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/banks")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
-public class BankInfoController (ILogger<AuthController> logger, IBankInfoService bankInfoService) : ControllerBase
+public class BankInfoController(ILogger<AuthController> logger, IBankInfoService bankInfoService)
+    : ControllerBase
 {
     [HttpPost]
+    [OpenApiOperation("Add bank info", "Add bank info")]
     [Authorize]
     public async Task<IActionResult> AddBankInfoAsync([FromBody] AddBankInfoReqDto req)
     {
@@ -33,8 +36,9 @@ public class BankInfoController (ILogger<AuthController> logger, IBankInfoServic
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
-    
+
     [HttpDelete("{id:guid}")]
+    [OpenApiOperation("Delete bank info", "Delete bank info")]
     [Authorize]
     public async Task<IActionResult> DeleteBankInfoAsync([FromRoute] Guid id)
     {
@@ -56,6 +60,7 @@ public class BankInfoController (ILogger<AuthController> logger, IBankInfoServic
     }
 
     [HttpGet]
+    [OpenApiOperation("Get all bank info", "Get all bank info")]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllBankInfo()
     {

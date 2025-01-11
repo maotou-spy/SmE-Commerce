@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Discount;
 using SmE_CommerceModels.RequestDtos.Discount.DiscountCode;
@@ -120,6 +121,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     #region DiscountCode
 
     [HttpPost("{id:guid}/codes")]
+    [OpenApiOperation("Add Discount Code", "Add Discount Code")]
     [Authorize]
     public async Task<IActionResult> AddDiscountCodeAsync(
         [FromRoute] Guid id,
@@ -144,6 +146,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpGet("codes/{code}")]
+    [OpenApiOperation("Get Discount Code By Code", "Get Discount Code By Code")]
     [AllowAnonymous]
     public async Task<IActionResult> GetDiscountCodeByCodeAsync([FromRoute] string code)
     {
@@ -165,6 +168,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpPut("codes/{codeId:guid}")]
+    [OpenApiOperation("Update Discount Code", "Update Discount Code")]
     [Authorize]
     public async Task<IActionResult> UpdateDiscountCodeAsync(
         [FromRoute] Guid codeId,
@@ -189,6 +193,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpGet("codes/{id:guid}")]
+    [OpenApiOperation("Get Discount Code By Id", "Get Discount Code By Id")]
     [Authorize]
     public async Task<IActionResult> GetDiscountCodeByIdAsync([FromRoute] Guid id)
     {
@@ -210,6 +215,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpDelete("codes/{id:guid}")]
+    [OpenApiOperation("Delete Discount Code", "Delete Discount Code")]
     [Authorize]
     public async Task<IActionResult> DeleteDiscountCodeAsync([FromRoute] Guid id)
     {
@@ -233,6 +239,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpGet("{id:guid}/codes")]
+    [OpenApiOperation("Get Discount Codes By Discount Id", "Get Discount Codes By Discount Id")]
     [Authorize]
     public async Task<IActionResult> GetDiscountCodesByDiscountIdAsync(
         [FromRoute] Guid id,

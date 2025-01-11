@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Setting;
@@ -15,6 +16,7 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
     : ControllerBase
 {
     [HttpGet]
+    [OpenApiOperation("Get Settings", "Get all system's settings")]
     [AllowAnonymous]
     public async Task<IActionResult> GetSettings()
     {
@@ -36,6 +38,7 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
     }
 
     [HttpGet("{key}")]
+    [OpenApiOperation("Get Setting By Key", "Get a system's setting by key")]
     [AllowAnonymous]
     public async Task<IActionResult> GetSettingByKey(string key)
     {
@@ -57,6 +60,7 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
     }
 
     [HttpPut]
+    [OpenApiOperation("Update Settings", "Update system's settings")]
     [Authorize]
     public async Task<IActionResult> UpdateSettings(List<SettingReqDto> settings)
     {

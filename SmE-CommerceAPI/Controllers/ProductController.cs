@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceServices.Interface;
@@ -15,6 +16,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     : ControllerBase
 {
     [HttpPost]
+    [OpenApiOperation("Create Product", "Create Product")]
     [Authorize]
     public async Task<IActionResult> AddProductAsync([FromBody] AddProductReqDto req)
     {
@@ -36,6 +38,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPost("{productId:guid}/attributes")]
+    [OpenApiOperation("Create Product Attribute", "Create Product Attribute")]
     [Authorize]
     public async Task<IActionResult> AddProductAttributeAsync(
         [FromBody] AddProductAttributeReqDto req,
@@ -63,6 +66,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPost("{productId:guid}/images")]
+    [OpenApiOperation("Create Product Image", "Create Product Image")]
     [Authorize]
     public async Task<IActionResult> AddProductImageAsync(
         [FromBody] AddProductImageReqDto req,
@@ -90,6 +94,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPut("{productId:guid}/categories")]
+    [OpenApiOperation("Update Product Category", "Update Product Category")]
     [Authorize]
     public async Task<IActionResult> UpdateProductCategoryAsync(
         [FromBody] List<Guid> categoryIds,
@@ -118,6 +123,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPut("{productId:guid}/attributes/{attributeId:guid}")]
+    [OpenApiOperation("Update Product Attribute", "Update Product Attribute")]
     [Authorize]
     public async Task<IActionResult> UpdateProductAttributeAsync(
         [FromBody] AddProductAttributeReqDto req,
@@ -151,6 +157,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpDelete("{productId:guid}/attributes/{attributeId:guid}")]
+    [OpenApiOperation("Delete Product Attribute", "Delete Product Attribute")]
     [Authorize]
     public async Task<IActionResult> DeleteProductAttributeAsync(Guid productId, Guid attributeId)
     {
@@ -176,6 +183,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPut("{productId:guid}/images/{imageId:guid}")]
+    [OpenApiOperation("Update Product Image", "Update Product Image")]
     [Authorize]
     public async Task<IActionResult> UpdateProductImageAsync(
         [FromBody] AddProductImageReqDto req,
@@ -205,6 +213,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpDelete("{productId:guid}/images/{imageId:guid}")]
+    [OpenApiOperation("Delete Product Image", "Delete Product Image")]
     [Authorize]
     public async Task<IActionResult> DeleteProductImageAsync(Guid productId, Guid imageId)
     {
@@ -230,6 +239,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpPut("{productId:guid}")]
+    [OpenApiOperation("Update Product", "Update Product")]
     [Authorize]
     public async Task<IActionResult> UpdateProductAsync(
         [FromBody] UpdateProductReqDto req,
@@ -255,6 +265,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpDelete("{productId:guid}")]
+    [OpenApiOperation("Delete Product", "Delete Product")]
     [Authorize]
     public async Task<IActionResult> DeleteProductAsync(Guid productId)
     {
@@ -277,6 +288,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpGet("{productId:guid}/active")]
+    [OpenApiOperation("Active Product", "Active Product")]
     [AllowAnonymous]
     public async Task<IActionResult> CustomerGetProductDetailsAsync(Guid productId)
     {
@@ -297,6 +309,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpGet("{productId:guid}")]
+    [OpenApiOperation("Get Product Details", "Get Product Details")]
     [Authorize]
     public async Task<IActionResult> ManagerGetProductDetailsAsync(Guid productId)
     {
@@ -318,6 +331,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
 
     // Product Variant
     [HttpPost("{productId:guid}/variants")]
+    [OpenApiOperation("Create Product Variant", "Create Product Variant")]
     [Authorize]
     public async Task<IActionResult> BulkProductVariantAsync(
         [FromBody] List<AddProductVariantReqDto> req,

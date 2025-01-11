@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
@@ -48,6 +49,7 @@ public class UserController(
     // }
 
     [HttpGet("profile")]
+    [OpenApiOperation("Get User Profile", "Get user profile")]
     [Authorize]
     public async Task<IActionResult> GetUserProfile()
     {
@@ -73,6 +75,7 @@ public class UserController(
     }
 
     [HttpGet("{id:guid}/profile")]
+    [OpenApiOperation("Get User Profile By Manager", "Get user profile by manager")]
     [Authorize]
     public async Task<IActionResult> GetUserProfileByManager([FromRoute] Guid id)
     {
@@ -101,6 +104,7 @@ public class UserController(
     }
 
     [HttpGet("addresses")]
+    [OpenApiOperation("Get User Addresses", "Get user addresses")]
     [Authorize]
     public async Task<IActionResult> GetUserAddresses(
         [FromQuery] int pageSize,
@@ -129,6 +133,7 @@ public class UserController(
     }
 
     [HttpPost("addresses")]
+    [OpenApiOperation("Add Address", "Add address")]
     [Authorize]
     public async Task<IActionResult> AddAddress([FromBody] AddressReqDto req)
     {
@@ -154,6 +159,7 @@ public class UserController(
     }
 
     [HttpPut("addresses/{addressId:guid}")]
+    [OpenApiOperation("Update Address", "Update address")]
     [Authorize]
     public async Task<IActionResult> UpdateAddress(
         [FromRoute] Guid addressId,
@@ -182,6 +188,7 @@ public class UserController(
     }
 
     [HttpDelete("addresses/{addressId:guid}")]
+    [OpenApiOperation("Delete Address", "Delete address")]
     [Authorize]
     public async Task<IActionResult> DeleteAddress([FromRoute] Guid addressId)
     {
@@ -207,6 +214,7 @@ public class UserController(
     }
 
     [HttpPut("addresses/{addressId:guid}/default")]
+    [OpenApiOperation("Set Default Address", "Set default address")]
     [Authorize]
     public async Task<IActionResult> SetDefaultAddress([FromRoute] Guid addressId)
     {
@@ -232,6 +240,7 @@ public class UserController(
     }
 
     [HttpPut("profile")]
+    [OpenApiOperation("Update User Profile", "Update user profile")]
     [Authorize]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileReqDto req)
     {
@@ -254,6 +263,7 @@ public class UserController(
     }
 
     [HttpGet]
+    [OpenApiOperation("Get All Users", "Get all users")]
     [Authorize]
     public async Task<IActionResult> GetAllUsers(
         [FromQuery] string? status,
@@ -292,7 +302,8 @@ public class UserController(
         }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [OpenApiOperation("Delete User", "Delete user")]
     [Authorize]
     public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
     {
@@ -316,7 +327,8 @@ public class UserController(
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [OpenApiOperation("Change User Status", "Change user status")]
     [Authorize]
     public async Task<IActionResult> ChangeUserStatus([FromRoute] Guid id)
     {
@@ -341,6 +353,7 @@ public class UserController(
     }
 
     [HttpGet("codes")]
+    [OpenApiOperation("Get Discount Codes For Customer", "Get discount codes for customer")]
     [Authorize]
     public async Task<IActionResult> GetDiscountCodesForCustomerAsync()
     {
@@ -362,6 +375,7 @@ public class UserController(
     }
 
     [HttpPut("password")]
+    [OpenApiOperation("Change Password", "Change password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordReqDto req)
     {

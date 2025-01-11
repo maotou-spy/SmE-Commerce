@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Cart;
@@ -15,6 +16,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     : ControllerBase
 {
     [HttpGet]
+    [OpenApiOperation("Get Cart", "Get cart by user id")]
     [Authorize]
     public async Task<IActionResult> CustomerGetCartAsync()
     {
@@ -37,6 +39,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     }
 
     [HttpPost]
+    [OpenApiOperation("Add To Cart", "Add item to cart")]
     [Authorize]
     public async Task<IActionResult> AddToCartAsync([FromBody] CartItemReqDto request)
     {
@@ -59,6 +62,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     }
 
     [HttpPut("{cartId:guid}")]
+    [OpenApiOperation("Update Cart Item", "Update cart item quantity")]
     [Authorize]
     public async Task<IActionResult> UpdateCartItemAsync(
         Guid cartId,
@@ -84,6 +88,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     }
 
     [HttpDelete("{cartId:guid}")]
+    [OpenApiOperation("Remove Cart Item", "Remove cart item by id")]
     [Authorize]
     public async Task<IActionResult> RemoveCartItemByIdAsync(Guid cartId)
     {
@@ -106,6 +111,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     }
 
     [HttpDelete]
+    [OpenApiOperation("Clear Cart", "Clear cart by user id")]
     [Authorize]
     public async Task<IActionResult> ClearCartByUserIdAsync()
     {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Category;
@@ -16,6 +17,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     : ControllerBase
 {
     [HttpPost]
+    [OpenApiOperation("Add Category", "Add Category")]
     [Authorize]
     public async Task<IActionResult> AddCategoryAsync([FromBody] AddCategoryReqDto req)
     {
@@ -37,6 +39,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     }
 
     [HttpGet("active")]
+    [OpenApiOperation("Get Active Categories", "Get Active Categories")]
     [Authorize]
     public async Task<IActionResult> GetCategoriesForCustomerAsync(
         string? name,
@@ -68,6 +71,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     }
 
     [HttpGet]
+    [OpenApiOperation("Get Categories", "Get All Categories")]
     [Authorize]
     public async Task<IActionResult> GetCategoriesForManagerAsync(
         string? name,
@@ -100,6 +104,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     }
 
     [HttpPut("{id:guid}")]
+    [OpenApiOperation("Update Category", "Update Category")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryDetailAsync(
         [FromRoute] Guid id,
@@ -127,6 +132,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     }
 
     [HttpDelete("{id:guid}")]
+    [OpenApiOperation("Delete Category", "Delete Category")]
     [Authorize]
     public async Task<IActionResult> DeleteCategoryAsync([FromRoute] Guid id)
     {
@@ -149,6 +155,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     }
 
     [HttpPut("{id:guid}/status")]
+    [OpenApiOperation("Update Category Status", "Update Category Status")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryStatusAsync([FromRoute] Guid id)
     {

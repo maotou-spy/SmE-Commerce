@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Auth;
@@ -14,6 +15,7 @@ namespace SmE_CommerceAPI.Controllers;
 public class AuthController(IAuthService authService, ILogger<AuthController> logger) : Controller
 {
     [HttpPost("login")]
+    [OpenApiOperation("Login with account", "Login with account")]
     [AllowAnonymous]
     public async Task<IActionResult> LoginAsync([FromBody] LoginWithAccountReqDto reqDto)
     {
@@ -36,6 +38,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     }
 
     [HttpPost("register")]
+    [OpenApiOperation("Register with account", "Register with account")]
     [AllowAnonymous]
     public async Task<IActionResult> RegisterAsync([FromBody] RegisterWithAccountReqDto reqDto)
     {
