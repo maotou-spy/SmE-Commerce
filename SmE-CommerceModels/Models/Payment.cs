@@ -20,6 +20,10 @@ public class Payment
     [Precision(15, 0)]
     public decimal Amount { get; set; }
 
+    [Column("description")]
+    [StringLength(100)]
+    public string Description { get; set; } = null!;
+
     /// <summary>
     ///     Values: pending, paid, completed
     /// </summary>
