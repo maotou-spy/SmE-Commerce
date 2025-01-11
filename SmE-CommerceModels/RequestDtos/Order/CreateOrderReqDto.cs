@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SmE_CommerceModels.RequestDtos.Cart;
 
 namespace SmE_CommerceModels.RequestDtos.Order;
 

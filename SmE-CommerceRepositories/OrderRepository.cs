@@ -20,7 +20,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-                IsSuccess = true,
+                IsSuccess = true
             };
         }
         catch (Exception ex)
@@ -31,7 +31,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -48,7 +48,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
             }
             return new Return<Order>
@@ -56,7 +56,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -67,7 +67,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
