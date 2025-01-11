@@ -20,10 +20,8 @@ public class CreateOrderReqDto
 
     public string? Note { get; set; }
 
-    public string? CancelReason { get; set; }
+    public bool IsUsingPoint { get; set; } = false;
 
-    public string? ReturnReason { get; set; }
-
-    // [Required(ErrorMessage = "Order items are required")]
-    // public List<CreateOrderItemReqDto> OrderItems { get; set; } = [];
+    [Required(ErrorMessage = "Order items are required")]
+    public List<CreateOrderItemReqDto> OrderItems { get; set; } = [];
 }
