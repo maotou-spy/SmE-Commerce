@@ -15,6 +15,9 @@ public static class ErrorCode
     public const string InvalidNumber = "007";
     public const string InvalidDiscountCode = "008";
     public const string InvalidAmount = "009";
+    public const string InvalidTotalAmount = "010";
+    public const string InvalidPoint = "011";
+    public const string InvalidSubTotal = "012";
 
     // Not found
     public const string ProductNotFound = "101";
@@ -32,6 +35,9 @@ public static class ErrorCode
     public const string SettingNotFound = "113";
     public const string BankInfoNotFound = "114";
     public const string PaymentMethodNotFound = "115";
+    public const string OrderItemNotFound = "116";
+    public const string InvalidQuantity = "117";
+    
     // Already exists
     public const string EmailAlreadyExists = "201";
     public const string PhoneAlreadyExists = "202";
@@ -61,6 +67,7 @@ public static class ErrorCode
 
     // Not For Customer
     public const string NotForCustomer = "501";
+    public const string NotYourAddress  = "502";
 
     // Internal server error
     public const string InternalServerError = "999";
