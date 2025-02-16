@@ -13,8 +13,8 @@ public class OrderItem
     [Column("orderId")]
     public Guid OrderId { get; set; }
 
-    [Column("productId")]
-    public Guid ProductId { get; set; }
+    [Column("productVariantId")]
+    public Guid ProductVariantId { get; set; }
 
     [Column("quantity")]
     public int Quantity { get; set; }
