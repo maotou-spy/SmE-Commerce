@@ -124,7 +124,6 @@ builder.Services.AddScoped<IHelperService, HelperService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IVariantNameService, VariantNameService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
