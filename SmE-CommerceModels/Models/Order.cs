@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +7,7 @@ namespace SmE_CommerceModels.Models;
 [Index("OrderCode", Name = "Orders_orderCode_key", IsUnique = true)]
 [Index("Status", Name = "idx_orders_status")]
 [Index("UserId", Name = "idx_orders_userid")]
-public partial class Order
+public class Order
 {
     [Key]
     [Column("orderId")]
@@ -35,7 +33,7 @@ public partial class Order
     public int PointsEarned { get; set; }
 
     /// <summary>
-    /// Values: pending, processing, completed, cancelled, rejected, returned
+    ///     Values: pending, processing, completed, cancelled, rejected, returned
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -106,7 +104,8 @@ public partial class Order
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     [InverseProperty("Order")]
-    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } = new List<OrderStatusHistory>();
+    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } =
+        new List<OrderStatusHistory>();
 
     [InverseProperty("Order")]
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();

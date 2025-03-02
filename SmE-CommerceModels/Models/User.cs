@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +6,7 @@ namespace SmE_CommerceModels.Models;
 
 [Index("Email", Name = "Users_email_key", IsUnique = true)]
 [Index("Phone", Name = "users_phone_key", IsUnique = true)]
-public partial class User
+public class User
 {
     [Key]
     [Column("userId")]
@@ -38,7 +36,7 @@ public partial class User
     public int Point { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, suspended
+    ///     Values: active, inactive, suspended
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -102,10 +100,12 @@ public partial class User
     public virtual ICollection<BankInfo> BankInfoModifiedBies { get; set; } = new List<BankInfo>();
 
     [InverseProperty("CreateBy")]
-    public virtual ICollection<BlogCategory> BlogCategoryCreateBies { get; set; } = new List<BlogCategory>();
+    public virtual ICollection<BlogCategory> BlogCategoryCreateBies { get; set; } =
+        new List<BlogCategory>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<BlogCategory> BlogCategoryModifiedBies { get; set; } = new List<BlogCategory>();
+    public virtual ICollection<BlogCategory> BlogCategoryModifiedBies { get; set; } =
+        new List<BlogCategory>();
 
     [InverseProperty("User")]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -127,13 +127,16 @@ public partial class User
     public virtual User? CreateBy { get; set; }
 
     [InverseProperty("CreateBy")]
-    public virtual ICollection<DiscountCode> DiscountCodeCreateBies { get; set; } = new List<DiscountCode>();
+    public virtual ICollection<DiscountCode> DiscountCodeCreateBies { get; set; } =
+        new List<DiscountCode>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<DiscountCode> DiscountCodeModifiedBies { get; set; } = new List<DiscountCode>();
+    public virtual ICollection<DiscountCode> DiscountCodeModifiedBies { get; set; } =
+        new List<DiscountCode>();
 
     [InverseProperty("User")]
-    public virtual ICollection<DiscountCode> DiscountCodeUsers { get; set; } = new List<DiscountCode>();
+    public virtual ICollection<DiscountCode> DiscountCodeUsers { get; set; } =
+        new List<DiscountCode>();
 
     [InverseProperty("CreateBy")]
     public virtual ICollection<Discount> DiscountCreateBies { get; set; } = new List<Discount>();
@@ -158,7 +161,8 @@ public partial class User
     public virtual ICollection<Order> OrderModifiedBies { get; set; } = new List<Order>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } = new List<OrderStatusHistory>();
+    public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } =
+        new List<OrderStatusHistory>();
 
     [InverseProperty("User")]
     public virtual ICollection<Order> OrderUsers { get; set; } = new List<Order>();
@@ -176,10 +180,12 @@ public partial class User
     public virtual ICollection<Product> ProductModifiedBies { get; set; } = new List<Product>();
 
     [InverseProperty("CreateBy")]
-    public virtual ICollection<ProductVariant> ProductVariantCreateBies { get; set; } = new List<ProductVariant>();
+    public virtual ICollection<ProductVariant> ProductVariantCreateBies { get; set; } =
+        new List<ProductVariant>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<ProductVariant> ProductVariantModifiedBies { get; set; } = new List<ProductVariant>();
+    public virtual ICollection<ProductVariant> ProductVariantModifiedBies { get; set; } =
+        new List<ProductVariant>();
 
     [InverseProperty("User")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
@@ -188,14 +194,18 @@ public partial class User
     public virtual ICollection<Setting> Settings { get; set; } = new List<Setting>();
 
     [InverseProperty("CreatedBy")]
-    public virtual ICollection<VariantAttribute> VariantAttributeCreatedBies { get; set; } = new List<VariantAttribute>();
+    public virtual ICollection<VariantAttribute> VariantAttributeCreatedBies { get; set; } =
+        new List<VariantAttribute>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<VariantAttribute> VariantAttributeModifiedBies { get; set; } = new List<VariantAttribute>();
+    public virtual ICollection<VariantAttribute> VariantAttributeModifiedBies { get; set; } =
+        new List<VariantAttribute>();
 
     [InverseProperty("CreatedBy")]
-    public virtual ICollection<VariantName> VariantNameCreatedBies { get; set; } = new List<VariantName>();
+    public virtual ICollection<VariantName> VariantNameCreatedBies { get; set; } =
+        new List<VariantName>();
 
     [InverseProperty("ModifiedBy")]
-    public virtual ICollection<VariantName> VariantNameModifiedBies { get; set; } = new List<VariantName>();
+    public virtual ICollection<VariantName> VariantNameModifiedBies { get; set; } =
+        new List<VariantName>();
 }

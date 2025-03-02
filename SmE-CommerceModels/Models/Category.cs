@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class Category
+public class Category
 {
     [Key]
     [Column("categoryId")]
@@ -21,7 +18,7 @@ public partial class Category
     public string? Description { get; set; }
 
     /// <summary>
-    /// Values: active, inactive, deleted
+    ///     Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -52,5 +49,6 @@ public partial class Category
     public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Category")]
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } =
+        new List<ProductCategory>();
 }

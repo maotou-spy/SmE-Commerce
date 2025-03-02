@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class VariantName
+public class VariantName
 {
     [Key]
     [Column("variantNameId")]
@@ -37,5 +34,6 @@ public partial class VariantName
     public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("VariantName")]
-    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } = new List<VariantAttribute>();
+    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
+        new List<VariantAttribute>();
 }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Index("Status", Name = "idx_contents_status")]
-public partial class Content
+public class Content
 {
     [Key]
     [Column("contentId")]
@@ -27,21 +25,21 @@ public partial class Content
     public Guid? ProductId { get; set; }
 
     /// <summary>
-    /// Values: blog, facebook
+    ///     Values: blog, facebook
     /// </summary>
     [Column("externalType")]
     [StringLength(50)]
     public string ExternalType { get; set; } = null!;
 
     /// <summary>
-    /// blogId for blogs, facebookPostId for Facebook posts
+    ///     blogId for blogs, facebookPostId for Facebook posts
     /// </summary>
     [Column("externalId")]
     [StringLength(255)]
     public string? ExternalId { get; set; }
 
     /// <summary>
-    /// Values: draft, pending, published, unpublished, deleted
+    ///     Values: draft, pending, published, unpublished, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -80,13 +78,15 @@ public partial class Content
     public string ShortDescription { get; set; } = null!;
 
     [InverseProperty("Content")]
-    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } = new List<ContentCategoryMap>();
+    public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } =
+        new List<ContentCategoryMap>();
 
     [InverseProperty("Content")]
     public virtual ICollection<ContentImage> ContentImages { get; set; } = new List<ContentImage>();
 
     [InverseProperty("Content")]
-    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
+        new List<ContentProduct>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("ContentCreateBies")]

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class CartItem
+public class CartItem
 {
     [Key]
     [Column("cartItemId")]
@@ -22,7 +20,7 @@ public partial class CartItem
     public int Quantity { get; set; }
 
     /// <summary>
-    /// Price of the product when added to the cart
+    ///     Price of the product when added to the cart
     /// </summary>
     [Column("price")]
     [Precision(15, 0)]

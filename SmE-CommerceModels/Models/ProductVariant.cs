@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public partial class ProductVariant
+public class ProductVariant
 {
     [Key]
     [Column("productVariantId")]
@@ -68,5 +66,6 @@ public partial class ProductVariant
     public virtual Product Product { get; set; } = null!;
 
     [InverseProperty("ProductVariant")]
-    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } = new List<VariantAttribute>();
+    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
+        new List<VariantAttribute>();
 }

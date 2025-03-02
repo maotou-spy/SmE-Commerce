@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Table("ContentCategoryMap")]
-public partial class ContentCategoryMap
+public class ContentCategoryMap
 {
-    [Key]
-    [Column("contentCategoryMapId")]
-    public Guid ContentCategoryMapId { get; set; }
+    [Key] [Column("contentCategoryMapId")] public Guid ContentCategoryMapId { get; set; }
 
-    [Column("contentId")]
-    public Guid? ContentId { get; set; }
+    [Column("contentId")] public Guid? ContentId { get; set; }
 
-    [Column("blogCategoryId")]
-    public Guid? BlogCategoryId { get; set; }
+    [Column("blogCategoryId")] public Guid? BlogCategoryId { get; set; }
 
     [ForeignKey("BlogCategoryId")]
     [InverseProperty("ContentCategoryMaps")]
