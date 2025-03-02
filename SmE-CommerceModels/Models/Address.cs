@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class Address
+public partial class Address
 {
     [Key]
     [Column("addressId")]
@@ -37,7 +40,7 @@ public class Address
     public string City { get; set; } = null!;
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

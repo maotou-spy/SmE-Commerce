@@ -217,7 +217,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         }
     }
 
-    public async Task<Return<User>> UpdateUser(User user)
+    public async Task<Return<User>> UpdateUserAsync(User user)
     {
         try
         {

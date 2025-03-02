@@ -54,6 +54,46 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    public async Task<Return<Product>> GetProductByProductVariantIdAsync(Guid variantId)
+    {
+        try
+        {
+            var product = await dbContext
+                .Products
+                .Include(x => x.ProductVariants)
+                .Where(x => x.Status != ProductStatus.Deleted && x.Status != ProductStatus.Inactive)
+                .FirstOrDefaultAsync(x => x.ProductVariants.Any(y => y.ProductVariantId == variantId));
+
+            if (product is null)
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    TotalRecord = 0,
+                };
+
+            return new Return<Product>
+            {
+                Data = product,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<Product>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds)
     {
         try
@@ -133,6 +173,49 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             };
         }
     }
+
+    public async Task<Return<Product>> GetProductByVariantIdForUpdateAsync(Guid productVariantId)
+    {
+        try
+        {
+            var product = await dbContext.Products
+                .Where(x => x.Status != ProductStatus.Deleted && x.Status != ProductStatus.Inactive)
+                .Include(x => x.ProductVariants)
+                .AsTracking()
+                .FirstOrDefaultAsync(x => x.ProductVariants.Any(y => y.ProductVariantId == productVariantId));
+
+            if (product is null)
+            {
+                return new Return<Product>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    TotalRecord = 0,
+                };
+            }
+
+            return new Return<Product>
+            {
+                Data = product,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<Product>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
 
     public async Task<Return<Product>> AddProductAsync(Product product)
     {
@@ -695,6 +778,49 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             return new Return<bool>
             {
                 Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+    
+    public async Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid productVariantId)
+    {
+        try
+        {
+            var productVariant = await dbContext.ProductVariants.FirstOrDefaultAsync(x =>
+                x.ProductVariantId == productVariantId
+            );
+
+            if (productVariant is null)
+                return new Return<ProductVariant>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    TotalRecord = 0,
+                };
+
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"ProductVariants\" WHERE public.\"ProductVariants\".\"productVariantId\" = {0} FOR UPDATE",
+                productVariantId
+            );
+
+            return new Return<ProductVariant>
+            {
+                Data = productVariant,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<ProductVariant>
+            {
+                Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,

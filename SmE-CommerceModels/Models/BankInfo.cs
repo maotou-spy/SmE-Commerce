@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Table("BankInfo")]
-public class BankInfo
+public partial class BankInfo
 {
     [Key]
     [Column("bankInfoId")]
@@ -31,7 +34,7 @@ public class BankInfo
     public string AccountHolderName { get; set; } = null!;
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

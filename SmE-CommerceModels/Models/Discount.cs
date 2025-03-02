@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class Discount
+public partial class Discount
 {
     [Key]
     [Column("discountId")]
@@ -40,7 +42,7 @@ public class Discount
     public DateTime? ToDate { get; set; }
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -57,12 +59,6 @@ public class Discount
 
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
-
-    [Column("usageLimit")]
-    public int? UsageLimit { get; set; }
-
-    [Column("usedCount")]
-    public int? UsedCount { get; set; }
 
     [Column("minQuantity")]
     public int? MinQuantity { get; set; }
@@ -81,8 +77,7 @@ public class Discount
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     [InverseProperty("Discount")]
-    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
-        new List<DiscountProduct>();
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("DiscountModifiedBies")]

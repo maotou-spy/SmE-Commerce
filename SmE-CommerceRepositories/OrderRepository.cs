@@ -71,4 +71,78 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
+    
+    // getOrderByUserIdAsync
+    public async Task<Return<List<Order>>> GetOrderByUserIdAsync(Guid userId)
+    {
+        try
+        {
+            var orders = await defaultdb.Orders.Where(x => x.UserId == userId).ToListAsync();
+            if (orders.Count == 0)
+            {
+                return new Return<List<Order>>
+                {
+                    Data = null,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    IsSuccess = false,
+                    TotalRecord = 0
+                };
+            }
+            return new Return<List<Order>>
+            {
+                Data = orders,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = orders.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Order>>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex
+            };
+        }
+    }
+    
+    // Check OrderCode is existed?
+    public async Task<Return<bool>> CheckOrderCodeExistedAsync(string orderCode)
+    {
+        try
+        {
+            var order = await defaultdb.Orders.FirstOrDefaultAsync(x => x.OrderCode == orderCode);
+            if (order == null)
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    StatusCode = ErrorCode.Ok,
+                    IsSuccess = true,
+                    TotalRecord = 1
+                };
+            }
+            return new Return<bool>
+            {
+                Data = true,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex
+            };
+        }
+    }
 }

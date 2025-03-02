@@ -1,11 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Index("Status", Name = "idx_products_status")]
-public class Product
+[Index("ProductCode", Name = "products_code_key", IsUnique = true)]
+public partial class Product
 {
     [Key]
     [Column("productId")]
@@ -33,7 +36,7 @@ public class Product
     public int SoldQuantity { get; set; }
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -70,41 +73,30 @@ public class Product
     public string PrimaryImage { get; set; } = null!;
 
     [InverseProperty("Product")]
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    [InverseProperty("Product")]
-    public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
-        new List<ContentProduct>();
+    public virtual ICollection<ContentProduct> ContentProducts { get; set; } = new List<ContentProduct>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("ProductCreateBies")]
     public virtual User? CreateBy { get; set; }
 
     [InverseProperty("Product")]
-    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
-        new List<DiscountProduct>();
+    public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } = new List<DiscountProduct>();
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("ProductModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Product")]
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } =
-        new List<ProductAttribute>();
-
-    [InverseProperty("Product")]
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } =
-        new List<ProductCategory>();
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
 
     [InverseProperty("Product")]
     public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
     [InverseProperty("Product")]
-    public virtual ICollection<ProductVariant> ProductVariants { get; set; } =
-        new List<ProductVariant>();
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
 
     [InverseProperty("Product")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();

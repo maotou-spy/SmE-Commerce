@@ -182,8 +182,6 @@ public class DiscountService(
                 Status = discount.Status != GeneralStatus.Inactive
                     ? GeneralStatus.Active
                     : GeneralStatus.Inactive,
-                UsageLimit = discount.UsageLimit,
-                UsedCount = 0,
                 MinQuantity = discount.MinQuantity,
                 MaxQuantity = discount.MaxQuantity,
                 IsFirstOrder = discount.IsFirstOrder,
@@ -411,7 +409,6 @@ public class DiscountService(
             discount.Data.MaximumDiscount = req.MaximumDiscount;
             discount.Data.FromDate = req.FromDate != discount.Data.FromDate ? req.FromDate : discount.Data.FromDate;
             discount.Data.ToDate = req.ToDate != discount.Data.ToDate ? req.ToDate : discount.Data.ToDate;
-            discount.Data.UsageLimit = req.UsageLimit;
             discount.Data.MinQuantity = req.MinQuantity;
             discount.Data.MaxQuantity = req.MaxQuantity;
             discount.Data.IsFirstOrder = req.IsFirstOrder;
@@ -911,8 +908,6 @@ public class DiscountService(
                 fromDate = x.FromDate,
                 toDate = x.ToDate,
                 status = x.Status,
-                usageLimit = x.UsageLimit,
-                usageCount = x.UsedCount,
                 minQuantity = x.MinQuantity,
                 maxQuantity = x.MaxQuantity,
                 isFirstOrder = x.IsFirstOrder

@@ -22,8 +22,6 @@ public class ManagerGetDiscountsResDto
     
     public required string status { get; set; }
     
-    public int? usageLimit { get; set; }
-    
     public int? usageCount { get; set; }
     
     public int? minQuantity { get; set; }

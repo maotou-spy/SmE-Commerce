@@ -13,7 +13,7 @@ public interface IUserRepository
     Task<Return<User>> GetUserByPhoneAsync(string phone);
     Task<Return<User>> GetUserByEmailOrPhone(string emailOrPhone);
     Task<Return<User>> CreateNewUser(User user);
-    Task<Return<User>> UpdateUser(User user);
+    Task<Return<User>> UpdateUserAsync(User user);
     
     Task<Return<IEnumerable<DiscountCode>>> UserGetDiscountsByUserIdAsync(Guid cusId);
 }

@@ -18,6 +18,10 @@ public static class ErrorCode
     public const string InvalidTotalAmount = "010";
     public const string InvalidPoint = "011";
     public const string InvalidSubTotal = "012";
+    public const string DiscountCodeExpired = "013";
+    public const string OnlyForTheNewUser = "014";
+    public const string InvalidPointBalance = "015";
+    public const string InvalidPrice = "016";
 
     // Not found
     public const string ProductNotFound = "101";
@@ -59,6 +63,7 @@ public static class ErrorCode
     public const string ProductImageMinimum = "302";
     public const string OverStockQuantity = "303";
     public const string VariantNameConflict = "304";
+    public const string OrderAmountTooLow = "305";
 
     // Authorization
     public const string NotAuthority = "401";

@@ -37,16 +37,16 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
         }
     }
 
-    public async Task<Return<CartItem>> GetCartItemByProductIdAndUserIdAsync(
-        Guid productId,
+    public async Task<Return<CartItem>> GetCartItemByProductVariantIdAndUserIdAsync(
+        Guid productVariantId,
         Guid userId
     )
     {
         try
         {
             var cart = await defaultdbContext
-                .CartItems.Include(x => x.Product)
-                .SingleOrDefaultAsync(x => x.ProductId == productId && x.UserId == userId);
+                .CartItems
+                .SingleOrDefaultAsync(x => x.ProductVariantId == productVariantId && x.UserId == userId);
 
             return new Return<CartItem>
             {
@@ -74,7 +74,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
         {
             var query = defaultdbContext.CartItems
                 .Where(x => x.UserId == userId)
-                .Include(x => x.Product)
+                .Include(x => x.ProductVariant)
+                .ThenInclude(x => x.Product)
                 .AsQueryable();
 
             var totalRecords = await query.CountAsync();

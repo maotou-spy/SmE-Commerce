@@ -127,6 +127,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IVariantNameService, VariantNameService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<BearerTokenUtil>();
 
 #endregion
@@ -136,6 +137,7 @@ builder.Services.AddScoped<BearerTokenUtil>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IBankInfoRepository, BankInforRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
