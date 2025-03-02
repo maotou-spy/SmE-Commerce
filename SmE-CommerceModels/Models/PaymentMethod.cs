@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class PaymentMethod
+public partial class PaymentMethod
 {
     [Key]
     [Column("paymentMethodId")]
@@ -14,7 +17,7 @@ public class PaymentMethod
     public string Name { get; set; } = null!;
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

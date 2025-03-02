@@ -1,18 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Index("Key", Name = "Settings_key_key", IsUnique = true)]
-public class Setting
+public partial class Setting
 {
     [Key]
     [Column("settingId")]
     public Guid SettingId { get; set; }
 
     /// <summary>
-    ///     Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate
+    /// Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate
     /// </summary>
     [Column("key")]
     [StringLength(50)]
@@ -33,6 +35,6 @@ public class Setting
     public Guid? ModifiedById { get; set; }
 
     [ForeignKey("ModifiedById")]
-    [InverseProperty("SettingModifiedBies")]
+    [InverseProperty("Settings")]
     public virtual User? ModifiedBy { get; set; }
 }

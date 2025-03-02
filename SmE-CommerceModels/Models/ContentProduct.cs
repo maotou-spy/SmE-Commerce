@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class ContentProduct
+public partial class ContentProduct
 {
     [Key]
     [Column("contentProductId")]

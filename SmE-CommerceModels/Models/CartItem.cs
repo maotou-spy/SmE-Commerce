@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class CartItem
+public partial class CartItem
 {
     [Key]
     [Column("cartItemId")]
@@ -20,15 +22,15 @@ public class CartItem
     public int Quantity { get; set; }
 
     /// <summary>
-    ///     Price of the product when added to the cart
+    /// Price of the product when added to the cart
     /// </summary>
     [Column("price")]
     [Precision(15, 0)]
     public decimal Price { get; set; }
 
-    [ForeignKey("ProductId")]
+    [ForeignKey("ProductVariantId")]
     [InverseProperty("CartItems")]
-    public virtual Product Product { get; set; } = null!;
+    public virtual ProductVariant ProductVariant { get; set; } = null!;
 
     [ForeignKey("UserId")]
     [InverseProperty("CartItems")]

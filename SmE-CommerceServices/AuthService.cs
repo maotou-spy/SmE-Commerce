@@ -51,7 +51,7 @@ public class AuthService(
             user.LastLogin = DateTime.Now;
             user.ModifiedById = user.UserId;
             user.ModifiedAt = DateTime.Now;
-            var updateResult = await userRepository.UpdateUser(user);
+            var updateResult = await userRepository.UpdateUserAsync(user);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<LoginResDto>
                 {

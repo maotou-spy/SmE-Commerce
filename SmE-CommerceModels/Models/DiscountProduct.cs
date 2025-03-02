@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Table("DiscountProduct")]
-public class DiscountProduct
+public partial class DiscountProduct
 {
     [Key]
     [Column("discountProductId")]

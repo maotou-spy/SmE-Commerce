@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class OrderItem
+public partial class OrderItem
 {
     [Key]
     [Column("orderItemId")]
@@ -13,22 +15,12 @@ public class OrderItem
     [Column("orderId")]
     public Guid OrderId { get; set; }
 
-    [Column("productVariantId")]
-    public Guid ProductVariantId { get; set; }
-
     [Column("quantity")]
     public int Quantity { get; set; }
 
     [Column("price")]
     [Precision(15, 0)]
     public decimal Price { get; set; }
-
-    /// <summary>
-    ///     Values: active, inactive, deleted
-    /// </summary>
-    [Column("status")]
-    [StringLength(50)]
-    public string Status { get; set; } = null!;
 
     [Column("variantId")]
     public Guid VariantId { get; set; }
@@ -37,17 +29,13 @@ public class OrderItem
     [StringLength(100)]
     public string ProductName { get; set; } = null!;
 
-    [Column("attributeValue")]
+    [Column("variantName")]
     [StringLength(100)]
-    public string? AttributeValue { get; set; }
+    public string? VariantName { get; set; }
 
     [ForeignKey("OrderId")]
     [InverseProperty("OrderItems")]
     public virtual Order Order { get; set; } = null!;
-
-    [ForeignKey("ProductId")]
-    [InverseProperty("OrderItems")]
-    public virtual Product Product { get; set; } = null!;
 
     [ForeignKey("VariantId")]
     [InverseProperty("OrderItems")]

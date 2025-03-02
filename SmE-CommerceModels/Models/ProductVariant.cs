@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class ProductVariant
+public partial class ProductVariant
 {
     [Key]
     [Column("productVariantId")]
@@ -27,10 +29,6 @@ public class ProductVariant
     [Column("soldQuantity")]
     public int SoldQuantity { get; set; }
 
-    [Column("variantImage")]
-    [StringLength(255)]
-    public string? VariantImage { get; set; }
-
     [Column("status")]
     [StringLength(50)]
     public string Status { get; set; } = null!;
@@ -46,6 +44,13 @@ public class ProductVariant
 
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
+
+    [Column("variantImage")]
+    [StringLength(255)]
+    public string? VariantImage { get; set; }
+
+    [InverseProperty("ProductVariant")]
+    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     [ForeignKey("CreateById")]
     [InverseProperty("ProductVariantCreateBies")]
@@ -63,6 +68,5 @@ public class ProductVariant
     public virtual Product Product { get; set; } = null!;
 
     [InverseProperty("ProductVariant")]
-    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =
-        new List<VariantAttribute>();
+    public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } = new List<VariantAttribute>();
 }

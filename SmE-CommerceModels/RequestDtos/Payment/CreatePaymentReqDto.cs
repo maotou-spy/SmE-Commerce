@@ -13,6 +13,8 @@ public class CreatePaymentReqDto
     [Required]
     public required decimal Amount { get; set; }
     
+    public string? Description { get; set; }
+    
     [Required]
     public required string Status { get; set; } = "Pending";
 }

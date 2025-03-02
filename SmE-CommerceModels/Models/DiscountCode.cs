@@ -1,11 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
 [Index("Status", Name = "idx_discountcodes_status")]
-public class DiscountCode
+public partial class DiscountCode
 {
     [Key]
     [Column("codeId")]
@@ -15,7 +17,7 @@ public class DiscountCode
     public Guid DiscountId { get; set; }
 
     /// <summary>
-    ///     this code only for this user
+    /// this code only for this user
     /// </summary>
     [Column("userId")]
     public Guid? UserId { get; set; }
@@ -27,7 +29,7 @@ public class DiscountCode
     public DateTime? ToDate { get; set; }
 
     /// <summary>
-    ///     Values: active, inactive, used, deleted
+    /// Values: active, inactive, used, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]

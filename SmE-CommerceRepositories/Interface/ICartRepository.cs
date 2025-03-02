@@ -7,7 +7,7 @@ public interface ICartRepository
 {
     Task<Return<CartItem>> GetCartItemByIdAsync(Guid cartId);
 
-    Task<Return<CartItem>> GetCartItemByProductIdAndUserIdAsync(Guid productId, Guid userId);
+    Task<Return<CartItem>> GetCartItemByProductVariantIdAndUserIdAsync(Guid productId, Guid userId);
 
     Task<Return<List<CartItem>>> GetCartItemsByUserIdAsync(Guid userId);
 

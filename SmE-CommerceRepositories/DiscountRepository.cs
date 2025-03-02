@@ -230,7 +230,6 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             };
         }
     }
-    
     #endregion
 
     #region DiscountCode
@@ -337,6 +336,9 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         {
             // Lấy discount code từ cơ sở dữ liệu cùng các liên kết liên quan (nếu có)
             var discountCode = await dbContext.DiscountCodes
+                .Include(x => x.Discount)
+                    .ThenInclude(x => x.DiscountProducts)
+                .Where(x => x.Status != DiscountCodeStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.CodeId == id);
 
             // Nếu không tìm thấy discount code
@@ -386,6 +388,8 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         {
             var discountCode = await dbContext.DiscountCodes
                 .Include(x => x.Discount)
+                    .ThenInclude(x => x.DiscountProducts)
+                .Where(x => x.Status != DiscountCodeStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.CodeId == id);
             if (discountCode == null)
             {

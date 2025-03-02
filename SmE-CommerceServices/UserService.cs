@@ -283,7 +283,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 
-            var updateResult = await userRepository.UpdateUser(user.Data);
+            var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>
                 {
@@ -341,7 +341,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             currentUser.Data.ModifiedAt = DateTime.Now;
             currentUser.Data.ModifiedById = currentUser.Data.UserId;
 
-            var updateResult = await userRepository.UpdateUser(currentUser.Data);
+            var updateResult = await userRepository.UpdateUserAsync(currentUser.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>
                 {
@@ -395,7 +395,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 
-            var updateResult = await userRepository.UpdateUser(user.Data);
+            var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>
                 {
@@ -454,7 +454,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             user.Data.ModifiedAt = DateTime.Now;
             user.Data.ModifiedById = currentUser.Data.UserId;
 
-            var updateResult = await userRepository.UpdateUser(user.Data);
+            var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>
                 {

@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class Payment
+public partial class Payment
 {
     [Key]
     [Column("paymentId")]
@@ -20,12 +22,8 @@ public class Payment
     [Precision(15, 0)]
     public decimal Amount { get; set; }
 
-    [Column("description")]
-    [StringLength(100)]
-    public string Description { get; set; } = null!;
-
     /// <summary>
-    ///     Values: pending, paid, completed
+    /// Values: pending, paid, completed
     /// </summary>
     [Column("status")]
     [StringLength(50)]
@@ -42,6 +40,10 @@ public class Payment
 
     [Column("modifiedById")]
     public Guid? ModifiedById { get; set; }
+
+    [Column("description")]
+    [StringLength(100)]
+    public string Description { get; set; } = null!;
 
     [ForeignKey("CreateById")]
     [InverseProperty("PaymentCreateBies")]

@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmE_CommerceModels.Models;
 
-public class Review
+public partial class Review
 {
     [Key]
     [Column("reviewId")]
@@ -25,7 +28,7 @@ public class Review
     public string? Comment { get; set; }
 
     /// <summary>
-    ///     Values: active, inactive, deleted
+    /// Values: active, inactive, deleted
     /// </summary>
     [Column("status")]
     [StringLength(50)]
