@@ -32,6 +32,9 @@ public class Order
     [Column("pointsEarned")]
     public int PointsEarned { get; set; }
 
+    [Column("pointsUsed")]
+    public int PointsUsed { get; set; } = 0;
+
     /// <summary>
     ///     Values: pending, processing, completed, cancelled, rejected, returned
     /// </summary>
