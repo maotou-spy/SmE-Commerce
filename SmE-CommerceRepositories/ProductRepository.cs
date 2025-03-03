@@ -178,14 +178,13 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
     {
         try
         {
-            var product = await dbContext.Products
-                .Where(x => x.Status != ProductStatus.Deleted && x.Status != ProductStatus.Inactive)
+            var product = await dbContext
+                .Products
                 .Include(x => x.ProductVariants)
-                .AsTracking()
+                .Where(x => x.Status != ProductStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.ProductVariants.Any(y => y.ProductVariantId == productVariantId));
 
             if (product is null)
-            {
                 return new Return<Product>
                 {
                     Data = null,
@@ -193,7 +192,11 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     StatusCode = ErrorCode.ProductNotFound,
                     TotalRecord = 0,
                 };
-            }
+
+            await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"Products\" WHERE public.\"Products\".\"productId\" = {0} FOR UPDATE",
+                product.ProductId
+            );
 
             return new Return<Product>
             {
