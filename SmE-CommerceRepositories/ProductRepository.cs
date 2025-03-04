@@ -59,10 +59,11 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var product = await dbContext
-                .Products
-                .Include(x => x.ProductVariants)
+                .Products.Include(x => x.ProductVariants)
                 .Where(x => x.Status != ProductStatus.Deleted && x.Status != ProductStatus.Inactive)
-                .FirstOrDefaultAsync(x => x.ProductVariants.Any(y => y.ProductVariantId == variantId));
+                .FirstOrDefaultAsync(x =>
+                    x.ProductVariants.Any(y => y.ProductVariantId == variantId)
+                );
 
             if (product is null)
                 return new Return<Product>
@@ -78,7 +79,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 Data = product,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -179,10 +180,11 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         try
         {
             var product = await dbContext
-                .Products
-                .Include(x => x.ProductVariants)
+                .Products.Include(x => x.ProductVariants)
                 .Where(x => x.Status != ProductStatus.Deleted)
-                .FirstOrDefaultAsync(x => x.ProductVariants.Any(y => y.ProductVariantId == productVariantId));
+                .FirstOrDefaultAsync(x =>
+                    x.ProductVariants.Any(y => y.ProductVariantId == productVariantId)
+                );
 
             if (product is null)
                 return new Return<Product>
@@ -218,7 +220,6 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             };
         }
     }
-
 
     public async Task<Return<Product>> AddProductAsync(Product product)
     {
@@ -733,6 +734,44 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
 
     #region Product Variant
 
+    public async Task<Return<ProductVariant>> GetProductVariantByIdAsync(Guid productVariantId)
+    {
+        try
+        {
+            var productVariant = await dbContext
+                .ProductVariants.Include(x => x.Product)
+                .FirstOrDefaultAsync(x => x.ProductVariantId == productVariantId);
+
+            if (productVariant is null)
+                return new Return<ProductVariant>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    TotalRecord = 0,
+                };
+
+            return new Return<ProductVariant>
+            {
+                Data = productVariant,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<ProductVariant>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<bool>> AddProductVariantAsync(ProductVariant productVariant)
     {
         try
@@ -788,8 +827,10 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             };
         }
     }
-    
-    public async Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid productVariantId)
+
+    public async Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(
+        Guid productVariantId
+    )
     {
         try
         {

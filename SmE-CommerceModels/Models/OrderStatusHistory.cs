@@ -27,6 +27,7 @@ public class OrderStatusHistory
     public Guid? ModifiedById { get; set; }
 
     [Column("note")]
+    [StringLength(500)]
     public string? Note { get; set; }
 
     [ForeignKey("ModifiedById")]

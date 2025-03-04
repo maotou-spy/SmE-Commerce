@@ -15,7 +15,7 @@ public class AddProductReqDto
 
     [Required(ErrorMessage = "Product price is required")]
     [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price")]
-    public decimal Price { get; set; }
+    public decimal Price { get; set; } = 0;
 
     [RegularExpression(@"^\d+$", ErrorMessage = "Invalid stock quantity")]
     public int StockQuantity { get; set; } = 0;

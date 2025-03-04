@@ -61,6 +61,7 @@ public class Product
     public string MetaTitle { get; set; } = null!;
 
     [Column("metaDescription")]
+    [StringLength(300)]
     public string? MetaDescription { get; set; }
 
     [Column("isTopSeller")]

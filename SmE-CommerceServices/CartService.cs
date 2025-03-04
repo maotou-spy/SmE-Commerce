@@ -29,7 +29,7 @@ public class CartService(
                     Data = [],
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
-                    InternalErrorMessage = currentCustomer.InternalErrorMessage
+                    InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
             // Get cart items
@@ -42,7 +42,7 @@ public class CartService(
                     Data = [],
                     IsSuccess = false,
                     StatusCode = cartItems.StatusCode,
-                    InternalErrorMessage = cartItems.InternalErrorMessage
+                    InternalErrorMessage = cartItems.InternalErrorMessage,
                 };
 
             // Check if cart is empty
@@ -51,7 +51,7 @@ public class CartService(
                 {
                     Data = [],
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 };
 
             // Map cart items to response DTO
@@ -59,8 +59,7 @@ public class CartService(
                 .Data.Where(_ => true)
                 .Select(cartItem =>
                 {
-                    var isPriceUpdated =
-                        cartItem.Price != cartItem.ProductVariant.Product.Price;
+                    var isPriceUpdated = cartItem.Price != cartItem.ProductVariant.Product.Price;
 
                     return new GetCartResDto
                     {
@@ -70,11 +69,13 @@ public class CartService(
                         ImageUrl = cartItem.ProductVariant.Product.PrimaryImage,
                         ProductSlug = cartItem.ProductVariant.Product.Slug,
                         Quantity =
-                            cartItem.ProductVariant.Product.Status == ProductStatus.Active ? cartItem.Quantity : 0,
+                            cartItem.ProductVariant.Product.Status == ProductStatus.Active
+                                ? cartItem.Quantity
+                                : 0,
                         StockQuantity = cartItem.ProductVariant.Product.StockQuantity,
                         Price = cartItem.ProductVariant.Product.Price,
                         IsPriceUpdated = isPriceUpdated,
-                        ProductStatus = cartItem.ProductVariant.Product.Status
+                        ProductStatus = cartItem.ProductVariant.Product.Status,
                     };
                 })
                 .ToList();
@@ -83,7 +84,7 @@ public class CartService(
             {
                 Data = cartItemsRes,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -93,7 +94,7 @@ public class CartService(
                 Data = [],
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -109,7 +110,7 @@ public class CartService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest
+                    StatusCode = ErrorCode.BadRequest,
                 };
 
             // Get current customer
@@ -122,33 +123,40 @@ public class CartService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
-                    InternalErrorMessage = currentCustomer.InternalErrorMessage
+                    InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
             // Check if the product variant is existing and is active
-            var existingProduct = await productRepository.GetProductByProductVariantIdAsync(cartItem.ProductVariantId);
-            if (!existingProduct.IsSuccess || existingProduct.Data == null)
+            var existingProductVariant = await productRepository.GetProductVariantByIdAsync(
+                cartItem.ProductVariantId
+            );
+            if (
+                !existingProductVariant.IsSuccess
+                || existingProductVariant.Data is not { Status: ProductStatus.Active }
+                || existingProductVariant.Data.Product.Status != ProductStatus.Active
+            )
                 return new Return<int?>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound,
                 };
-            if (existingProduct.Data.Price <= 0)
+
+            if (existingProductVariant.Data.Price <= 0)
                 return new Return<int?>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidPrice
+                    StatusCode = ErrorCode.InvalidPrice,
                 };
 
             // Check if stock is sufficient for add new cart item
-            if (existingProduct.Data.StockQuantity < cartItem.Quantity)
+            if (existingProductVariant.Data.StockQuantity < cartItem.Quantity)
                 return new Return<int?>
                 {
-                    Data = existingProduct.Data.StockQuantity, // Return remaining stock
+                    Data = existingProductVariant.Data.StockQuantity, // Return remaining stock
                     IsSuccess = false,
-                    StatusCode = ErrorCode.OutOfStock
+                    StatusCode = ErrorCode.OutOfStock,
                 };
 
             // Check if the cart item already exists
@@ -163,12 +171,12 @@ public class CartService(
             {
                 var newQuantity = existingCartItem.Data.Quantity + cartItem.Quantity;
 
-                if (existingProduct.Data.StockQuantity < newQuantity)
+                if (existingProductVariant.Data.StockQuantity < newQuantity)
                     return new Return<int?>
                     {
-                        Data = existingProduct.Data.StockQuantity, // Return remaining stock
+                        Data = existingProductVariant.Data.StockQuantity, // Return remaining stock
                         IsSuccess = false,
-                        StatusCode = ErrorCode.OverStockQuantity
+                        StatusCode = ErrorCode.OverStockQuantity,
                     };
 
                 existingCartItem.Data.Quantity = newQuantity;
@@ -180,7 +188,7 @@ public class CartService(
                         Data = null,
                         IsSuccess = false,
                         StatusCode = updatedCart.StatusCode,
-                        InternalErrorMessage = updatedCart.InternalErrorMessage
+                        InternalErrorMessage = updatedCart.InternalErrorMessage,
                     };
 
                 // Complete transaction and return success
@@ -189,7 +197,7 @@ public class CartService(
                 {
                     Data = null,
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 };
             }
 
@@ -200,7 +208,7 @@ public class CartService(
                 ProductVariantId = cartItem.ProductVariantId,
                 UserId = currentCustomer.Data.UserId,
                 Quantity = cartItem.Quantity,
-                Price = existingProduct.Data.Price
+                Price = existingProductVariant.Data.Price,
             };
 
             var addedResult = await cartRepository.AddToCartAsync(newCartItem);
@@ -211,7 +219,7 @@ public class CartService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = addedResult.StatusCode,
-                    InternalErrorMessage = addedResult.InternalErrorMessage
+                    InternalErrorMessage = addedResult.InternalErrorMessage,
                 };
 
             // Complete transaction and return success
@@ -220,7 +228,7 @@ public class CartService(
             {
                 Data = null,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -230,7 +238,7 @@ public class CartService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -250,7 +258,7 @@ public class CartService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
-                    InternalErrorMessage = currentCustomer.InternalErrorMessage
+                    InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
             // Check if the cart item exists
@@ -260,7 +268,7 @@ public class CartService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.CartNotFound
+                    StatusCode = ErrorCode.CartNotFound,
                 };
 
             // Check if the cart item belongs to the current customer
@@ -269,7 +277,7 @@ public class CartService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.CartNotFound
+                    StatusCode = ErrorCode.CartNotFound,
                 };
 
             // Check if the product exists and is active
@@ -284,7 +292,7 @@ public class CartService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound
+                    StatusCode = ErrorCode.ProductNotFound,
                 };
 
             // Check if stock is sufficient for the updated quantity
@@ -293,7 +301,7 @@ public class CartService(
                 {
                     Data = existingProduct.Data.StockQuantity, // Return remaining stock
                     IsSuccess = false,
-                    StatusCode = ErrorCode.OverStockQuantity
+                    StatusCode = ErrorCode.OverStockQuantity,
                 };
 
             // Update existing cart item
@@ -306,7 +314,7 @@ public class CartService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = updatedCart.StatusCode,
-                    InternalErrorMessage = updatedCart.InternalErrorMessage
+                    InternalErrorMessage = updatedCart.InternalErrorMessage,
                 };
 
             // Complete transaction and return success
@@ -315,7 +323,7 @@ public class CartService(
             {
                 Data = updatedQuantity, // Return the updated quantity
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -325,7 +333,7 @@ public class CartService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -344,7 +352,7 @@ public class CartService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
-                    InternalErrorMessage = currentCustomer.InternalErrorMessage
+                    InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
             // Check if the cart item exists
@@ -354,7 +362,7 @@ public class CartService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.CartNotFound
+                    StatusCode = ErrorCode.CartNotFound,
                 };
 
             // Check if the cart item belongs to the current customer
@@ -363,7 +371,7 @@ public class CartService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.CartNotFound
+                    StatusCode = ErrorCode.CartNotFound,
                 };
 
             // Remove cart item
@@ -374,14 +382,14 @@ public class CartService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = deletedCart.StatusCode,
-                    InternalErrorMessage = deletedCart.InternalErrorMessage
+                    InternalErrorMessage = deletedCart.InternalErrorMessage,
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -391,7 +399,7 @@ public class CartService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -410,7 +418,7 @@ public class CartService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
-                    InternalErrorMessage = currentCustomer.InternalErrorMessage
+                    InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
             // Remove cart items
@@ -423,14 +431,14 @@ public class CartService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = deletedCart.StatusCode,
-                    InternalErrorMessage = deletedCart.InternalErrorMessage
+                    InternalErrorMessage = deletedCart.InternalErrorMessage,
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -440,7 +448,7 @@ public class CartService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }

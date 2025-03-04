@@ -43,6 +43,8 @@ public interface IProductRepository
 
     Task<Return<ProductAttribute>> GetProductAttributeByIdAsync(Guid attributeId);
 
+    Task<Return<ProductVariant>> GetProductVariantByIdAsync(Guid productVariantId);
+
     Task<Return<ProductAttribute>> AddProductAttributeAsync(ProductAttribute productAttribute);
 
     Task<Return<bool>> BulkAddProductVariantAsync(List<ProductVariant> productVariants);

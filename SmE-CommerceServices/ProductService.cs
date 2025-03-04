@@ -1008,40 +1008,6 @@ public class ProductService(
                     StatusCode = ErrorCode.ProductNameAlreadyExists,
                 };
 
-            // Initialize the product
-            var product = new Product
-            {
-                Name = req.Name.Trim(),
-                PrimaryImage = req.PrimaryImage,
-                Description = req.Description?.Trim(),
-                Price = req.Price < 0 ? 0 : req.Price,
-                StockQuantity = req.StockQuantity,
-                SoldQuantity = 0,
-                IsTopSeller = req.IsTopSeller,
-                Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
-                MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
-                MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
-                Status =
-                    req.StockQuantity > 0
-                        ? req.Status != ProductStatus.Inactive
-                            ? ProductStatus.Active
-                            : ProductStatus.Inactive
-                        : ProductStatus.OutOfStock,
-                CreateById = currentUserId,
-                CreatedAt = DateTime.Now,
-            };
-
-            // Add Product to the database
-            var result = await productRepository.AddProductAsync(product);
-            if (!result.IsSuccess || result.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
-                };
-
             // Only add active categories
             var categoryResult = await categoryRepository.GetCategoriesAsync(
                 status: GeneralStatus.Active,
@@ -1069,45 +1035,51 @@ public class ProductService(
                     StatusCode = ErrorCode.CategoryNotFound,
                 };
 
-            result.Data.ProductCategories = categories
-                .Select(category => new ProductCategory
-                {
-                    ProductId = result.Data.ProductId,
-                    CategoryId = category.CategoryId,
-                })
-                .ToList();
+            // Initialize the product
+            var product = new Product
+            {
+                Name = req.Name.Trim(),
+                PrimaryImage = req.PrimaryImage,
+                Description = req.Description?.Trim(),
+                Price = req.Price < 0 ? 0 : req.Price,
+                StockQuantity = req.StockQuantity,
+                SoldQuantity = 0,
+                IsTopSeller = req.IsTopSeller,
+                Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
+                MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
+                MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
+                Status =
+                    req.StockQuantity > 0
+                        ? req.Status != ProductStatus.Inactive
+                            ? ProductStatus.Active
+                            : ProductStatus.Inactive
+                        : ProductStatus.OutOfStock,
+                CreateById = currentUserId,
+                CreatedAt = DateTime.Now,
+                ProductCategories = categories
+                    .Select(c => new ProductCategory { CategoryId = c.CategoryId })
+                    .ToList(),
+                ProductImages = req
+                    .Images.Select(i => new ProductImage { Url = i.Url, AltText = i.AltText })
+                    .ToList(),
+                ProductAttributes = req
+                    .Attributes.Select(a => new ProductAttribute
+                    {
+                        AttributeName = a.AttributeName,
+                        AttributeValue = a.AttributeValue,
+                    })
+                    .ToList(),
+            };
 
-            // Product Images
-            var productImages = req
-                .Images.Select(image => new ProductImage
-                {
-                    ProductId = result.Data.ProductId,
-                    Url = image.Url,
-                    AltText = image.AltText,
-                })
-                .ToList();
-            result.Data.ProductImages = productImages;
-
-            // Product Attributes
-            var productAttributes = req
-                .Attributes.Select(attribute => new ProductAttribute
-                {
-                    ProductId = result.Data.ProductId,
-                    AttributeName = attribute.AttributeName,
-                    AttributeValue = attribute.AttributeValue,
-                })
-                .ToList();
-            result.Data.ProductAttributes = productAttributes;
-
-            // Update Product with Categories, Images and Attributes
-            var productResult = await productRepository.UpdateProductAsync(result.Data);
-            if (!productResult.IsSuccess)
+            // Add Product to the database
+            var result = await productRepository.AddProductAsync(product);
+            if (!result.IsSuccess || result.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = productResult.StatusCode,
-                    InternalErrorMessage = productResult.InternalErrorMessage,
+                    StatusCode = result.StatusCode,
+                    InternalErrorMessage = result.InternalErrorMessage,
                 };
 
             transaction.Complete();
@@ -1172,6 +1144,14 @@ public class ProductService(
         }
     }
 
+    private static string GetVariantKey(IEnumerable<dynamic> values)
+    {
+        return string.Join(
+            "-",
+            values.OrderBy(v => v.VariantNameId).Select(v => v.Value ?? v.VariantValue)
+        );
+    }
+
     #endregion
 
     #region Product Variation
@@ -1209,7 +1189,10 @@ public class ProductService(
 
             if (
                 req.Any(x =>
-                    !expectedAttributes.SetEquals(x.VariantValues.Select(v => v.VariantNameId))
+                    !x
+                        .VariantValues.Select(v => v.VariantNameId)
+                        .ToHashSet()
+                        .SetEquals(expectedAttributes)
                 )
             )
                 return new Return<bool>
@@ -1218,42 +1201,18 @@ public class ProductService(
                     IsSuccess = false,
                     StatusCode = ErrorCode.BadRequest,
                 };
-            // Fetch existing variants for the product
+
+            // Check existing variants for duplicates
             var existingVariants = await productRepository.GetProductVariantsByProductIdAsync(
                 productId
             );
-
-            if (existingVariants is { IsSuccess: true, Data: not null })
+            if (existingVariants is { IsSuccess: true, Data.Count: > 0 })
             {
-                var existingVariantKeys = existingVariants
-                    .Data.Select(x =>
-                        string.Join(
-                            "-",
-                            x.VariantAttributes.OrderBy(v => v.VariantNameId).Select(v => v.Value)
-                        )
-                    )
+                var existingKeys = existingVariants
+                    .Data.Select(x => GetVariantKey(x.VariantAttributes))
                     .ToHashSet();
 
-                var joinedStrings = req.Select(x =>
-                        string.Join(
-                            "-",
-                            x.VariantValues.OrderBy(v => v.VariantNameId)
-                                .Select(v => v.VariantValue)
-                        )
-                    )
-                    .ToList();
-
-                if (
-                    req.Any(x =>
-                        existingVariantKeys.Contains(
-                            string.Join(
-                                "-",
-                                x.VariantValues.OrderBy(v => v.VariantNameId)
-                                    .Select(v => v.VariantValue)
-                            )
-                        )
-                    )
-                )
+                if (req.Any(x => existingKeys.Contains(GetVariantKey(x.VariantValues))))
                     return new Return<bool>
                     {
                         Data = false,
@@ -1262,17 +1221,9 @@ public class ProductService(
                     };
             }
 
-            // Ensure no duplicate variants
-            var uniqueVariants = new HashSet<string>();
-            if (
-                req.Select(x =>
-                        string.Join(
-                            "-",
-                            x.VariantValues.Select(v => v.VariantValue).OrderBy(v => v)
-                        )
-                    )
-                    .Any(variantKey => !uniqueVariants.Add(variantKey))
-            )
+            // Check for duplicate variants in request
+            var uniqueKeys = new HashSet<string>();
+            if (req.Any(x => !uniqueKeys.Add(GetVariantKey(x.VariantValues))))
                 return new Return<bool>
                 {
                     Data = false,
@@ -1280,7 +1231,7 @@ public class ProductService(
                     StatusCode = ErrorCode.BadRequest,
                 };
 
-            // Ensure all variantNames exist
+            // Validate variant names and product in one go
             var variantNameIds = req.SelectMany(x => x.VariantValues.Select(v => v.VariantNameId))
                 .Distinct()
                 .ToList();
@@ -1296,24 +1247,27 @@ public class ProductService(
                     StatusCode = ErrorCode.VariantNameNotFound,
                 };
 
-            // Fetch and validate products
-            var product = await productRepository.GetProductByIdAsync(productId);
+            var productResult = await productRepository.GetProductByIdAsync(productId);
 
-            if (!product.IsSuccess || product.Data == null)
+            if (!productResult.IsSuccess || productResult.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = product.InternalErrorMessage,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
                 };
-
-            if (product.Data.Status == ProductStatus.Deleted)
+            if (
+                !productResult.IsSuccess
+                || productResult.Data == null
+                || productResult.Data.Status == ProductStatus.Deleted
+            )
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
                 };
 
             // Map product variants
