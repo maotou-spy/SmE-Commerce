@@ -58,7 +58,7 @@ public class ProductVariant
     [InverseProperty("ProductVariantModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
 
-    [InverseProperty("Variant")]
+    [InverseProperty("ProductVariant")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     [ForeignKey("ProductId")]

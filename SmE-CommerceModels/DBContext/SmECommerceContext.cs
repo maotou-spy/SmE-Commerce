@@ -175,6 +175,7 @@ public partial class SmECommerceContext : DbContext
             entity
                 .HasOne(d => d.Product)
                 .WithMany(p => p.CartItems)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_CartItem_Product");
 
             entity
@@ -405,9 +406,14 @@ public partial class SmECommerceContext : DbContext
                 .HasConstraintName("fk_orderitemorder");
 
             entity
-                .HasOne(d => d.Variant)
+                .HasOne(d => d.Product)
                 .WithMany(p => p.OrderItems)
                 .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_orderitemproduct");
+
+            entity
+                .HasOne(d => d.ProductVariant)
+                .WithMany(p => p.OrderItems)
                 .HasConstraintName("OrderItems_variantId_fkey");
         });
 
@@ -475,15 +481,14 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.ProductId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.HasVariant).HasDefaultValue(false);
             entity.Property(e => e.IsTopSeller).HasDefaultValue(false);
-            entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
-            entity.Property(e => e.StockQuantity).HasDefaultValue(0);
-            entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-
             entity
                 .Property(e => e.ProductCode)
                 .HasDefaultValueSql(
                     "concat('SP', lpad((nextval('product_code_seq'::regclass))::text, 6, '0'::text))"
                 );
+            entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
+            entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
+            entity.Property(e => e.StockQuantity).HasDefaultValue(0);
 
             entity
                 .HasOne(d => d.CreateBy)

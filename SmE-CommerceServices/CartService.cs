@@ -56,25 +56,26 @@ public class CartService(
 
             // Map cart items to response DTO
             var cartItemsRes = cartItems
-                .Data.Where(_ => true)
-                .Select(cartItem =>
+                .Data.Select(cartItem =>
                 {
-                    var isPriceUpdated = cartItem.Price != cartItem.ProductVariant.Product.Price;
+                    var isPriceUpdated =
+                        cartItem.ProductVariant != null
+                        && cartItem.Price != cartItem.ProductVariant.Product.Price;
 
                     return new GetCartResDto
                     {
                         CartItemId = cartItem.CartItemId,
                         ProductId = cartItem.ProductId,
                         ProductVariantId = cartItem.ProductVariantId,
-                        ProductName = cartItem.ProductVariant.Product.Name,
-                        ImageUrl = cartItem.ProductVariant.Product.PrimaryImage,
-                        ProductSlug = cartItem.ProductVariant.Product.Slug,
+                        ProductName = cartItem.ProductVariant?.Product.Name ?? "",
+                        ImageUrl = cartItem.ProductVariant?.Product.PrimaryImage ?? "",
+                        ProductSlug = cartItem.ProductVariant?.Product.Slug ?? "",
                         Quantity =
-                            cartItem.ProductVariant.Product.Status == ProductStatus.Active
+                            cartItem.ProductVariant?.Product.Status == ProductStatus.Active
                                 ? cartItem.Quantity
                                 : 0,
-                        StockQuantity = cartItem.ProductVariant.Product.StockQuantity,
-                        Price = cartItem.ProductVariant.Product.Price,
+                        StockQuantity = cartItem.ProductVariant?.Product.StockQuantity ?? 0,
+                        Price = cartItem.ProductVariant?.Product.Price,
                         IsPriceUpdated = isPriceUpdated,
                         ProductStatus = cartItem.ProductVariant.Product.Status,
                     };
@@ -163,8 +164,8 @@ public class CartService(
             // Check if the cart item already exists
             // * If exists, update the quantity
             // => Update existing cart item
-            var existingCartItem = await cartRepository.GetCartItemByProductVariantIdAndUserIdAsync(
-                cartItem.ProductVariantId,
+            var existingCartItem = await cartRepository.GetCartItemByProductIdAndUserIdAsync(
+                cartItem.ProductId,
                 currentCustomer.Data.UserId
             );
 
@@ -207,6 +208,7 @@ public class CartService(
             var newCartItem = new CartItem
             {
                 ProductVariantId = cartItem.ProductVariantId,
+                ProductId = cartItem.ProductId,
                 UserId = currentCustomer.Data.UserId,
                 Quantity = cartItem.Quantity,
                 Price = existingProductVariant.Data.Price,
@@ -281,10 +283,20 @@ public class CartService(
                     StatusCode = ErrorCode.CartNotFound,
                 };
 
+            // Validate updated quantity
+            if (updatedQuantity <= 0)
+                return new Return<int?>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+
             // Check if the product exists and is active
-            var existingProduct = await productRepository.GetProductByProductVariantIdAsync(
-                existingCartItem.Data.ProductVariantId
+            var existingProduct = await productRepository.GetProductByIdAsync(
+                existingCartItem.Data.ProductId
             );
+
             if (
                 !existingProduct.IsSuccess
                 || existingProduct.Data is not { Status: ProductStatus.Active }

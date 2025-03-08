@@ -13,9 +13,6 @@ public class CartItem
     [Column("userId")]
     public Guid UserId { get; set; }
 
-    [Column("productId")]
-    public Guid ProductId { get; set; }
-
     [Column("productVariantId")]
     public Guid? ProductVariantId { get; set; }
 
@@ -29,9 +26,12 @@ public class CartItem
     [Precision(15, 0)]
     public decimal Price { get; set; }
 
+    [Column("productId")]
+    public Guid ProductId { get; set; }
+
     [ForeignKey("ProductId")]
     [InverseProperty("CartItems")]
-    public virtual Product? Product { get; set; }
+    public virtual Product Product { get; set; } = null!;
 
     [ForeignKey("ProductVariantId")]
     [InverseProperty("CartItems")]

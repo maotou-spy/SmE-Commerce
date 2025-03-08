@@ -20,8 +20,8 @@ public class OrderItem
     [Precision(15, 0)]
     public decimal Price { get; set; }
 
-    [Column("variantId")]
-    public Guid VariantId { get; set; }
+    [Column("productVariantId")]
+    public Guid? ProductVariantId { get; set; }
 
     [Column("productName")]
     [StringLength(100)]
@@ -31,11 +31,18 @@ public class OrderItem
     [StringLength(100)]
     public string? VariantName { get; set; }
 
+    [Column("productId")]
+    public Guid ProductId { get; set; }
+
     [ForeignKey("OrderId")]
     [InverseProperty("OrderItems")]
     public virtual Order Order { get; set; } = null!;
 
-    [ForeignKey("VariantId")]
+    [ForeignKey("ProductId")]
     [InverseProperty("OrderItems")]
-    public virtual ProductVariant Variant { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
+
+    [ForeignKey("ProductVariantId")]
+    [InverseProperty("OrderItems")]
+    public virtual ProductVariant? ProductVariant { get; set; }
 }

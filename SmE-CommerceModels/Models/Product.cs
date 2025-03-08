@@ -25,7 +25,7 @@ public class Product
 
     [Column("price")]
     [Precision(15, 0)]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
 
     [Column("stockQuantity")]
     public int StockQuantity { get; set; }
@@ -94,6 +94,9 @@ public class Product
     [ForeignKey("ModifiedById")]
     [InverseProperty("ProductModifiedBies")]
     public virtual User? ModifiedBy { get; set; }
+
+    [InverseProperty("Product")]
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     [InverseProperty("Product")]
     public virtual ICollection<ProductAttribute> ProductAttributes { get; set; } =

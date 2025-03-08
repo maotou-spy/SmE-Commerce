@@ -37,15 +37,15 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
         }
     }
 
-    public async Task<Return<CartItem>> GetCartItemByProductVariantIdAndUserIdAsync(
-        Guid productVariantId,
+    public async Task<Return<CartItem>> GetCartItemByProductIdAndUserIdAsync(
+        Guid productId,
         Guid userId
     )
     {
         try
         {
             var cart = await defaultdbContext.CartItems.SingleOrDefaultAsync(x =>
-                x.ProductVariantId == productVariantId && x.UserId == userId
+                x.ProductId == productId && x.UserId == userId
             );
 
             return new Return<CartItem>
