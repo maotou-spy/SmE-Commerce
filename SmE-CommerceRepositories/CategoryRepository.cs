@@ -22,7 +22,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -43,27 +43,25 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
     {
         try
         {
-            var result = await dbContext.Categories
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .Categories.Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Name == name);
 
             if (result == null)
-            {
                 return new Return<Category>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CategoryNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             return new Return<Category>
             {
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -75,12 +73,17 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
 
-    public async Task<Return<IEnumerable<Category>>> GetCategoriesAsync(string? name, string? status, int? pageNumber, int? pageSize)
+    public async Task<Return<IEnumerable<Category>>> GetCategoriesAsync(
+        string? name,
+        string? status,
+        int? pageNumber,
+        int? pageSize
+    )
     {
         try
         {
@@ -89,21 +92,15 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             query = query.Where(x => x.Status != GeneralStatus.Deleted);
 
             if (!string.IsNullOrEmpty(status))
-            {
                 query = query.Where(x => x.Status.Equals(status));
-            }
 
             if (!string.IsNullOrEmpty(name))
-            {
                 query = query.Where(x => x.Name.Contains(name));
-            }
 
             var totalRecords = await query.CountAsync();
 
             if (pageNumber.HasValue && pageSize.HasValue)
-            {
                 query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
-            }
 
             var result = await query.ToListAsync();
 
@@ -112,7 +109,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords
+                TotalRecord = totalRecords,
             };
         }
         catch (Exception ex)
@@ -124,7 +121,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -134,23 +131,21 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
         try
         {
             var result = await dbContext.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
-            if(result == null)
-            {
+            if (result == null)
                 return new Return<Category>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CategoryNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             return new Return<Category>
             {
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -162,11 +157,11 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
-    
+
     public async Task<Return<Category>> GetCategoryByIdForUpdateAsync(Guid categoryId)
     {
         try
@@ -176,7 +171,6 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 .FirstOrDefaultAsync(x => x.CategoryId == categoryId);
 
             if (category is null)
-            {
                 return new Return<Category>
                 {
                     Data = null,
@@ -184,7 +178,6 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                     StatusCode = ErrorCode.CategoryNotFound,
                     TotalRecord = 0,
                 };
-            }
 
             await dbContext.Database.ExecuteSqlRawAsync(
                 "SELECT * FROM public.\"Categories\" WHERE public.\"Categories\".\"categoryId\" = {0} FOR UPDATE",
@@ -212,7 +205,6 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
         }
     }
 
-
     public async Task<Return<Category>> UpdateCategoryAsync(Category category)
     {
         try
@@ -225,7 +217,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = category,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -236,7 +228,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -245,8 +237,8 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
     {
         try
         {
-            var result = await dbContext.Categories
-                .Include(x => x.ProductCategories)
+            var result = await dbContext
+                .Categories.Include(x => x.ProductCategories)
                 .ThenInclude(y => y.Product)
                 .Where(x => x.CategoryId == id)
                 .ToListAsync();
@@ -256,7 +248,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = result.Count
+                TotalRecord = result.Count,
             };
         }
         catch (Exception ex)
@@ -267,7 +259,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }

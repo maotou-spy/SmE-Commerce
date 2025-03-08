@@ -18,7 +18,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
         {
             var settings = await settingRepository.GetSettingsAsync();
             if (settings.IsSuccess == false)
-                return new Return<List<SettingResDto>>()
+                return new Return<List<SettingResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -26,10 +26,10 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     InternalErrorMessage = settings.InternalErrorMessage,
                 };
 
-            return new Return<List<SettingResDto>>()
+            return new Return<List<SettingResDto>>
             {
                 Data = settings
-                    .Data?.Select(x => new SettingResDto()
+                    .Data?.Select(x => new SettingResDto
                     {
                         SettingId = x.SettingId,
                         Key = x.Key,
@@ -45,7 +45,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
         }
         catch (Exception ex)
         {
-            return new Return<List<SettingResDto>>()
+            return new Return<List<SettingResDto>>
             {
                 Data = null,
                 IsSuccess = false,
@@ -61,7 +61,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
         {
             var setting = await settingRepository.GetSettingByKeyAsync(key);
             if (setting.IsSuccess == false)
-                return new Return<SettingResDto>()
+                return new Return<SettingResDto>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -70,16 +70,16 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 };
 
             if (setting.Data == null)
-                return new Return<SettingResDto>()
+                return new Return<SettingResDto>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.SettingNotFound,
                 };
 
-            return new Return<SettingResDto>()
+            return new Return<SettingResDto>
             {
-                Data = new SettingResDto()
+                Data = new SettingResDto
                 {
                     SettingId = setting.Data.SettingId,
                     Key = setting.Data.Key,
@@ -94,7 +94,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
         }
         catch (Exception ex)
         {
-            return new Return<SettingResDto>()
+            return new Return<SettingResDto>
             {
                 Data = null,
                 IsSuccess = false,
@@ -124,7 +124,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 settings.Select(x => x.SettingId).ToList()
             );
             if (existedSettings.IsSuccess == false)
-                return new Return<List<ManagerSettingResDto>>()
+                return new Return<List<ManagerSettingResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -133,7 +133,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 };
 
             if (existedSettings.Data?.Count == 0)
-                return new Return<List<ManagerSettingResDto>>()
+                return new Return<List<ManagerSettingResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -171,7 +171,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
 
             var settingResult = await settingRepository.UpdateSettingAsync(settingList!);
             if (settingResult.IsSuccess == false)
-                return new Return<List<ManagerSettingResDto>>()
+                return new Return<List<ManagerSettingResDto>>
                 {
                     Data = null,
                     IsSuccess = false,
@@ -179,16 +179,16 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     InternalErrorMessage = settingResult.InternalErrorMessage,
                 };
 
-            return new Return<List<ManagerSettingResDto>>()
+            return new Return<List<ManagerSettingResDto>>
             {
                 Data = settingResult
-                    .Data?.Select(x => new ManagerSettingResDto()
+                    .Data?.Select(x => new ManagerSettingResDto
                     {
                         SettingId = x.SettingId,
                         Key = x.Key,
                         Value = x.Value,
                         Description = x.Description,
-                        AuditMetadata = new AuditMetadata()
+                        AuditMetadata = new AuditMetadata
                         {
                             ModifiedById = x.ModifiedById,
                             ModifiedBy = x.ModifiedBy?.FullName,
@@ -204,7 +204,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
         }
         catch (Exception ex)
         {
-            return new Return<List<ManagerSettingResDto>>()
+            return new Return<List<ManagerSettingResDto>>
             {
                 Data = null,
                 IsSuccess = false,

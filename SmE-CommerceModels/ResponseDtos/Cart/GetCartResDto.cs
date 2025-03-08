@@ -4,7 +4,9 @@ public class GetCartResDto
 {
     public Guid CartItemId { get; set; }
 
-    public Guid ProductVariantId { get; set; }
+    public Guid ProductId { get; set; }
+
+    public Guid? ProductVariantId { get; set; }
 
     public string? ImageUrl { get; set; }
 

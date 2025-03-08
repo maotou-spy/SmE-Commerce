@@ -61,7 +61,6 @@ public class Product
     public string MetaTitle { get; set; } = null!;
 
     [Column("metaDescription")]
-    [StringLength(300)]
     public string? MetaDescription { get; set; }
 
     [Column("isTopSeller")]
@@ -72,7 +71,13 @@ public class Product
     public string PrimaryImage { get; set; } = null!;
 
     [Column("hasVariant")]
-    public bool HasVariant { get; set; } = false;
+    public bool HasVariant { get; set; }
+
+    [Column("averageRating")]
+    public decimal? AverageRating { get; set; }
+
+    [InverseProperty("Product")]
+    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     [InverseProperty("Product")]
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } =

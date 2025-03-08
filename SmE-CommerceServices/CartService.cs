@@ -64,6 +64,7 @@ public class CartService(
                     return new GetCartResDto
                     {
                         CartItemId = cartItem.CartItemId,
+                        ProductId = cartItem.ProductId,
                         ProductVariantId = cartItem.ProductVariantId,
                         ProductName = cartItem.ProductVariant.Product.Name,
                         ImageUrl = cartItem.ProductVariant.Product.PrimaryImage,

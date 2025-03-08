@@ -12,7 +12,7 @@ public class CreateOrderReqDto
     public string? Note { get; set; }
 
     public bool IsUsingPoint { get; set; } = false;
-    
+
     [Required]
     public required Guid PaymentMethodId { get; set; }
 

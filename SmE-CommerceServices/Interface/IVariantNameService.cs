@@ -1,5 +1,4 @@
-﻿using SmE_CommerceModels.Models;
-using SmE_CommerceModels.RequestDtos.VariantName;
+﻿using SmE_CommerceModels.RequestDtos.VariantName;
 using SmE_CommerceModels.ResponseDtos.VariantName;
 using SmE_CommerceModels.ReturnResult;
 

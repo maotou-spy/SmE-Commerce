@@ -13,8 +13,8 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
     {
         try
         {
-            var result = await defaultdbContext.Addresses
-                .Where(x => x.UserId == userId && x.Status != GeneralStatus.Deleted)
+            var result = await defaultdbContext
+                .Addresses.Where(x => x.UserId == userId && x.Status != GeneralStatus.Deleted)
                 .ToListAsync();
 
             return new Return<IEnumerable<Address>>
@@ -22,7 +22,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 Data = result,
                 StatusCode = result.Count > 0 ? ErrorCode.Ok : ErrorCode.AddressNotFound,
                 IsSuccess = true,
-                TotalRecord = result.Count
+                TotalRecord = result.Count,
             };
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -43,15 +43,15 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
     {
         try
         {
-            var result = await defaultdbContext.Addresses
-                .Where(x => x.AddressId == addressId && x.Status != GeneralStatus.Deleted)
+            var result = await defaultdbContext
+                .Addresses.Where(x => x.AddressId == addressId && x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync();
 
             return new Return<Address>
             {
                 Data = result,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.AddressNotFound,
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -78,7 +78,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 StatusCode = ErrorCode.Ok,
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -105,7 +105,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = address,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -116,7 +116,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -125,19 +125,17 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
     {
         try
         {
-            var address = await defaultdbContext.Addresses
-                .Where(x => x.AddressId == addressId)
+            var address = await defaultdbContext
+                .Addresses.Where(x => x.AddressId == addressId)
                 .FirstOrDefaultAsync();
 
             if (address == null)
-            {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AddressNotFound
+                    StatusCode = ErrorCode.AddressNotFound,
                 };
-            }
 
             address.Status = GeneralStatus.Deleted;
             defaultdbContext.Addresses.Update(address);
@@ -147,7 +145,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -158,7 +156,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -167,8 +165,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
     {
         try
         {
-            var addresses = await defaultdbContext.Addresses
-                .ToListAsync();
+            var addresses = await defaultdbContext.Addresses.ToListAsync();
 
             foreach (var address in addresses)
             {
@@ -182,7 +179,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -193,7 +190,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -202,25 +199,25 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
     {
         try
         {
-            var address = await defaultdbContext.Addresses
-                .Where(x => x.UserId == userId && x.IsDefault == true && x.Status != GeneralStatus.Deleted)
+            var address = await defaultdbContext
+                .Addresses.Where(x =>
+                    x.UserId == userId && x.IsDefault == true && x.Status != GeneralStatus.Deleted
+                )
                 .FirstOrDefaultAsync();
 
             if (address == null)
-            {
                 return new Return<Address>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AddressNotFound
+                    StatusCode = ErrorCode.AddressNotFound,
                 };
-            }
 
             return new Return<Address>
             {
                 Data = address,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -231,7 +228,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }

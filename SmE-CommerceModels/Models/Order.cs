@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace SmE_CommerceModels.Models;
 
 [Index("OrderCode", Name = "Orders_orderCode_key", IsUnique = true)]
+[Index("CreatedAt", Name = "idx_orders_createdat", AllDescending = true)]
 [Index("Status", Name = "idx_orders_status")]
 [Index("UserId", Name = "idx_orders_userid")]
 public class Order
@@ -31,9 +32,6 @@ public class Order
 
     [Column("pointsEarned")]
     public int PointsEarned { get; set; }
-
-    [Column("pointsUsed")]
-    public int PointsUsed { get; set; } = 0;
 
     /// <summary>
     ///     Values: pending, processing, completed, cancelled, rejected, returned
@@ -86,6 +84,9 @@ public class Order
     [Column("returnReason")]
     [StringLength(200)]
     public string? ReturnReason { get; set; }
+
+    [Column("pointsUsed")]
+    public int PointsUsed { get; set; }
 
     [ForeignKey("AddressId")]
     [InverseProperty("Orders")]

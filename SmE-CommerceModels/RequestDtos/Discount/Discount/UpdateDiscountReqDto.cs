@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SmE_CommerceModels.Enums;
 
 namespace SmE_CommerceModels.RequestDtos.Discount;
 

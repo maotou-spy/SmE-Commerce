@@ -4,7 +4,6 @@ using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Order;
-using SmE_CommerceModels.RequestDtos.Payment;
 using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceAPI.Controllers;
@@ -13,7 +12,8 @@ namespace SmE_CommerceAPI.Controllers;
 [ApiController]
 [Route("api/v{version:apiVersion}/orders")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
-public class OrderController(IOrderService orderService, ILogger<AuthController> logger) : ControllerBase
+public class OrderController(IOrderService orderService, ILogger<AuthController> logger)
+    : ControllerBase
 {
     [HttpPost]
     [OpenApiOperation("Create Order", "Create Order")]

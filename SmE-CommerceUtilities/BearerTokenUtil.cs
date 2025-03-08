@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SmE_CommerceUtilities;
 
@@ -17,13 +16,14 @@ public class BearerTokenUtil(IConfiguration configuration)
         // Create claims list
         List<Claim> claims =
         [
-            new Claim(ClaimTypes.Sid, userId.ToString()),
-            new Claim(ClaimTypes.Role, encryptedRole),
+            new(ClaimTypes.Sid, userId.ToString()),
+            new(ClaimTypes.Role, encryptedRole),
         ];
 
         // Get security key from configuration
-        var securityKey = configuration.GetSection("AppSettings:Token").Value
-                          ?? throw new Exception("SERVER_ERROR: Token key is missing");
+        var securityKey =
+            configuration.GetSection("AppSettings:Token").Value
+            ?? throw new Exception("SERVER_ERROR: Token key is missing");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(securityKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -33,9 +33,12 @@ public class BearerTokenUtil(IConfiguration configuration)
         {
             Subject = new ClaimsIdentity(claims),
             Expires = TimeZoneInfo
-                .ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"))
+                .ConvertTime(
+                    DateTime.Now,
+                    TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
+                )
                 .AddDays(7),
-            SigningCredentials = creds
+            SigningCredentials = creds,
         };
 
         // Create the token
@@ -43,7 +46,8 @@ public class BearerTokenUtil(IConfiguration configuration)
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         // Return the written token
-        return tokenHandler.WriteToken(token) ?? throw new Exception("SERVER_ERROR: Token generation failed");
+        return tokenHandler.WriteToken(token)
+            ?? throw new Exception("SERVER_ERROR: Token generation failed");
     }
 
     // private string Encrypt(string plainText)

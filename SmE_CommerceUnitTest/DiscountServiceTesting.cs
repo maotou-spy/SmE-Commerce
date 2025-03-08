@@ -12,9 +12,9 @@ namespace SmE_CommerceUnitTest;
 public class DiscountServiceTesting
 {
     private readonly Mock<IDiscountRepository> _discountRepositoryMock;
+    private readonly DiscountService _discountService;
     private readonly Mock<IHelperService> _helperServiceMock;
     private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly DiscountService _discountService;
 
     public DiscountServiceTesting()
     {
@@ -42,65 +42,69 @@ public class DiscountServiceTesting
             DiscountId = discountId,
             DiscountName = "Discount 1",
             DiscountValue = 10,
-            IsPercentage = true
+            IsPercentage = true,
         };
-        var discountReq = new UpdateDiscountReqDto
-        {
-            DiscountName = "Discount 1"
-        };
+        var discountReq = new UpdateDiscountReqDto { DiscountName = "Discount 1" };
 
-        _helperServiceMock.Setup(x => x.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager))).ReturnsAsync(
-            new Return<User>
-            {
-                Data = new User
+        _helperServiceMock
+            .Setup(x => x.GetCurrentUserWithRoleAsync(nameof(RoleEnum.Manager)))
+            .ReturnsAsync(
+                new Return<User>
                 {
-                    UserId = Guid.NewGuid(),
-                    Role = RoleEnum.Manager
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
-            });
+                    Data = new User { UserId = Guid.NewGuid(), Role = RoleEnum.Manager },
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 1,
+                }
+            );
 
-        _discountRepositoryMock.Setup(x => x.GetDiscountByIdForUpdateAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Return<Discount>
-            {
-                Data = discount,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
-            });
-
-        _discountRepositoryMock.Setup(x => x.GetDiscountByNameAsync(It.IsAny<string>())).ReturnsAsync(
-            new Return<Discount>
-            {
-                Data = null,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 0
-            });
-
-        _productRepositoryMock.Setup(x => x.GetProductByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Return<Product>
-            {
-                Data = new Product
+        _discountRepositoryMock
+            .Setup(x => x.GetDiscountByIdForUpdateAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(
+                new Return<Discount>
                 {
-                    ProductId = Guid.NewGuid(),
-                    PrimaryImage = "image.jpg"
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
-            });
+                    Data = discount,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 1,
+                }
+            );
 
-        _discountRepositoryMock.Setup(x => x.UpdateDiscountAsync(It.IsAny<Discount>())).ReturnsAsync(
-            new Return<Discount>
-            {
-                Data = discount,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
-            });
+        _discountRepositoryMock
+            .Setup(x => x.GetDiscountByNameAsync(It.IsAny<string>()))
+            .ReturnsAsync(
+                new Return<Discount>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 0,
+                }
+            );
+
+        _productRepositoryMock
+            .Setup(x => x.GetProductByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(
+                new Return<Product>
+                {
+                    Data = new Product { ProductId = Guid.NewGuid(), PrimaryImage = "image.jpg" },
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 1,
+                }
+            );
+
+        _discountRepositoryMock
+            .Setup(x => x.UpdateDiscountAsync(It.IsAny<Discount>()))
+            .ReturnsAsync(
+                new Return<Discount>
+                {
+                    Data = discount,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 1,
+                }
+            );
 
         // Act
         var task1 = _discountService.UpdateDiscountAsync(discountId, discountReq);

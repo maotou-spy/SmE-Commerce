@@ -7,7 +7,7 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class PaymentRepository (SmECommerceContext dbContext) : IPaymentRepository
+public class PaymentRepository(SmECommerceContext dbContext) : IPaymentRepository
 {
     #region Payment
 
@@ -17,12 +17,12 @@ public class PaymentRepository (SmECommerceContext dbContext) : IPaymentReposito
         {
             await dbContext.Payments.AddAsync(payment);
             await dbContext.SaveChangesAsync();
-            
+
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception e)
@@ -32,35 +32,35 @@ public class PaymentRepository (SmECommerceContext dbContext) : IPaymentReposito
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
 
     #endregion
-    
+
     #region Payment Method
-    
+
     public async Task<Return<PaymentMethod>> GetPaymentMethodByIdAsync(Guid paymentMethodId)
     {
         try
         {
-            var paymentMethod = await dbContext.PaymentMethods.FirstOrDefaultAsync(x => x.PaymentMethodId == paymentMethodId);
+            var paymentMethod = await dbContext.PaymentMethods.FirstOrDefaultAsync(x =>
+                x.PaymentMethodId == paymentMethodId
+            );
             if (paymentMethod == null)
-            {
                 return new Return<PaymentMethod>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.PaymentMethodNotFound
+                    StatusCode = ErrorCode.PaymentMethodNotFound,
                 };
-            }
 
             return new Return<PaymentMethod>
             {
                 Data = paymentMethod,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception e)
@@ -70,12 +70,10 @@ public class PaymentRepository (SmECommerceContext dbContext) : IPaymentReposito
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
-    
-    
-    
+
     #endregion
 }

@@ -7,7 +7,7 @@ using SmE_CommerceRepositories.Interface;
 
 namespace SmE_CommerceRepositories;
 
-public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepository
+public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoRepository
 {
     public async Task<Return<bool>> AddBankInfoByManagerAsync(BankInfo bankInfo)
     {
@@ -21,7 +21,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 IsSuccess = true,
                 Data = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -31,7 +31,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 IsSuccess = false,
                 Data = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -40,16 +40,16 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
     {
         try
         {
-            var result = await dbContext.BankInfos
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .BankInfos.Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.BankCode == code);
-            
+
             return new Return<BankInfo>
             {
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -59,7 +59,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -68,16 +68,16 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
     {
         try
         {
-            var result = await dbContext.BankInfos
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .BankInfos.Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.BankName == name);
-            
+
             return new Return<BankInfo>
             {
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -87,7 +87,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -96,16 +96,16 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
     {
         try
         {
-            var result = await dbContext.BankInfos
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .BankInfos.Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.AccountNumber == accountNumber);
-            
+
             return new Return<BankInfo>
             {
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -115,7 +115,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -124,15 +124,15 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
     {
         try
         {
-            var result = await dbContext.BankInfos
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .BankInfos.Where(x => x.Status != GeneralStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.BankInfoId == id);
-            
+
             return new Return<BankInfo>
             {
                 Data = result,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception e)
@@ -142,7 +142,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -151,16 +151,16 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
     {
         try
         {
-            var result = await dbContext.BankInfos
-                .Where(x => x.Status != GeneralStatus.Deleted)
+            var result = await dbContext
+                .BankInfos.Where(x => x.Status != GeneralStatus.Deleted)
                 .ToListAsync();
-            
+
             return new Return<IEnumerable<BankInfo>>
             {
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = result.Count
+                TotalRecord = result.Count,
             };
         }
         catch (Exception e)
@@ -170,7 +170,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -181,12 +181,12 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
         {
             dbContext.BankInfos.Update(bankInfo);
             await dbContext.SaveChangesAsync();
-            
+
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception e)
@@ -196,7 +196,7 @@ public class BankInforRepository (SmECommerceContext dbContext) : IBankInfoRepos
                 Data = false,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }

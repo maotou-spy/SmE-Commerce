@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.ReturnResult;
 
@@ -9,7 +8,7 @@ namespace SmE_CommerceAPI.HelperClass;
 public static class Helper
 {
     /// <summary>
-    /// Return error response with status code.
+    ///     Return error response with status code.
     /// </summary>
     public static IActionResult GetErrorResponse(string statusCode)
     {
@@ -21,7 +20,7 @@ public static class Helper
     }
 
     /// <summary>
-    /// Map status code to HTTP status code.
+    ///     Map status code to HTTP status code.
     /// </summary>
     private static HttpStatusCode GetHttpStatusCode(string statusCode)
     {

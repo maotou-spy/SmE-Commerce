@@ -1,5 +1,4 @@
-﻿using SmE_CommerceModels.Models;
-using SmE_CommerceModels.RequestDtos.Setting;
+﻿using SmE_CommerceModels.RequestDtos.Setting;
 using SmE_CommerceModels.ResponseDtos.setting;
 using SmE_CommerceModels.ResponseDtos.setting.Manager;
 using SmE_CommerceModels.ReturnResult;

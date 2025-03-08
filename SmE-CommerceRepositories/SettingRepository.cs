@@ -14,7 +14,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         try
         {
             var settings = await defaultdbContext.Settings.ToListAsync();
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = settings,
                 IsSuccess = true,
@@ -24,7 +24,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         }
         catch (Exception ex)
         {
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = null,
                 IsSuccess = false,
@@ -41,7 +41,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
             var settings = await defaultdbContext
                 .Settings.Where(x => settingIds.Contains(x.SettingId))
                 .ToListAsync();
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = settings,
                 IsSuccess = true,
@@ -51,7 +51,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         }
         catch (Exception ex)
         {
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = null,
                 IsSuccess = false,
@@ -66,7 +66,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         try
         {
             var setting = await defaultdbContext.Settings.FirstOrDefaultAsync(x => x.Key == key);
-            return new Return<Setting>()
+            return new Return<Setting>
             {
                 Data = setting,
                 IsSuccess = true,
@@ -75,7 +75,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         }
         catch (Exception ex)
         {
-            return new Return<Setting>()
+            return new Return<Setting>
             {
                 Data = null,
                 IsSuccess = false,
@@ -91,7 +91,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         {
             defaultdbContext.Settings.UpdateRange(settings);
             await defaultdbContext.SaveChangesAsync();
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = settings,
                 IsSuccess = true,
@@ -100,7 +100,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
         }
         catch (Exception ex)
         {
-            return new Return<List<Setting>>()
+            return new Return<List<Setting>>
             {
                 Data = null,
                 IsSuccess = false,

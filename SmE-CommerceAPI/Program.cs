@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using SmE_CommerceModels.DBContext;
@@ -29,10 +30,7 @@ builder
     })
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
-            .Json
-            .ReferenceLoopHandling
-            .Ignore;
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
     });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -106,7 +104,7 @@ builder.Services.AddScoped<SmECommerceContext>();
 #region Firebase Service
 
 var defaultApp = FirebaseApp.Create(
-    new AppOptions() { Credential = GoogleCredential.FromFile("serviceAccountKey.json") }
+    new AppOptions { Credential = GoogleCredential.FromFile("serviceAccountKey.json") }
 );
 Console.WriteLine(defaultApp.Name);
 
@@ -223,7 +221,7 @@ if (app.Environment.IsDevelopment())
     app.UseOpenApi();
     app.UseSwaggerUi(settings =>
     {
-        settings.Path = $"/swagger";
+        settings.Path = "/swagger";
         settings.DocExpansion = "list"; // none, list or full
     });
 }

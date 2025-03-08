@@ -14,13 +14,16 @@ public static class HashUtil
         var salt = new byte[SaltSize];
         Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
-        using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
+        using var pbkdf2 = new Rfc2898DeriveBytes(
+            password,
+            salt,
+            Iterations,
+            HashAlgorithmName.SHA256
+        );
         var hash = pbkdf2.GetBytes(HashSize);
         for (var i = 0; i < HashSize; i++)
-        {
             if (hashBytes[i + SaltSize] != hash[i])
                 return false;
-        }
 
         return true;
     }
@@ -34,7 +37,14 @@ public static class HashUtil
         }
 
         byte[] hash;
-        using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
+        using (
+            var pbkdf2 = new Rfc2898DeriveBytes(
+                password,
+                salt,
+                Iterations,
+                HashAlgorithmName.SHA256
+            )
+        )
         {
             hash = pbkdf2.GetBytes(HashSize);
         }

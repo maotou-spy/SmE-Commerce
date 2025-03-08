@@ -1,5 +1,4 @@
-﻿using FirebaseAdmin;
-using FirebaseAdmin.Auth;
+﻿using FirebaseAdmin.Auth;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;

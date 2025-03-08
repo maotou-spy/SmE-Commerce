@@ -24,7 +24,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -36,7 +36,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -45,23 +45,23 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
     {
         try
         {
-            var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountName == name);
+            var discount = await dbContext.Discounts.FirstOrDefaultAsync(x =>
+                x.DiscountName == name
+            );
             if (discount == null)
-            {
                 return new Return<Discount>
                 {
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
             return new Return<Discount>
             {
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -72,31 +72,29 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
-    
+
     // GetDiscountByIdForUpdateAsync to using FOR UPDATE
     public async Task<Return<Discount>> GetDiscountByIdForUpdateAsync(Guid id)
     {
         try
         {
-            var discount = await dbContext.Discounts
-                .Include(x => x.DiscountProducts)
-                .ThenInclude(x => x.Product)   
+            var discount = await dbContext
+                .Discounts.Include(x => x.DiscountProducts)
+                .ThenInclude(x => x.Product)
                 .FirstOrDefaultAsync(x => x.DiscountId == id);
 
             if (discount == null)
-            {
                 return new Return<Discount>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             await dbContext.Database.ExecuteSqlRawAsync(
                 "SELECT * FROM public.\"Discounts\" WHERE \"discountId\" = {0} FOR UPDATE",
@@ -108,7 +106,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -119,7 +117,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -136,7 +134,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -146,7 +144,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -157,22 +155,20 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         {
             var discount = await dbContext.Discounts.FirstOrDefaultAsync(x => x.DiscountId == id);
             if (discount == null)
-            {
                 return new Return<Discount>
                 {
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             return new Return<Discount>
             {
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -183,12 +179,16 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
 
-    public async Task<Return<IEnumerable<Discount>>> GetDiscountsAsync(string? name, int? pageNumber, int? pageSize)
+    public async Task<Return<IEnumerable<Discount>>> GetDiscountsAsync(
+        string? name,
+        int? pageNumber,
+        int? pageSize
+    )
     {
         try
         {
@@ -197,16 +197,12 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
             query = query.Where(x => x.Status != GeneralStatus.Deleted);
 
             if (!string.IsNullOrEmpty(name))
-            {
                 query = query.Where(x => x.DiscountName.Contains(name));
-            }
 
             var totalRecords = await query.CountAsync();
 
             if (pageNumber.HasValue && pageSize.HasValue)
-            {
                 query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
-            }
 
             var result = await query.ToListAsync();
 
@@ -215,7 +211,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords
+                TotalRecord = totalRecords,
             };
         }
         catch (Exception e)
@@ -226,10 +222,11 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
+
     #endregion
 
     #region DiscountCode
@@ -247,7 +244,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -259,7 +256,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -276,7 +273,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -288,7 +285,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -297,24 +294,24 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
     {
         try
         {
-            var discountCode = await dbContext.DiscountCodes.FirstOrDefaultAsync(x => x.Code == code);
+            var discountCode = await dbContext.DiscountCodes.FirstOrDefaultAsync(x =>
+                x.Code == code
+            );
             if (discountCode == null)
-            {
                 return new Return<DiscountCode>
                 {
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             return new Return<DiscountCode>
             {
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -325,7 +322,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -335,23 +332,21 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
         try
         {
             // Lấy discount code từ cơ sở dữ liệu cùng các liên kết liên quan (nếu có)
-            var discountCode = await dbContext.DiscountCodes
-                .Include(x => x.Discount)
-                    .ThenInclude(x => x.DiscountProducts)
+            var discountCode = await dbContext
+                .DiscountCodes.Include(x => x.Discount)
+                .ThenInclude(x => x.DiscountProducts)
                 .Where(x => x.Status != DiscountCodeStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.CodeId == id);
 
             // Nếu không tìm thấy discount code
             if (discountCode == null)
-            {
                 return new Return<DiscountCode>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.DiscountCodeNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             // Đánh dấu bản ghi FOR UPDATE để thực hiện đồng bộ
             await dbContext.Database.ExecuteSqlRawAsync(
@@ -365,7 +360,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -377,37 +372,35 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
-    
+
     public async Task<Return<DiscountCode>> GetDiscountCodeByIdAsync(Guid id)
     {
         try
         {
-            var discountCode = await dbContext.DiscountCodes
-                .Include(x => x.Discount)
-                    .ThenInclude(x => x.DiscountProducts)
+            var discountCode = await dbContext
+                .DiscountCodes.Include(x => x.Discount)
+                .ThenInclude(x => x.DiscountProducts)
                 .Where(x => x.Status != DiscountCodeStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.CodeId == id);
             if (discountCode == null)
-            {
                 return new Return<DiscountCode>
                 {
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountCodeNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             return new Return<DiscountCode>
             {
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -418,25 +411,27 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
 
-    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsync(Guid id, int? pageNumber, int? pageSize)
+    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsync(
+        Guid id,
+        int? pageNumber,
+        int? pageSize
+    )
     {
         try
         {
-            var query = dbContext.DiscountCodes
-                .Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
+            var query = dbContext
+                .DiscountCodes.Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
                 .AsQueryable();
 
             var totalRecords = await query.CountAsync();
 
             if (pageNumber.HasValue && pageSize.HasValue)
-            {
                 query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
-            }
 
             var result = await query.ToListAsync();
 
@@ -445,9 +440,10 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords
+                TotalRecord = totalRecords,
             };
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return new Return<IEnumerable<DiscountCode>>
             {
@@ -455,18 +451,20 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
-    
-    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsyncForUpdate(Guid id)
+
+    public async Task<Return<IEnumerable<DiscountCode>>> GetDiscountCodesByDiscountIdAsyncForUpdate(
+        Guid id
+    )
     {
         try
         {
             // Lọc các bản ghi theo DiscountId và trạng thái không bị xóa
-            var query = dbContext.DiscountCodes
-                .Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
+            var query = dbContext
+                .DiscountCodes.Where(x => x.Status != GeneralStatus.Deleted && x.DiscountId == id)
                 .AsQueryable();
 
             // Đếm tổng số bản ghi sau khi áp dụng các bộ lọc
@@ -481,7 +479,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords
+                TotalRecord = totalRecords,
             };
         }
         catch (Exception e)
@@ -493,7 +491,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
