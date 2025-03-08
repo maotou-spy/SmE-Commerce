@@ -11,6 +11,60 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
 {
     #region Product
 
+    public async Task<Return<List<Product>>> GetProductsAsync(
+        string keyword = "",
+        int pageSize = 20,
+        int page = 1,
+        string status = ProductStatus.Active
+    )
+    {
+        try
+        {
+            if (page < 1)
+                page = 1;
+
+            // Limit page size in range [1, 100]
+            if (pageSize < 1)
+                pageSize = 20;
+            if (pageSize > 100)
+                pageSize = 100;
+
+            var query = dbContext.Products.Where(x => x.Status == status).AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+                query = query.Where(x => x.Name.Contains(keyword.Trim()));
+
+            var totalRecords = await query.CountAsync();
+
+            var products = await query
+                .Include(x => x.ProductCategories)
+                .ThenInclude(x => x.Category)
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new Return<List<Product>>
+            {
+                Data = products,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Product>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<Product>> GetProductByIdAsync(Guid productId)
     {
         try
