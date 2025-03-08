@@ -475,12 +475,15 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.ProductId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.HasVariant).HasDefaultValue(false);
             entity.Property(e => e.IsTopSeller).HasDefaultValue(false);
+            entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
+            entity.Property(e => e.StockQuantity).HasDefaultValue(0);
+            entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
+
             entity
                 .Property(e => e.ProductCode)
-                .HasDefaultValueSql("nextval('product_code_seq'::regclass)");
-            entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
-            entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-            entity.Property(e => e.StockQuantity).HasDefaultValue(0);
+                .HasDefaultValueSql(
+                    "concat('SP', lpad((nextval('product_code_seq'::regclass))::text, 6, '0'::text))"
+                );
 
             entity
                 .HasOne(d => d.CreateBy)
