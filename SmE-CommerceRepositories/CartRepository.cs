@@ -9,20 +9,77 @@ namespace SmE_CommerceRepositories;
 
 public class CartRepository(SmECommerceContext defaultdbContext) : ICartRepository
 {
+    public async Task<Return<CartItem>> GetCartItemByCustomerIdAndIdForUpdateAsync(Guid customerId, Guid id)
+    {
+        try
+        {
+            var cartItem = await defaultdbContext.CartItems
+                .FirstOrDefaultAsync(x => x.UserId == customerId && x.CartItemId == id);
+
+            if (cartItem == null)
+            {
+                return new Return<CartItem>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.CartNotFound,
+                    TotalRecord = 0
+                };
+            }
+            
+            await defaultdbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"CartItems\" WHERE \"cartItemId\" = {0} AND \"userId\" = {1} FOR UPDATE",
+                id, customerId
+            );
+            
+            return new Return<CartItem>
+            {
+                Data = cartItem,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<CartItem>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e
+            };
+        }
+    }
     public async Task<Return<CartItem>> GetCartItemByIdAsync(Guid cartId)
     {
         try
         {
-            var cart = await defaultdbContext.CartItems.SingleOrDefaultAsync(x =>
-                x.CartItemId == cartId
+            var cartItem = await defaultdbContext.CartItems
+                .FirstOrDefaultAsync(x => x.CartItemId == cartId);
+
+            if (cartItem == null)
+            {
+                return new Return<CartItem>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.CartNotFound,
+                    TotalRecord = 0
+                };
+            }
+
+            await defaultdbContext.Database.ExecuteSqlRawAsync(
+                "SELECT * FROM public.\"CartItems\" WHERE \"cartItemId\" = {0} FOR UPDATE",
+                cartId
             );
 
             return new Return<CartItem>
             {
-                Data = cart,
+                Data = cartItem,
                 IsSuccess = true,
-                StatusCode = cart == null ? ErrorCode.CartNotFound : ErrorCode.Ok,
-                TotalRecord = cart == null ? 0 : 1,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)

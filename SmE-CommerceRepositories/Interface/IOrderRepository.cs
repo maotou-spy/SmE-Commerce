@@ -6,8 +6,6 @@ namespace SmE_CommerceRepositories.Interface;
 public interface IOrderRepository
 {
     Task<Return<Order>> CreateOrderAsync(Order order);
-
-    Task<Return<Order>> GetOrderByIdAsync(Guid orderId);
+    Task<Return<Order>> CustomerGetOrderByIdAsync(Guid orderId, Guid userId);
     Task<Return<List<Order>>> GetOrderByUserIdAsync(Guid userId);
-    Task<Return<bool>> CheckOrderCodeExistedAsync(string orderCode);
 }

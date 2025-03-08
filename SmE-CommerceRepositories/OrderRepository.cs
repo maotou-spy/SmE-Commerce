@@ -31,16 +31,21 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
 
-    public async Task<Return<Order>> GetOrderByIdAsync(Guid orderId)
+    public async Task<Return<Order>> CustomerGetOrderByIdAsync(Guid orderId, Guid userId)
     {
         try
         {
-            var order = await defaultdb.Orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
+            var order = await defaultdb.Orders
+                .Include(x => x.Address)
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.ProductVariant)
+                    .ThenInclude(x => x!.VariantAttributes)
+                .FirstOrDefaultAsync(x => x.OrderId == orderId && x.UserId == userId);
             if (order == null)
                 return new Return<Order>
                 {
@@ -112,6 +117,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         {
             var order = await defaultdb.Orders.FirstOrDefaultAsync(x => x.OrderCode == orderCode);
             if (order == null)
+            {
                 return new Return<bool>
                 {
                     Data = false,
@@ -119,6 +125,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     IsSuccess = true,
                     TotalRecord = 1,
                 };
+            }
             return new Return<bool>
             {
                 Data = true,

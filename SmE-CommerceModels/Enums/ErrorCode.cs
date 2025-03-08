@@ -41,6 +41,7 @@ public static class ErrorCode
     public const string PaymentMethodNotFound = "115";
     public const string OrderItemNotFound = "116";
     public const string InvalidQuantity = "117";
+    public const string ExceedMaxQuantity = "118";
 
     // Already exists
     public const string EmailAlreadyExists = "201";

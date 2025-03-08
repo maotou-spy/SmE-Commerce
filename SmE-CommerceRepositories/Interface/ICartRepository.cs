@@ -18,4 +18,5 @@ public interface ICartRepository
     Task<Return<bool>> RemoveCartItemByIdAsync(Guid cartId);
 
     Task<Return<bool>> ClearCartByUserIdAsync(Guid userId);
+    Task<Return<CartItem>> GetCartItemByCustomerIdAndIdForUpdateAsync(Guid customerId, Guid id);
 }

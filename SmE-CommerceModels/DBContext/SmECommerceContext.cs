@@ -353,6 +353,10 @@ public partial class SmECommerceContext : DbContext
             entity.HasKey(e => e.OrderId).HasName("Orders_pkey");
 
             entity.Property(e => e.OrderId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.OrderCode).IsRequired()
+                .HasMaxLength(50)
+                .HasDefaultValueSql("concat('TMDS', to_char(NOW(), 'YYMMDD'), '-', lpad(nextval('order_code_seq')::text, 6, '0'))");
+            entity.Property(e => e.Status).HasComment("Values: pending, processing, completed, cancelled, rejected, returned");
             entity
                 .Property(e => e.OrderCode)
                 .HasDefaultValueSql(
