@@ -57,7 +57,7 @@ public class Order
 
     [Column("discountamount")]
     [Precision(15, 0)]
-    public decimal? Discountamount { get; set; }
+    public decimal? DiscountAmount { get; set; }
 
     [Column("orderCode")]
     [StringLength(50)]

@@ -494,53 +494,54 @@ public class ProductService(
                     StatusCode = ErrorCode.ProductNotFound,
                 };
 
-            return new Return<GetProductDetailsResDto>
-            {
-                Data = new GetProductDetailsResDto
-                {
-                    ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode,
-                    Name = result.Data.Name,
-                    PrimaryImage = result.Data.PrimaryImage,
-                    Description = result.Data.Description,
-                    Price = result.Data.Price,
-                    StockQuantity = result.Data.StockQuantity,
-                    SoldQuantity = result.Data.SoldQuantity,
-                    IsTopSeller = result.Data.IsTopSeller,
-                    SeoMetadata = new SeoMetadata
-                    {
-                        Slug = result.Data.Slug,
-                        MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
-                    },
-                    Status = result.Data.Status,
-                    Images = result
-                        .Data.ProductImages.Select(image => new GetProductImageResDto
-                        {
-                            ImageId = image.ImageId,
-                            Url = image.Url,
-                            AltText = image.AltText,
-                        })
-                        .ToList(),
-                    Categories = result
-                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-                        {
-                            CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
-                        })
-                        .ToList(),
-                    Attributes = result
-                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-                        {
-                            AttributeId = attribute.AttributeId,
-                            Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
-                        })
-                        .ToList(),
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-            };
+            // return new Return<GetProductDetailsResDto>
+            // {
+            //     Data = new GetProductDetailsResDto
+            //     {
+            //         ProductId = result.Data.ProductId,
+            //         ProductCode = result.Data.ProductCode,
+            //         Name = result.Data.Name,
+            //         PrimaryImage = result.Data.PrimaryImage,
+            //         Description = result.Data.Description,
+            //         Price = result.Data.Price,
+            //         StockQuantity = result.Data.StockQuantity,
+            //         SoldQuantity = result.Data.SoldQuantity,
+            //         IsTopSeller = result.Data.IsTopSeller,
+            //         SeoMetadata = new SeoMetadata
+            //         {
+            //             Slug = result.Data.Slug,
+            //             MetaTitle = result.Data.MetaTitle,
+            //             MetaDescription = result.Data.MetaDescription,
+            //         },
+            //         Status = result.Data.Status,
+            //         Images = result
+            //             .Data.ProductImages.Select(image => new GetProductImageResDto
+            //             {
+            //                 ImageId = image.ImageId,
+            //                 Url = image.Url,
+            //                 AltText = image.AltText,
+            //             })
+            //             .ToList(),
+            //         Categories = result
+            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+            //             {
+            //                 CategoryId = category.CategoryId,
+            //                 Name = category.Category.Name,
+            //             })
+            //             .ToList(),
+            //         Attributes = result
+            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+            //             {
+            //                 AttributeId = attribute.AttributeId,
+            //                 Name = attribute.AttributeName,
+            //                 Value = attribute.AttributeValue,
+            //             })
+            //             .ToList(),
+            //     },
+            //     IsSuccess = true,
+            //     StatusCode = ErrorCode.Ok,
+            // };
+            return null;
         }
         catch (Exception ex)
         {
@@ -560,81 +561,82 @@ public class ProductService(
     {
         try
         {
-            var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            if (!currentManager.IsSuccess || currentManager.Data == null)
-                return new Return<ManagerGetProductDetailResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = currentManager.StatusCode,
-                    InternalErrorMessage = currentManager.InternalErrorMessage,
-                };
-
-            var result = await productRepository.GetProductByIdAsync(productId);
-            if (!result.IsSuccess || result.Data == null)
-                return new Return<ManagerGetProductDetailResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                };
-
-            return new Return<ManagerGetProductDetailResDto>
-            {
-                Data = new ManagerGetProductDetailResDto
-                {
-                    ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode,
-                    Name = result.Data.Name,
-                    PrimaryImage = result.Data.PrimaryImage,
-                    Description = result.Data.Description,
-                    Price = result.Data.Price,
-                    StockQuantity = result.Data.StockQuantity,
-                    SoldQuantity = result.Data.SoldQuantity,
-                    IsTopSeller = result.Data.IsTopSeller,
-                    SeoMetadata = new SeoMetadata
-                    {
-                        Slug = result.Data.Slug,
-                        MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
-                    },
-                    Status = result.Data.Status,
-                    Images = result
-                        .Data.ProductImages.Select(image => new GetProductImageResDto
-                        {
-                            ImageId = image.ImageId,
-                            Url = image.Url,
-                            AltText = image.AltText,
-                        })
-                        .ToList(),
-                    Categories = result
-                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-                        {
-                            CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
-                        })
-                        .ToList(),
-                    Attributes = result
-                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-                        {
-                            AttributeId = attribute.AttributeId,
-                            Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
-                        })
-                        .ToList(),
-                    AuditMetadata = new AuditMetadata
-                    {
-                        CreatedById = result.Data.CreateById,
-                        CreatedAt = result.Data.CreatedAt,
-                        CreatedBy = result.Data.CreateBy?.FullName,
-                        ModifiedById = result.Data.ModifiedById,
-                        ModifiedAt = result.Data.ModifiedAt,
-                        ModifiedBy = result.Data.ModifiedBy?.FullName,
-                    },
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-            };
+            // var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            // if (!currentManager.IsSuccess || currentManager.Data == null)
+            //     return new Return<ManagerGetProductDetailResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = currentManager.StatusCode,
+            //         InternalErrorMessage = currentManager.InternalErrorMessage,
+            //     };
+            //
+            // var result = await productRepository.GetProductByIdAsync(productId);
+            // if (!result.IsSuccess || result.Data == null)
+            //     return new Return<ManagerGetProductDetailResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.ProductNotFound,
+            //     };
+            //
+            // return new Return<ManagerGetProductDetailResDto>
+            // {
+            //     Data = new ManagerGetProductDetailResDto
+            //     {
+            //         ProductId = result.Data.ProductId,
+            //         ProductCode = result.Data.ProductCode,
+            //         Name = result.Data.Name,
+            //         PrimaryImage = result.Data.PrimaryImage,
+            //         Description = result.Data.Description,
+            //         Price = result.Data.Price,
+            //         StockQuantity = result.Data.StockQuantity,
+            //         SoldQuantity = result.Data.SoldQuantity,
+            //         IsTopSeller = result.Data.IsTopSeller,
+            //         SeoMetadata = new SeoMetadata
+            //         {
+            //             Slug = result.Data.Slug,
+            //             MetaTitle = result.Data.MetaTitle,
+            //             MetaDescription = result.Data.MetaDescription,
+            //         },
+            //         Status = result.Data.Status,
+            //         Images = result
+            //             .Data.ProductImages.Select(image => new GetProductImageResDto
+            //             {
+            //                 ImageId = image.ImageId,
+            //                 Url = image.Url,
+            //                 AltText = image.AltText,
+            //             })
+            //             .ToList(),
+            //         Categories = result
+            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+            //             {
+            //                 CategoryId = category.CategoryId,
+            //                 Name = category.Category.Name,
+            //             })
+            //             .ToList(),
+            //         Attributes = result
+            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+            //             {
+            //                 AttributeId = attribute.AttributeId,
+            //                 Name = attribute.AttributeName,
+            //                 Value = attribute.AttributeValue,
+            //             })
+            //             .ToList(),
+            //         AuditMetadata = new AuditMetadata
+            //         {
+            //             CreatedById = result.Data.CreateById,
+            //             CreatedAt = result.Data.CreatedAt,
+            //             CreatedBy = result.Data.CreateBy?.FullName,
+            //             ModifiedById = result.Data.ModifiedById,
+            //             ModifiedAt = result.Data.ModifiedAt,
+            //             ModifiedBy = result.Data.ModifiedBy?.FullName,
+            //         },
+            //     },
+            //     IsSuccess = true,
+            //     StatusCode = ErrorCode.Ok,
+            // };
+            return null;
         }
         catch (Exception ex)
         {
@@ -717,134 +719,135 @@ public class ProductService(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // Get the current user
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            if (!currentUser.IsSuccess || currentUser.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
-                };
-
-            var productResult = await productRepository.GetProductByIdForUpdateAsync(productId);
-            if (!productResult.IsSuccess || productResult.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = productResult.StatusCode,
-                    InternalErrorMessage = productResult.InternalErrorMessage,
-                };
-
-            // Check if the product is deleted
-            if (productResult.Data.Status == ProductStatus.Deleted)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                };
-
-            // Check if the product data is valid
-            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
-                };
-
-            // Check if the product name is unique except the current product
-            var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
-            if (
-                exitedProductResult is { IsSuccess: true, Data: not null }
-                && exitedProductResult.Data.ProductId != productId
-            )
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNameAlreadyExists,
-                };
-
-            productResult.Data.Name = req.Name.Trim();
-            productResult.Data.Description = req.Description.Trim();
-            productResult.Data.Price = req.Price < 0 ? 0 : req.Price;
-            productResult.Data.StockQuantity = req.StockQuantity;
-            productResult.Data.IsTopSeller = req.IsTopSeller;
-            productResult.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
-            productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
-            productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
-            productResult.Data.Status =
-                req.StockQuantity > 0
-                    ? req.Status != ProductStatus.Inactive
-                        ? ProductStatus.Active
-                        : ProductStatus.Inactive
-                    : ProductStatus.OutOfStock;
-            productResult.Data.ModifiedById = currentUser.Data.UserId;
-            productResult.Data.ModifiedAt = DateTime.Now;
-
-            // Update Product in the database
-            var result = await productRepository.UpdateProductAsync(productResult.Data);
-            if (!result.IsSuccess || result.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = result.StatusCode,
-                };
-
-            // Mark the transaction as complete
-            transaction.Complete();
-            return new Return<GetProductDetailsResDto>
-            {
-                Data = new GetProductDetailsResDto
-                {
-                    ProductId = result.Data.ProductId,
-                    ProductCode = result.Data.ProductCode,
-                    Name = result.Data.Name,
-                    PrimaryImage = result.Data.PrimaryImage,
-                    Description = result.Data.Description,
-                    Price = result.Data.Price,
-                    StockQuantity = result.Data.StockQuantity,
-                    SoldQuantity = result.Data.SoldQuantity,
-                    IsTopSeller = result.Data.IsTopSeller,
-                    Attributes = result
-                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-                        {
-                            AttributeId = attribute.AttributeId,
-                            Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
-                        })
-                        .ToList(),
-                    Categories = result
-                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-                        {
-                            CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
-                        })
-                        .ToList(),
-                    Images = result
-                        .Data.ProductImages.Select(image => new GetProductImageResDto
-                        {
-                            ImageId = image.ImageId,
-                            Url = image.Url,
-                            AltText = image.AltText,
-                        })
-                        .ToList(),
-                    SeoMetadata = new SeoMetadata
-                    {
-                        Slug = result.Data.Slug,
-                        MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
-                    },
-                    Status = result.Data.Status,
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-            };
+            // // Get the current user
+            // var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            // if (!currentUser.IsSuccess || currentUser.Data == null)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = currentUser.StatusCode,
+            //         InternalErrorMessage = currentUser.InternalErrorMessage,
+            //     };
+            //
+            // var productResult = await productRepository.GetProductByIdForUpdateAsync(productId);
+            // if (!productResult.IsSuccess || productResult.Data == null)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = productResult.StatusCode,
+            //         InternalErrorMessage = productResult.InternalErrorMessage,
+            //     };
+            //
+            // // Check if the product is deleted
+            // if (productResult.Data.Status == ProductStatus.Deleted)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.ProductNotFound,
+            //     };
+            //
+            // // Check if the product data is valid
+            // if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.BadRequest,
+            //     };
+            //
+            // // Check if the product name is unique except the current product
+            // var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
+            // if (
+            //     exitedProductResult is { IsSuccess: true, Data: not null }
+            //     && exitedProductResult.Data.ProductId != productId
+            // )
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.ProductNameAlreadyExists,
+            //     };
+            //
+            // productResult.Data.Name = req.Name.Trim();
+            // productResult.Data.Description = req.Description.Trim();
+            // productResult.Data.Price = req.Price < 0 ? 0 : req.Price;
+            // productResult.Data.StockQuantity = req.StockQuantity;
+            // productResult.Data.IsTopSeller = req.IsTopSeller;
+            // productResult.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
+            // productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
+            // productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
+            // productResult.Data.Status =
+            //     req.StockQuantity > 0
+            //         ? req.Status != ProductStatus.Inactive
+            //             ? ProductStatus.Active
+            //             : ProductStatus.Inactive
+            //         : ProductStatus.OutOfStock;
+            // productResult.Data.ModifiedById = currentUser.Data.UserId;
+            // productResult.Data.ModifiedAt = DateTime.Now;
+            //
+            // // Update Product in the database
+            // var result = await productRepository.UpdateProductAsync(productResult.Data);
+            // if (!result.IsSuccess || result.Data == null)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = result.StatusCode,
+            //     };
+            //
+            // // Mark the transaction as complete
+            // transaction.Complete();
+            // return new Return<GetProductDetailsResDto>
+            // {
+            //     Data = new GetProductDetailsResDto
+            //     {
+            //         ProductId = result.Data.ProductId,
+            //         ProductCode = result.Data.ProductCode,
+            //         Name = result.Data.Name,
+            //         PrimaryImage = result.Data.PrimaryImage,
+            //         Description = result.Data.Description,
+            //         Price = result.Data.Price,
+            //         StockQuantity = result.Data.StockQuantity,
+            //         SoldQuantity = result.Data.SoldQuantity,
+            //         IsTopSeller = result.Data.IsTopSeller,
+            //         Attributes = result
+            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+            //             {
+            //                 AttributeId = attribute.AttributeId,
+            //                 Name = attribute.AttributeName,
+            //                 Value = attribute.AttributeValue,
+            //             })
+            //             .ToList(),
+            //         Categories = result
+            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+            //             {
+            //                 CategoryId = category.CategoryId,
+            //                 Name = category.Category.Name,
+            //             })
+            //             .ToList(),
+            //         Images = result
+            //             .Data.ProductImages.Select(image => new GetProductImageResDto
+            //             {
+            //                 ImageId = image.ImageId,
+            //                 Url = image.Url,
+            //                 AltText = image.AltText,
+            //             })
+            //             .ToList(),
+            //         SeoMetadata = new SeoMetadata
+            //         {
+            //             Slug = result.Data.Slug,
+            //             MetaTitle = result.Data.MetaTitle,
+            //             MetaDescription = result.Data.MetaDescription,
+            //         },
+            //         Status = result.Data.Status,
+            //     },
+            //     IsSuccess = true,
+            //     StatusCode = ErrorCode.Ok,
+            // };
+            return null;
         }
         catch (Exception ex)
         {
@@ -1330,139 +1333,140 @@ public class ProductService(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // Check if the product name is unique
-            var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
-            if (exitedProductResult.IsSuccess)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNameAlreadyExists,
-                };
-
-            // Only add active categories
-            var categoryResult = await categoryRepository.GetCategoriesAsync(
-                status: GeneralStatus.Active,
-                name: null,
-                pageNumber: null,
-                pageSize: null
-            );
-            if (!categoryResult.IsSuccess)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = categoryResult.StatusCode,
-                    InternalErrorMessage = categoryResult.InternalErrorMessage,
-                };
-
-            var categories = categoryResult
-                .Data?.Where(c => req.CategoryIds.Contains(c.CategoryId))
-                .ToList();
-            if (categories == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.CategoryNotFound,
-                };
-
-            // Initialize the product
-            var product = new Product
-            {
-                Name = req.Name.Trim(),
-                PrimaryImage = req.PrimaryImage,
-                Description = req.Description?.Trim(),
-                Price = req.Price < 0 ? 0 : req.Price,
-                StockQuantity = req.StockQuantity,
-                SoldQuantity = 0,
-                IsTopSeller = req.IsTopSeller,
-                Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
-                MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
-                MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
-                Status =
-                    req.StockQuantity > 0
-                        ? req.Status != ProductStatus.Inactive
-                            ? ProductStatus.Active
-                            : ProductStatus.Inactive
-                        : ProductStatus.OutOfStock,
-                CreateById = currentUserId,
-                CreatedAt = DateTime.Now,
-                ProductCategories = categories
-                    .Select(c => new ProductCategory { CategoryId = c.CategoryId })
-                    .ToList(),
-                ProductImages = req
-                    .Images.Select(i => new ProductImage { Url = i.Url, AltText = i.AltText })
-                    .ToList(),
-                ProductAttributes = req
-                    .Attributes.Select(a => new ProductAttribute
-                    {
-                        AttributeName = a.AttributeName,
-                        AttributeValue = a.AttributeValue,
-                    })
-                    .ToList(),
-            };
-
-            // Add Product to the database
-            var result = await productRepository.AddProductAsync(product);
-            if (!result.IsSuccess || result.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
-                };
-
-            transaction.Complete();
-
-            return new Return<GetProductDetailsResDto>
-            {
-                Data = new GetProductDetailsResDto
-                {
-                    ProductId = product.ProductId,
-                    ProductCode = product.ProductCode,
-                    Name = product.Name,
-                    PrimaryImage = result.Data.PrimaryImage,
-                    Description = product.Description,
-                    Price = product.Price,
-                    StockQuantity = product.StockQuantity,
-                    SoldQuantity = product.SoldQuantity,
-                    IsTopSeller = product.IsTopSeller,
-                    SeoMetadata = new SeoMetadata
-                    {
-                        Slug = result.Data.Slug,
-                        MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
-                    },
-                    Status = product.Status,
-                    Images = result
-                        .Data.ProductImages.Select(image => new GetProductImageResDto
-                        {
-                            ImageId = image.ImageId,
-                            Url = image.Url,
-                            AltText = image.AltText,
-                        })
-                        .ToList(),
-                    Categories = result
-                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-                        {
-                            CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
-                        })
-                        .ToList(),
-                    Attributes = result
-                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-                        {
-                            AttributeId = attribute.AttributeId,
-                            Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
-                        })
-                        .ToList(),
-                },
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-            };
+            // // Check if the product name is unique
+            // var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
+            // if (exitedProductResult.IsSuccess)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.ProductNameAlreadyExists,
+            //     };
+            //
+            // // Only add active categories
+            // var categoryResult = await categoryRepository.GetCategoriesAsync(
+            //     status: GeneralStatus.Active,
+            //     name: null,
+            //     pageNumber: null,
+            //     pageSize: null
+            // );
+            // if (!categoryResult.IsSuccess)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = categoryResult.StatusCode,
+            //         InternalErrorMessage = categoryResult.InternalErrorMessage,
+            //     };
+            //
+            // var categories = categoryResult
+            //     .Data?.Where(c => req.CategoryIds.Contains(c.CategoryId))
+            //     .ToList();
+            // if (categories == null)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = ErrorCode.CategoryNotFound,
+            //     };
+            //
+            // // Initialize the product
+            // var product = new Product
+            // {
+            //     Name = req.Name.Trim(),
+            //     PrimaryImage = req.PrimaryImage,
+            //     Description = req.Description?.Trim(),
+            //     Price = req.Price < 0 ? 0 : req.Price,
+            //     StockQuantity = req.StockQuantity,
+            //     SoldQuantity = 0,
+            //     IsTopSeller = req.IsTopSeller,
+            //     Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
+            //     MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
+            //     MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
+            //     Status =
+            //         req.StockQuantity > 0
+            //             ? req.Status != ProductStatus.Inactive
+            //                 ? ProductStatus.Active
+            //                 : ProductStatus.Inactive
+            //             : ProductStatus.OutOfStock,
+            //     CreateById = currentUserId,
+            //     CreatedAt = DateTime.Now,
+            //     ProductCategories = categories
+            //         .Select(c => new ProductCategory { CategoryId = c.CategoryId })
+            //         .ToList(),
+            //     ProductImages = req
+            //         .Images.Select(i => new ProductImage { Url = i.Url, AltText = i.AltText })
+            //         .ToList(),
+            //     ProductAttributes = req
+            //         .Attributes.Select(a => new ProductAttribute
+            //         {
+            //             AttributeName = a.AttributeName,
+            //             AttributeValue = a.AttributeValue,
+            //         })
+            //         .ToList(),
+            // };
+            //
+            // // Add Product to the database
+            // var result = await productRepository.AddProductAsync(product);
+            // if (!result.IsSuccess || result.Data == null)
+            //     return new Return<GetProductDetailsResDto>
+            //     {
+            //         Data = null,
+            //         IsSuccess = false,
+            //         StatusCode = result.StatusCode,
+            //         InternalErrorMessage = result.InternalErrorMessage,
+            //     };
+            //
+            // transaction.Complete();
+            //
+            // return new Return<GetProductDetailsResDto>
+            // {
+            //     Data = new GetProductDetailsResDto
+            //     {
+            //         ProductId = product.ProductId,
+            //         ProductCode = product.ProductCode,
+            //         Name = product.Name,
+            //         PrimaryImage = result.Data.PrimaryImage,
+            //         Description = product.Description,
+            //         Price = product.Price,
+            //         StockQuantity = product.StockQuantity,
+            //         SoldQuantity = product.SoldQuantity,
+            //         IsTopSeller = product.IsTopSeller,
+            //         SeoMetadata = new SeoMetadata
+            //         {
+            //             Slug = result.Data.Slug,
+            //             MetaTitle = result.Data.MetaTitle,
+            //             MetaDescription = result.Data.MetaDescription,
+            //         },
+            //         Status = product.Status,
+            //         Images = result
+            //             .Data.ProductImages.Select(image => new GetProductImageResDto
+            //             {
+            //                 ImageId = image.ImageId,
+            //                 Url = image.Url,
+            //                 AltText = image.AltText,
+            //             })
+            //             .ToList(),
+            //         Categories = result
+            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+            //             {
+            //                 CategoryId = category.CategoryId,
+            //                 Name = category.Category.Name,
+            //             })
+            //             .ToList(),
+            //         Attributes = result
+            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+            //             {
+            //                 AttributeId = attribute.AttributeId,
+            //                 Name = attribute.AttributeName,
+            //                 Value = attribute.AttributeValue,
+            //             })
+            //             .ToList(),
+            //     },
+            //     IsSuccess = true,
+            //     StatusCode = ErrorCode.Ok,
+            // };
+            return null;
         }
         catch (Exception e)
         {

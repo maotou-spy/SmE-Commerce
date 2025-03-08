@@ -59,5 +59,5 @@ public interface IProductRepository
 
     Task<Return<bool>> BulkAddVariantAttributeAsync(List<VariantAttribute> variantAttributes);
 
-    Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid productVariantId);
+    Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid? productVariantId);
 }

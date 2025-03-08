@@ -883,7 +883,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
     }
 
     public async Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(
-        Guid productVariantId
+        Guid? productVariantId
     )
     {
         try
@@ -901,10 +901,11 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                     TotalRecord = 0,
                 };
 
-            await dbContext.Database.ExecuteSqlRawAsync(
-                "SELECT * FROM public.\"ProductVariants\" WHERE public.\"ProductVariants\".\"productVariantId\" = {0} FOR UPDATE",
-                productVariantId
-            );
+            if (productVariantId != null)
+                await dbContext.Database.ExecuteSqlRawAsync(
+                    "SELECT * FROM public.\"ProductVariants\" WHERE public.\"ProductVariants\".\"productVariantId\" = {0} FOR UPDATE",
+                    productVariantId
+                );
 
             return new Return<ProductVariant>
             {

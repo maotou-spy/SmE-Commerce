@@ -36,4 +36,26 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpGet("{orderId:guid}")]
+    [OpenApiOperation("Get Order Detail", "Get Order Detail")]
+    [Authorize(AuthenticationSchemes = "JwtScheme")]
+    public async Task<IActionResult> GetOrderByIdAsync([FromRoute] Guid orderId)
+    {
+        try
+        {
+            var result = await orderService.GetOrderByIdAsync(orderId);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get order detail: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get order detail: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 }
