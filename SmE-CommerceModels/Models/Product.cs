@@ -71,6 +71,9 @@ public class Product
     [StringLength(255)]
     public string PrimaryImage { get; set; } = null!;
 
+    [Column("hasVariant")]
+    public bool HasVariant { get; set; } = false;
+
     [InverseProperty("Product")]
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
         new List<ContentProduct>();
