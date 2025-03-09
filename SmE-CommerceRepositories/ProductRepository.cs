@@ -71,7 +71,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         {
             var product = await dbContext
                 .Products
-                // .Where(x => x.Status != ProductStatus.Deleted)
+                // .Where(x => x.Status != Status.Deleted)
                 .Include(x => x.ProductCategories)
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)

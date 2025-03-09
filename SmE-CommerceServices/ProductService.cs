@@ -394,7 +394,7 @@ public class ProductService(
     //                 InternalErrorMessage = product.InternalErrorMessage,
     //             };
     //
-    //         if (product.Data.Status == ProductStatus.Deleted)
+    //         if (product.Data.Status == Status.Deleted)
     //             return new Return<bool>
     //             {
     //                 Data = false,
@@ -431,8 +431,8 @@ public class ProductService(
     //         productVariant.Data.StockQuantity = req.StockQuantity;
     //         productVariant.Data.Status =
     //             req.StockQuantity > 0
-    //                 ? req.Status ?? ProductStatus.Active
-    //                 : ProductStatus.OutOfStock;
+    //                 ? req.Status ?? Status.Active
+    //                 : Status.OutOfStock;
     //         productVariant.Data.ModifiedById = currentUser.Data.UserId;
     //         productVariant.Data.ModifiedAt = DateTime.Now;
     //

@@ -19,7 +19,6 @@ public class CartService(
     {
         try
         {
-            // Get current customer
             var currentCustomer = await helperService.GetCurrentUserWithRoleAsync(
                 RoleEnum.Customer
             );
@@ -32,7 +31,6 @@ public class CartService(
                     InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
-            // Get cart items
             var cartItems = await cartRepository.GetCartItemsByUserIdAsync(
                 currentCustomer.Data.UserId
             );
@@ -45,7 +43,6 @@ public class CartService(
                     InternalErrorMessage = cartItems.InternalErrorMessage,
                 };
 
-            // Check if cart is empty
             if (cartItems.Data == null || cartItems.Data.Count == 0)
                 return new Return<List<GetCartResDto>>
                 {
@@ -54,38 +51,107 @@ public class CartService(
                     StatusCode = ErrorCode.Ok,
                 };
 
-            // Map cart items to response DTO
-            // var cartItemsRes = cartItems
-            //     .Data.Where(_ => true)
-            //     .Select(cartItem =>
-            //     {
-            //         var isPriceUpdated = cartItem.Price != cartItem.ProductVariant.Product.Price;
-            //
-            //         return new GetCartResDto
-            //         {
-            //             CartItemId = cartItem.CartItemId,
-            //             ProductId = cartItem.ProductId,
-            //             ProductVariantId = cartItem.ProductVariantId,
-            //             ProductName = cartItem.ProductVariant.Product.Name,
-            //             ImageUrl = cartItem.ProductVariant.Product.PrimaryImage,
-            //             ProductSlug = cartItem.ProductVariant.Product.Slug,
-            //             Quantity =
-            //                 cartItem.ProductVariant.Product.Status == ProductStatus.Active
-            //                     ? cartItem.Quantity
-            //                     : 0,
-            //             StockQuantity = cartItem.ProductVariant.Product.StockQuantity,
-            //             Price = cartItem.ProductVariant.Product.Price,
-            //             IsPriceUpdated = isPriceUpdated,
-            //             ProductStatus = cartItem.ProductVariant.Product.Status,
-            //         };
-            //     })
-            //     .ToList();
+            var cartItemsToUpdate = new List<CartItem>();
+            var cartItemsRes = cartItems
+                .Data.Select(cartItem =>
+                {
+                    var productVariant = cartItem.ProductVariant;
+                    var product = cartItem.Product;
+
+                    var isProductActive = product.Status == ProductStatus.Active;
+                    var isVariantActive =
+                        productVariant == null || productVariant.Status == ProductStatus.Active;
+
+                    // Only product has variant, price is null
+                    var hasError = productVariant is null && product.Price == null;
+
+                    var isAvailable = isProductActive && isVariantActive && !hasError;
+
+                    var stockQuantity = productVariant?.StockQuantity ?? product.StockQuantity;
+                    if (stockQuantity < 0) // Ensure stock quantity is not negative
+                        stockQuantity = 0;
+
+                    var quantity = cartItem.Quantity;
+                    var isQuantityUpdated = false;
+
+                    if (quantity > stockQuantity)
+                    {
+                        quantity = stockQuantity;
+                        isQuantityUpdated = true;
+                    }
+
+                    if (!isAvailable)
+                        quantity = 0;
+
+                    var isPriceUpdated = cartItem.Price != (productVariant?.Price ?? product.Price);
+
+                    if (!isPriceUpdated && !isQuantityUpdated)
+                        return new GetCartResDto
+                        {
+                            CartItemId = cartItem.CartItemId,
+                            ProductId = cartItem.ProductId,
+                            ProductVariantId = cartItem.ProductVariantId,
+                            ProductName = product.Name,
+                            ImageUrl = product.PrimaryImage,
+                            ProductSlug = product.Slug,
+                            Quantity = quantity,
+                            StockQuantity = stockQuantity,
+                            Price = productVariant?.Price ?? product.Price ?? 0,
+                            IsPriceUpdated = isPriceUpdated,
+                            IsQuantityUpdated = isQuantityUpdated,
+                            Status = product.Status,
+                        };
+                    cartItem.Price = productVariant?.Price ?? product.Price ?? 0;
+                    cartItem.Quantity = quantity;
+                    cartItemsToUpdate.Add(cartItem);
+
+                    return new GetCartResDto
+                    {
+                        CartItemId = cartItem.CartItemId,
+                        ProductId = cartItem.ProductId,
+                        ProductVariantId = cartItem.ProductVariantId,
+                        ProductName = product.Name,
+                        ImageUrl = product.PrimaryImage,
+                        ProductSlug = product.Slug,
+                        Quantity = quantity,
+                        StockQuantity = stockQuantity,
+                        Price = product.Price ?? 0,
+                        IsPriceUpdated = isPriceUpdated,
+                        IsQuantityUpdated = isQuantityUpdated,
+                        Status = product.Status,
+                    };
+                })
+                .ToList();
+
+            if (cartItemsToUpdate.Count <= 0)
+                return new Return<List<GetCartResDto>>
+                {
+                    Data = cartItemsRes,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = cartItemsRes.Count,
+                };
+
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var updateResult = await cartRepository.UpdateCartItemRangeAsync(cartItemsToUpdate);
+                if (!updateResult.IsSuccess)
+                    return new Return<List<GetCartResDto>>
+                    {
+                        Data = [],
+                        IsSuccess = false,
+                        StatusCode = updateResult.StatusCode,
+                        InternalErrorMessage = updateResult.InternalErrorMessage,
+                    };
+                transaction.Complete();
+            }
 
             return new Return<List<GetCartResDto>>
             {
-                // Data = cartItemsRes,
+                Data = cartItemsRes,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
+                TotalRecord = cartItemsRes.Count,
             };
         }
         catch (Exception ex)
@@ -106,7 +172,7 @@ public class CartService(
         try
         {
             // Validate cart item input
-            if (cartItem.ProductVariantId == Guid.Empty || cartItem.Quantity <= 0)
+            if (cartItem.Quantity <= 0)
                 return new Return<int?>
                 {
                     Data = null,
@@ -127,103 +193,140 @@ public class CartService(
                     InternalErrorMessage = currentCustomer.InternalErrorMessage,
                 };
 
-            // Check if the product variant is existing and is active
-            // var existingProductVariant = await productRepository.GetProductVariantByIdAsync(
-            //     cartItem.ProductVariantId
-            // );
-            // if (
-            //     !existingProductVariant.IsSuccess
-            //     || existingProductVariant.Data is not { Status: ProductStatus.Active }
-            //     || existingProductVariant.Data.Product.Status != ProductStatus.Active
-            // )
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNotFound,
-            //     };
-            //
-            // if (existingProductVariant.Data.Price <= 0)
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.InvalidPrice,
-            //     };
-            //
-            // // Check if stock is sufficient for add new cart item
-            // if (existingProductVariant.Data.StockQuantity < cartItem.Quantity)
-            //     return new Return<int?>
-            //     {
-            //         Data = existingProductVariant.Data.StockQuantity, // Return remaining stock
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.OutOfStock,
-            //     };
+            decimal price;
+            int stockQuantity;
+
+            // Check if the product has a variant
+            if (cartItem.ProductVariantId is not null)
+            {
+                // Case 1: Product has variant
+                var existingProductVariant = await productRepository.GetProductVariantByIdAsync(
+                    cartItem.ProductVariantId ?? Guid.Empty
+                );
+                if (
+                    !existingProductVariant.IsSuccess
+                    || existingProductVariant.Data is not { Status: ProductStatus.Active }
+                    || existingProductVariant.Data.Product.Status != ProductStatus.Active
+                )
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound,
+                    };
+
+                if (existingProductVariant.Data.Price <= 0)
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidPrice,
+                    };
+
+                price = existingProductVariant.Data.Price;
+                stockQuantity = existingProductVariant.Data.StockQuantity;
+            }
+            else
+            {
+                // Case 2: Product has no variant
+                var existingProduct = await productRepository.GetProductByIdAsync(
+                    cartItem.ProductId
+                );
+                if (
+                    !existingProduct.IsSuccess
+                    || existingProduct.Data is not { Status: ProductStatus.Active }
+                )
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound,
+                    };
+
+                if (existingProduct.Data.Price <= 0)
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidPrice,
+                    };
+
+                price = existingProduct.Data.Price ?? 0;
+                stockQuantity = existingProduct.Data.StockQuantity;
+            }
+
+            // Check if stock is sufficient
+            if (stockQuantity < cartItem.Quantity)
+                return new Return<int?>
+                {
+                    Data = stockQuantity, // Return remaining stock
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.OutOfStock,
+                };
 
             // Check if the cart item already exists
-            // * If exists, update the quantity
-            // => Update existing cart item
-            // var existingCartItem = await cartRepository.GetCartItemByProductVariantIdAndUserIdAsync(
-            //     cartItem.ProductVariantId,
-            //     currentCustomer.Data.UserId
-            // );
-            //
-            // if (existingCartItem is { IsSuccess: true, Data: not null })
-            // {
-            //     var newQuantity = existingCartItem.Data.Quantity + cartItem.Quantity;
-            //
-            //     if (existingProductVariant.Data.StockQuantity < newQuantity)
-            //         return new Return<int?>
-            //         {
-            //             Data = existingProductVariant.Data.StockQuantity, // Return remaining stock
-            //             IsSuccess = false,
-            //             StatusCode = ErrorCode.OverStockQuantity,
-            //         };
-            //
-            //     existingCartItem.Data.Quantity = newQuantity;
-            //     var updatedCart = await cartRepository.UpdateCartItemAsync(existingCartItem.Data);
-            //
-            //     if (!updatedCart.IsSuccess)
-            //         return new Return<int?>
-            //         {
-            //             Data = null,
-            //             IsSuccess = false,
-            //             StatusCode = updatedCart.StatusCode,
-            //             InternalErrorMessage = updatedCart.InternalErrorMessage,
-            //         };
-            //
-            //     // Complete transaction and return success
-            //     transactionScope.Complete();
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = true,
-            //         StatusCode = ErrorCode.Ok,
-            //     };
-            // }
+            var existingCartItem = await cartRepository.GetCartItemByProductIdAndUserIdAsync(
+                cartItem.ProductId,
+                currentCustomer.Data.UserId
+            );
 
-            // * If not exists, add new cart item
-            // => Add new cart item
-            // var newCartItem = new CartItem
-            // {
-            //     ProductVariantId = cartItem.ProductVariantId,
-            //     UserId = currentCustomer.Data.UserId,
-            //     Quantity = cartItem.Quantity,
-            //     Price = existingProductVariant.Data.Price,
-            // };
+            // Update existing cart item
+            if (existingCartItem is { IsSuccess: true, Data: not null })
+            {
+                var newQuantity = existingCartItem.Data.Quantity + cartItem.Quantity;
 
-            // var addedResult = await cartRepository.AddToCartAsync(newCartItem);
+                if (stockQuantity < newQuantity)
+                    return new Return<int?>
+                    {
+                        Data = stockQuantity, // Return remaining stock
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.OverStockQuantity,
+                    };
 
-            // if (!addedResult.IsSuccess)
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = addedResult.StatusCode,
-            //         InternalErrorMessage = addedResult.InternalErrorMessage,
-            //     };
+                existingCartItem.Data.Quantity = newQuantity;
+                existingCartItem.Data.Price = price;
+                var updatedCart = await cartRepository.UpdateCartItemAsync(existingCartItem.Data);
 
-            // Complete transaction and return success
+                if (!updatedCart.IsSuccess)
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = updatedCart.StatusCode,
+                        InternalErrorMessage = updatedCart.InternalErrorMessage,
+                    };
+
+                transactionScope.Complete();
+                return new Return<int?>
+                {
+                    Data = null,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                };
+            }
+
+            // Add new cart item
+            var newCartItem = new CartItem
+            {
+                ProductVariantId =
+                    cartItem.ProductVariantId != Guid.Empty ? cartItem.ProductVariantId : null,
+                ProductId = cartItem.ProductId,
+                UserId = currentCustomer.Data.UserId,
+                Quantity = cartItem.Quantity,
+                Price = price,
+            };
+
+            var addedResult = await cartRepository.AddToCartAsync(newCartItem);
+
+            if (!addedResult.IsSuccess)
+                return new Return<int?>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = addedResult.StatusCode,
+                    InternalErrorMessage = addedResult.InternalErrorMessage,
+                };
+
             transactionScope.Complete();
             return new Return<int?>
             {
@@ -281,48 +384,97 @@ public class CartService(
                     StatusCode = ErrorCode.CartNotFound,
                 };
 
-            // Check if the product exists and is active
-            // var existingProduct = await productRepository.GetProductByProductVariantIdAsync(
-            //     existingCartItem.Data.ProductVariantId
-            // );
-            // if (
-            //     !existingProduct.IsSuccess
-            //     || existingProduct.Data is not { Status: ProductStatus.Active }
-            // )
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNotFound,
-            //     };
-            //
-            // // Check if stock is sufficient for the updated quantity
-            // if (existingProduct.Data.StockQuantity < updatedQuantity)
-            //     return new Return<int?>
-            //     {
-            //         Data = existingProduct.Data.StockQuantity, // Return remaining stock
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.OverStockQuantity,
-            //     };
-            //
-            // // Update existing cart item
-            // existingCartItem.Data.Quantity = updatedQuantity;
-            // var updatedCart = await cartRepository.UpdateCartItemAsync(existingCartItem.Data);
-            //
-            // if (!updatedCart.IsSuccess)
-            //     return new Return<int?>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = updatedCart.StatusCode,
-            //         InternalErrorMessage = updatedCart.InternalErrorMessage,
-            //     };
+            // Validate updated quantity
+            if (updatedQuantity <= 0)
+                return new Return<int?>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
 
-            // Complete transaction and return success
+            // Check product or product variant
+            if (existingCartItem.Data.ProductVariantId.HasValue)
+            {
+                // Case: Product Variant exists
+                var existingProductVariant = await productRepository.GetProductVariantByIdAsync(
+                    existingCartItem.Data.ProductVariantId.Value
+                );
+
+                if (
+                    !existingProductVariant.IsSuccess
+                    || existingProductVariant.Data is not { Status: ProductStatus.Active }
+                )
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound, // Variant not active
+                    };
+
+                // Check if stock is sufficient for the updated quantity
+                if (existingProductVariant.Data.StockQuantity < updatedQuantity)
+                    return new Return<int?>
+                    {
+                        Data = existingProductVariant.Data.StockQuantity, // Return remaining stock
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.OverStockQuantity,
+                    };
+            }
+            else
+            {
+                // Case: No Product Variant → Check Product
+                var existingProduct = await productRepository.GetProductByIdAsync(
+                    existingCartItem.Data.ProductId
+                );
+
+                if (
+                    !existingProduct.IsSuccess
+                    || existingProduct.Data is not { Status: ProductStatus.Active }
+                )
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.ProductNotFound,
+                    };
+
+                // Ensure product does not have variants (avoid mix-up)
+                if (existingProduct.Data.ProductVariants.Count > 0)
+                    return new Return<int?>
+                    {
+                        Data = null,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.BadRequest,
+                    };
+
+                // Check if stock is sufficient for the updated quantity
+                if (existingProduct.Data.StockQuantity < updatedQuantity)
+                    return new Return<int?>
+                    {
+                        Data = existingProduct.Data.StockQuantity, // Return remaining stock
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.OverStockQuantity,
+                    };
+            }
+
+            // Update existing cart item
+            existingCartItem.Data.Quantity = updatedQuantity;
+            var updatedCart = await cartRepository.UpdateCartItemAsync(existingCartItem.Data);
+
+            if (!updatedCart.IsSuccess)
+                return new Return<int?>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = updatedCart.StatusCode,
+                    InternalErrorMessage = updatedCart.InternalErrorMessage,
+                };
+
             transactionScope.Complete();
             return new Return<int?>
             {
-                Data = updatedQuantity, // Return the updated quantity
+                Data = updatedQuantity,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
             };

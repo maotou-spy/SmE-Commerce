@@ -9,35 +9,38 @@ namespace SmE_CommerceRepositories;
 
 public class CartRepository(SmECommerceContext defaultdbContext) : ICartRepository
 {
-    public async Task<Return<CartItem>> GetCartItemByCustomerIdAndIdForUpdateAsync(Guid customerId, Guid id)
+    public async Task<Return<CartItem>> GetCartItemByCustomerIdAndIdForUpdateAsync(
+        Guid customerId,
+        Guid id
+    )
     {
         try
         {
-            var cartItem = await defaultdbContext.CartItems
-                .FirstOrDefaultAsync(x => x.UserId == customerId && x.CartItemId == id);
+            var cartItem = await defaultdbContext.CartItems.FirstOrDefaultAsync(x =>
+                x.UserId == customerId && x.CartItemId == id
+            );
 
             if (cartItem == null)
-            {
                 return new Return<CartItem>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CartNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
-            
+
             await defaultdbContext.Database.ExecuteSqlRawAsync(
                 "SELECT * FROM public.\"CartItems\" WHERE \"cartItemId\" = {0} AND \"userId\" = {1} FOR UPDATE",
-                id, customerId
+                id,
+                customerId
             );
-            
+
             return new Return<CartItem>
             {
                 Data = cartItem,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception e)
@@ -47,27 +50,27 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
+
     public async Task<Return<CartItem>> GetCartItemByIdAsync(Guid cartId)
     {
         try
         {
-            var cartItem = await defaultdbContext.CartItems
-                .FirstOrDefaultAsync(x => x.CartItemId == cartId);
+            var cartItem = await defaultdbContext.CartItems.FirstOrDefaultAsync(x =>
+                x.CartItemId == cartId
+            );
 
             if (cartItem == null)
-            {
                 return new Return<CartItem>
                 {
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CartNotFound,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             await defaultdbContext.Database.ExecuteSqlRawAsync(
                 "SELECT * FROM public.\"CartItems\" WHERE \"cartItemId\" = {0} FOR UPDATE",
@@ -79,7 +82,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
                 Data = cartItem,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -87,6 +90,32 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             return new Return<CartItem>
             {
                 Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> UpdateCartItemRangeAsync(List<CartItem> cartItems)
+    {
+        try
+        {
+            defaultdbContext.CartItems.UpdateRange(cartItems);
+            await defaultdbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
@@ -132,7 +161,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
             var query = defaultdbContext
                 .CartItems.Where(x => x.UserId == userId)
                 .Include(x => x.ProductVariant)
-                .ThenInclude(x => x.Product)
+                .Include(x => x.Product)
                 .AsQueryable();
 
             var totalRecords = await query.CountAsync();
@@ -189,9 +218,8 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
     {
         try
         {
-            defaultdbContext.CartItems.Update(cart);
+            var a = defaultdbContext.CartItems.Update(cart);
             await defaultdbContext.SaveChangesAsync();
-
             return new Return<bool>
             {
                 Data = true,
