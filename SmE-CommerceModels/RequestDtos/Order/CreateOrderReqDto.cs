@@ -17,5 +17,5 @@ public class CreateOrderReqDto
     public required Guid PaymentMethodId { get; set; }
 
     [Required(ErrorMessage = "Order items are required")]
-    public List<Guid> cartItemId { get; set; } = [];
+    public List<Guid> CartItemId { get; set; } = [];
 }

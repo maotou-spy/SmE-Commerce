@@ -31,25 +31,25 @@ public class OrderService(
     {
         try
         {
-            // // validate order
-            // var order = await orderRepository.GetOrderByIdAsync(reqDto.OrderId);
-            // if (!order.IsSuccess || order.Data == null)
-            //     return new Return<bool>
-            //     {
-            //         Data = false,
-            //         IsSuccess = false,
-            //         StatusCode = order.StatusCode,
-            //         InternalErrorMessage = order.InternalErrorMessage
-            //     };
+            // validate order
+            var order = await orderRepository.CustomerGetOrderByIdAsync(reqDto.OrderId, currentCustomerId);
+            if (!order.IsSuccess || order.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = order.StatusCode,
+                    InternalErrorMessage = order.InternalErrorMessage
+                };
 
-            // // validate amount
-            // if (reqDto.Amount <= 0)
-            //     return new Return<bool>
-            //     {
-            //         Data = false,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.InvalidAmount
-            //     };
+            // validate amount
+            if (reqDto.Amount <= 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidAmount
+                };
 
             var payment = new Payment
             {
@@ -135,7 +135,7 @@ public class OrderService(
                 };
 
             // Check if order items are empty
-            if (req.cartItemId.Count == 0)
+            if (req.CartItemId.Count == 0)
                 return new Return<bool>
                 {
                     Data = false,
@@ -143,7 +143,7 @@ public class OrderService(
                     StatusCode = ErrorCode.OrderItemNotFound,
                 };
 
-            var uniqueCartItemIds = req.cartItemId.Distinct().ToList();
+            var uniqueCartItemIds = req.CartItemId.Distinct().ToList();
             if (uniqueCartItemIds.Count == 0)
                 return new Return<bool>
                 {
@@ -155,7 +155,7 @@ public class OrderService(
             // Get cart items
             var orderItemsWithPrice =
                 new List<(Guid ProductId, Guid? VariantId, int Quantity, decimal Price)>();
-            foreach (var item in req.cartItemId)
+            foreach (var item in req.CartItemId)
             {
                 // 2 things will get from CartItem: ProductVariantId and Quantity
                 var cartItem = await cartRepository.GetCartItemByCustomerIdAndIdForUpdateAsync(
@@ -172,7 +172,7 @@ public class OrderService(
                     };
 
                 // If cart have Variant ID
-                if (cartItem.Data.ProductVariantId != null)
+                if (cartItem.Data.ProductVariantId.HasValue)
                 {
                     var variantCart = await productRepository.GetProductVariantByIdForUpdateAsync(
                         cartItem.Data.ProductVariantId
@@ -209,7 +209,7 @@ public class OrderService(
                     );
                 }
                 // If cart dont have Variant ID
-                else if (cartItem.Data.ProductVariantId == null)
+                else if (!cartItem.Data.ProductVariantId.HasValue)
                 {
                     var productCart = await productRepository.GetProductByIdForUpdateAsync(
                         cartItem.Data.ProductId
@@ -456,7 +456,7 @@ public class OrderService(
                     }
                 );
             }
-
+            
             // Create order record
             var order = new Order
             {
@@ -466,7 +466,7 @@ public class OrderService(
                 SubTotal = subTotal,
                 ShippingFee = shippingFee,
                 DiscountAmount = discountAmount,
-                Note = req.Note,
+                Note = req.Note!.Trim(),
                 OrderItems = orderItems,
                 Status = OrderStatus.Pending,
                 PointsUsed = Math.Min((int)totalAmount, currentCustomer.Data.Point),
@@ -615,8 +615,8 @@ public class OrderService(
             }
 
             // Clear cart items
-            var cartItems = await cartRepository.ClearCartByUserIdAsync(
-                currentCustomer.Data.UserId
+            var cartItems = await cartRepository.RemoveCartItemRangeByIdAsync(
+                req.CartItemId, currentCustomer.Data.UserId
             );
             if (!cartItems.IsSuccess)
                 return new Return<bool>
@@ -630,21 +630,52 @@ public class OrderService(
             // Update stock quantity and sold quantity
             foreach (var item in orderItemsWithPrice)
             {
-                var variant = await productRepository.GetProductVariantByIdForUpdateAsync(
-                    item.VariantId
-                );
-                variant.Data!.StockQuantity -= item.Quantity;
-                variant.Data.SoldQuantity += item.Quantity;
-                if (variant.Data.StockQuantity == 0)
-                    variant.Data.Status = ProductStatus.OutOfStock;
-                var updateResult = await productRepository.UpdateProductVariantAsync(variant.Data);
-                if (!updateResult.IsSuccess)
-                    return new Return<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = updateResult.StatusCode,
-                        InternalErrorMessage = updateResult.InternalErrorMessage,
-                    };
+                if (item.VariantId.HasValue)
+                {
+                    var variant = await productRepository.GetProductVariantByIdForUpdateAsync(item.VariantId.Value);
+                    if (!variant.IsSuccess || variant.Data == null)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = variant.StatusCode,
+                            InternalErrorMessage =  variant.InternalErrorMessage
+                        };
+                    variant.Data.StockQuantity -= item.Quantity;
+                    variant.Data.SoldQuantity += item.Quantity;
+                    if (variant.Data.StockQuantity == 0)
+                        variant.Data.Status = ProductStatus.OutOfStock;
+                    var updateResult = await productRepository.UpdateProductVariantAsync(variant.Data);
+                    if (!updateResult.IsSuccess)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = updateResult.StatusCode,
+                            InternalErrorMessage = updateResult.InternalErrorMessage
+                        };
+                }
+                else
+                {
+                    var product = await productRepository.GetProductByIdForUpdateAsync(item.ProductId);
+                    if (!product.IsSuccess || product.Data == null)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = product.StatusCode,
+                            InternalErrorMessage = product.InternalErrorMessage
+                        };
+                    product.Data.StockQuantity -= item.Quantity;
+                    product.Data.SoldQuantity += item.Quantity;
+                    if (product.Data.StockQuantity == 0)
+                        product.Data.Status = ProductStatus.OutOfStock;
+                    var updateResult = await productRepository.UpdateProductAsync(product.Data);
+                    if (!updateResult.IsSuccess)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = updateResult.StatusCode,
+                            InternalErrorMessage = updateResult.InternalErrorMessage
+                        };
+                }
             }
 
             // Update user points
@@ -739,8 +770,7 @@ public class OrderService(
                         Price = x.Price,
                         ProductName = x.ProductName,
                         VariantName =
-                            x.ProductVariantId.HasValue
-                            && x.ProductVariant != null
+                            x is { ProductVariantId: not null, ProductVariant: not null }
                             && x.ProductVariant.VariantAttributes.Any()
                                 ? string.Join(
                                     "-",
