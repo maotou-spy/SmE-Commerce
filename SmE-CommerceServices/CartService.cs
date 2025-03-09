@@ -25,7 +25,7 @@ public class CartService(
             if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
                 return new Return<List<GetCartResDto>>
                 {
-                    Data = [],
+                    Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.NotAuthority,
                     InternalErrorMessage = currentCustomer.InternalErrorMessage,

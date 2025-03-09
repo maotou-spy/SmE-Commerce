@@ -277,6 +277,44 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
         }
     }
 
+    public async Task<Return<bool>> RemoveCartItemRangeByIdAsync(List<Guid> cartId, Guid userId)
+    {
+        try
+        {
+            var carts = await defaultdbContext
+                .CartItems.Where(x => cartId.Contains(x.CartItemId) && x.UserId == userId)
+                .ToListAsync();
+
+            if (carts.Count == 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.CartNotFound,
+                };
+
+            defaultdbContext.CartItems.RemoveRange(carts);
+            await defaultdbContext.SaveChangesAsync();
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
     public async Task<Return<bool>> ClearCartByUserIdAsync(Guid userId)
     {
         try
