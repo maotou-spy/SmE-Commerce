@@ -76,6 +76,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
+                .Include(x => x.ProductVariants)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
@@ -159,6 +160,8 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
+                .Include(x => x.ProductVariants)
+                .ThenInclude(x => x.VariantAttributes)
                 .ToListAsync();
 
             return new Return<List<Product>>
@@ -192,6 +195,8 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
+                .Include(x => x.ProductVariants)
+                .ThenInclude(x => x.VariantAttributes)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
@@ -839,34 +844,6 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<bool>
-            {
-                Data = false,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
-                TotalRecord = 0,
-            };
-        }
-    }
-
-    public async Task<Return<bool>> BulkAddProductVariantAsync(List<ProductVariant> productVariants)
-    {
-        try
-        {
-            await dbContext.ProductVariants.AddRangeAsync(productVariants);
-            await dbContext.SaveChangesAsync();
-
-            return new Return<bool>
-            {
-                Data = true,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = productVariants.Count,
             };
         }
         catch (Exception ex)

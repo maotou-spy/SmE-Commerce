@@ -218,7 +218,7 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
     {
         try
         {
-            var a = defaultdbContext.CartItems.Update(cart);
+            defaultdbContext.CartItems.Update(cart);
             await defaultdbContext.SaveChangesAsync();
             return new Return<bool>
             {

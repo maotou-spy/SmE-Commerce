@@ -22,6 +22,10 @@ public static class ErrorCode
     public const string OnlyForTheNewUser = "014";
     public const string InvalidPointBalance = "015";
     public const string InvalidPrice = "016";
+    public const string InvalidStockQuantity = "017";
+    public const string InvalidImageUrl = "018";
+    public const string AtLeastTwoProductVariant = "019";
+    public const string InvalidVariantAttributeStructure = "020";
 
     // Not found
     public const string ProductNotFound = "101";
@@ -74,6 +78,9 @@ public static class ErrorCode
     // Not For Customer
     public const string NotForCustomer = "501";
     public const string NotYourAddress = "502";
+
+    // Data inconsistency
+    public const string DataInconsistency = "601";
 
     // Internal server error
     public const string InternalServerError = "999";

@@ -10,14 +10,14 @@ public class AddProductVariantReqDto
     [Range(0, double.MaxValue, ErrorMessage = "Price must be non-negative.")]
     public decimal Price { get; set; } = 0;
 
-    [Range(0, int.MaxValue, ErrorMessage = "Stock Quantity must be non-negative.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Stock Quantity must be non-negative.")]
     [Required(ErrorMessage = "Stock Quantity is required")]
     public required int StockQuantity { get; set; }
 
     public string? VariantImage { get; set; }
 
     [Required(ErrorMessage = "Variant values are required")]
-    public required List<ProductVariantValueReqDto> VariantValues { get; set; }
+    public required List<ProductVariantValueReqDto> VariantValues { get; set; } = null!;
 
-    public bool Status { get; set; } = false;
+    // public bool Status { get; set; } = true;
 }

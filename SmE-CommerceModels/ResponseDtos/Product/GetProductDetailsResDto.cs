@@ -22,6 +22,10 @@ public class GetProductDetailsResDto
 
     public bool IsTopSeller { get; set; }
 
+    public bool HasVariant { get; set; } = false;
+
+    public decimal? AverageRating { get; set; }
+
     public List<GetProductImageResDto>? Images { get; set; } = [];
 
     public List<GetProductAttributeResDto>? Attributes { get; set; } = [];

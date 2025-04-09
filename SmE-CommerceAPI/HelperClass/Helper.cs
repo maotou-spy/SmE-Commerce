@@ -26,17 +26,42 @@ public static class Helper
     {
         return statusCode switch
         {
-            // Authentication errors
-            ErrorCode.NotAuthority or ErrorCode.AccountIsInactive => HttpStatusCode.Forbidden, // 403
+            // ✅ Success
+            ErrorCode.Ok => HttpStatusCode.OK,
+
+            // 🔐 Authorization/Auth errors
+            ErrorCode.NotAuthority
+            or ErrorCode.AccountIsInactive
+            or ErrorCode.NotForCustomer
+            or ErrorCode.NotYourAddress => HttpStatusCode.Forbidden, // 403
+
             ErrorCode.InvalidToken or ErrorCode.InvalidCredentials => HttpStatusCode.Unauthorized, // 401
 
-            // Validation errors
-            ErrorCode.InvalidPercentage
-            or ErrorCode.InvalidDate
+            // ❌ Bad Request
+            ErrorCode.BadRequest
+            or ErrorCode.InvalidEmail
             or ErrorCode.InvalidPassword
-            or ErrorCode.InvalidEmail => HttpStatusCode.BadRequest, // 400
+            or ErrorCode.InvalidDate
+            or ErrorCode.InvalidPercentage
+            or ErrorCode.InvalidNumber
+            or ErrorCode.InvalidDiscountCode
+            or ErrorCode.InvalidAmount
+            or ErrorCode.InvalidTotalAmount
+            or ErrorCode.InvalidPoint
+            or ErrorCode.InvalidSubTotal
+            or ErrorCode.DiscountCodeExpired
+            or ErrorCode.OnlyForTheNewUser
+            or ErrorCode.InvalidPointBalance
+            or ErrorCode.InvalidPrice
+            or ErrorCode.InvalidStockQuantity
+            or ErrorCode.InvalidImageUrl
+            or ErrorCode.AtLeastTwoProductVariant
+            or ErrorCode.InvalidVariantAttributeStructure
+            or ErrorCode.InvalidQuantity
+            or ErrorCode.OverStockQuantity
+            or ErrorCode.OrderAmountTooLow => HttpStatusCode.BadRequest, // 400
 
-            // Resource not found
+            // 🔍 Not Found
             ErrorCode.ProductNotFound
             or ErrorCode.CategoryNotFound
             or ErrorCode.UserNotFound
@@ -45,26 +70,41 @@ public static class Helper
             or ErrorCode.AddressNotFound
             or ErrorCode.CartNotFound
             or ErrorCode.ProductImageNotFound
-            or ErrorCode.ProductAttributeNotFound => HttpStatusCode.NotFound, // 404
+            or ErrorCode.ProductAttributeNotFound
+            or ErrorCode.VariantNameNotFound
+            or ErrorCode.ProductVariantNotFound
+            or ErrorCode.DiscountCodeNotFound
+            or ErrorCode.SettingNotFound
+            or ErrorCode.BankInfoNotFound
+            or ErrorCode.PaymentMethodNotFound
+            or ErrorCode.OrderItemNotFound => HttpStatusCode.NotFound, // 404
 
-            // Conflict (already exists)
+            // 🌀 Conflict (already exists)
             ErrorCode.EmailAlreadyExists
             or ErrorCode.PhoneAlreadyExists
             or ErrorCode.NameAlreadyExists
             or ErrorCode.AddressAlreadyExists
             or ErrorCode.SlugAlreadyExists
             or ErrorCode.DiscountCodeAlreadyExists
-            or ErrorCode.UserAlreadyExists => HttpStatusCode.Conflict, // 409
+            or ErrorCode.UserAlreadyExists
+            or ErrorCode.CategoryHasProducts
+            or ErrorCode.VariantNameAlreadyExists
+            or ErrorCode.ProductNameAlreadyExists
+            or ErrorCode.ProductVariantAlreadyExists
+            or ErrorCode.BankCodeAlreadyExists
+            or ErrorCode.BankNameAlreadyExists
+            or ErrorCode.AccountNumberAlreadyExists
+            or ErrorCode.OutOfStock
+            or ErrorCode.VariantNameConflict => HttpStatusCode.Conflict, // 409
 
-            // Business-specific errors
-            ErrorCode.OutOfStock => HttpStatusCode.BadRequest, // 400
-            ErrorCode.NotForCustomer => HttpStatusCode.Forbidden, // 403
+            // 🧩 Data inconsistency
+            ErrorCode.DataInconsistency => HttpStatusCode.Conflict, // 409
 
-            // Internal server errors
+            // 🔧 Internal Error
             ErrorCode.InternalServerError => HttpStatusCode.InternalServerError, // 500
 
-            // Default fallback
-            _ => HttpStatusCode.InternalServerError, // 500
+            // 🚫 Default fallback
+            _ => HttpStatusCode.InternalServerError,
         };
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace SmE_CommerceModels.ReturnResult;
+﻿using SmE_CommerceModels.Enums;
+
+namespace SmE_CommerceModels.ReturnResult;
 
 public class Return<T>
 {

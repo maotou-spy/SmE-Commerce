@@ -333,14 +333,14 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     [HttpPost("{productId:guid}/variants")]
     [OpenApiOperation("Create Product Variant", "Create Product Variant")]
     [Authorize]
-    public async Task<IActionResult> BulkProductVariantAsync(
+    public async Task<IActionResult> AddProductVariantAsync(
         [FromBody] List<AddProductVariantReqDto> req,
         Guid productId
     )
     {
         try
         {
-            var result = await productService.BulkProductVariantAsync(productId, req);
+            var result = await productService.AddProductVariantAsync(productId, req);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -355,6 +355,36 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         catch (Exception ex)
         {
             logger.LogInformation("Error at create product variant user: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpPut("{productId:guid}/variants/{variantId:guid}")]
+    [OpenApiOperation("Update Product Variant", "Update Product Variant")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProductVariantAsync(
+        [FromBody] UpdateProductVariantReqDto req,
+        Guid productId,
+        Guid variantId
+    )
+    {
+        try
+        {
+            var result = await productService.UpdateProductVariantAsync(productId, variantId, req);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError(
+                    "Error at update product variant user: {ex}",
+                    result.InternalErrorMessage
+                );
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at update product variant user: {e}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

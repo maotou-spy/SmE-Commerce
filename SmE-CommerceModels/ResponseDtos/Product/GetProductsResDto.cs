@@ -16,5 +16,7 @@ public class GetProductsResDto
 
     public List<Dictionary<Guid, string>>? Categories { get; set; }
 
+    public bool HasVariant { get; set; } = false;
+
     public decimal? AverageRating { get; set; }
 }

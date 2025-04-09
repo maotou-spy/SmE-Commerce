@@ -1,21 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using SmE_CommerceModels.Enums;
 
 namespace SmE_CommerceModels.RequestDtos.Product;
 
 public class UpdateProductVariantReqDto
 {
-    [Required(ErrorMessage = "Variant Value is required")]
-    public required string VariantValue { get; set; }
-
-    public string? Sku { get; set; }
-
+    [Range(0, double.MaxValue, ErrorMessage = "Price must be non-negative")]
     public decimal Price { get; set; } = 0;
 
-    [Required(ErrorMessage = "Stock Quantity is required")]
-    public required int StockQuantity { get; set; }
+    [Range(0, int.MaxValue, ErrorMessage = "Stock Quantity must be non-negative")]
+    public int StockQuantity { get; set; } = 0;
 
-    [Required(ErrorMessage = "Variant values are required")]
-    public required List<ProductVariantValueReqDto> VariantValues { get; set; }
+    public string? VariantImage { get; set; }
 
-    public string? Status { get; set; }
+    public string Status { get; set; } = ProductStatus.Active;
+
+    public List<ProductVariantValueReqDto>? VariantValues { get; set; }
 }

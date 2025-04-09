@@ -2,22 +2,16 @@ using System.Transactions;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
-using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ResponseDtos.Product.Manager;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
-using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class ProductService(
-    IProductRepository productRepository,
-    ICategoryRepository categoryRepository,
-    IVariantNameRepository variantNameRepository,
-    IHelperService helperService
-) : IProductService
+public class ProductService(IProductRepository productRepository, IHelperService helperService)
+    : IProductService
 {
     #region Product Category
 
@@ -139,11 +133,12 @@ public class ProductService(
 
     #region Product Variation
 
-    public async Task<Return<bool>> BulkProductVariantAsync(
+    public async Task<Return<bool>> AddProductVariantAsync(
         Guid productId,
         List<AddProductVariantReqDto> req
     )
     {
+        // Step 1: Check if the request is empty
         if (req.Count == 0)
             return new Return<bool>
             {
@@ -152,9 +147,23 @@ public class ProductService(
                 StatusCode = ErrorCode.BadRequest,
             };
 
+        // Step 2: Check if the request is valid
+        foreach (
+            var isValid in req.Select(IsProductVariantReqValidAsync)
+                .Where(isValid => !isValid.Data || !isValid.IsSuccess)
+        )
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = isValid.StatusCode,
+                InternalErrorMessage = isValid.InternalErrorMessage,
+            };
+
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
+            // Step 3: Check if the current user is a manager
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
@@ -165,151 +174,217 @@ public class ProductService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            // Ensure all variants have the same number and type of attributes
-            var expectedAttributes = req.First()
-                .VariantValues.Select(v => v.VariantNameId)
-                .ToHashSet();
-
+            // Step 4: Check product
+            var existingProduct = await productRepository.GetProductByIdForUpdateAsync(productId);
             if (
-                req.Any(x =>
-                    !x
-                        .VariantValues.Select(v => v.VariantNameId)
-                        .ToHashSet()
-                        .SetEquals(expectedAttributes)
-                )
+                !existingProduct.IsSuccess
+                || existingProduct.Data == null
+                || existingProduct.Data.Status == ProductStatus.Deleted
             )
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage,
                 };
 
-            // Check existing variants for duplicates
-            var existingVariants = await productRepository.GetProductVariantsByProductIdAsync(
-                productId
-            );
-            if (existingVariants is { IsSuccess: true, Data.Count: > 0 })
-            {
-                var existingKeys = existingVariants
-                    .Data.Select(x => GetVariantKey(x.VariantAttributes))
-                    .ToHashSet();
+            var hasVariants = existingProduct.Data.HasVariant;
+            var existingVariantsCount = existingProduct.Data.ProductVariants.Count;
 
-                if (req.Any(x => existingKeys.Contains(GetVariantKey(x.VariantValues))))
+            switch (hasVariants)
+            {
+                // If product has variants, ensure ProductVariant exists
+                case true when existingVariantsCount <= 1:
                     return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.DataInconsistency,
+                    };
+
+                // If product does not have variants, ensure at least two variants are added
+                case false when req.Count < 2:
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.AtLeastTwoProductVariant,
+                    };
+            }
+
+            // Step 5: Check VariantAttributes for uniformity and non-duplication
+            List<Guid> expectedVariantNameIds; // Number and type of attributes
+            var existingAttributeDicts = new List<Dictionary<Guid, string>>(); // Existing attributes
+
+            if (hasVariants && existingVariantsCount > 0)
+            {
+                // Already has variants
+                if (existingProduct.Data.ProductVariants.Count == 0)
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.DataInconsistency,
+                    };
+
+                var firstExistingVariant = existingProduct.Data.ProductVariants.First();
+                expectedVariantNameIds = firstExistingVariant
+                    .VariantAttributes.Select(va => va.VariantNameId)
+                    .OrderBy(id => id)
+                    .ToList();
+
+                existingAttributeDicts.AddRange(
+                    existingProduct.Data.ProductVariants.Select(variant =>
+                        variant.VariantAttributes.ToDictionary(
+                            va => va.VariantNameId,
+                            va => va.Value
+                        )
+                    )
+                );
+            }
+            else
+            {
+                // No variants yet
+                if (req.First().VariantValues.Count == 0)
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.BadRequest,
+                    };
+
+                expectedVariantNameIds = req.First()
+                    .VariantValues.Select(vv => vv.VariantNameId)
+                    .OrderBy(id => id)
+                    .ToList();
+            }
+
+            // Check VariantAttributes for uniformity and non-duplication
+            var newAttributeDicts = new List<Dictionary<Guid, string>>(); // New attributes
+            foreach (var variantReq in req)
+            {
+                var variantNameIds = variantReq
+                    .VariantValues.Select(vv => vv.VariantNameId)
+                    .OrderBy(id => id)
+                    .ToList();
+
+                // Check uniformity
+                if (!variantNameIds.SequenceEqual(expectedVariantNameIds))
+                    return new Return<bool>()
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.DataInconsistency,
+                    };
+
+                // Check duplication
+                var newAttributeDict = variantReq.VariantValues.ToDictionary(
+                    vv => vv.VariantNameId,
+                    vv => vv.VariantValue
+                );
+
+                // Duplicate with existing variants
+                if (
+                    existingAttributeDicts.Any(dict =>
+                        dict.Count == newAttributeDict.Count
+                        && dict.All(kv =>
+                            newAttributeDict.ContainsKey(kv.Key)
+                            && newAttributeDict[kv.Key] == kv.Value
+                        )
+                    )
+                )
+                    return new Return<bool>()
                     {
                         Data = false,
                         IsSuccess = false,
                         StatusCode = ErrorCode.ProductVariantAlreadyExists,
                     };
+
+                // Duplicate with new variants
+                if (
+                    newAttributeDicts.Any(dict =>
+                        dict.Count == newAttributeDict.Count
+                        && dict.All(kv =>
+                            newAttributeDict.ContainsKey(kv.Key)
+                            && newAttributeDict[kv.Key] == kv.Value
+                        )
+                    )
+                )
+                    return new Return<bool>()
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.BadRequest,
+                    };
+
+                newAttributeDicts.Add(newAttributeDict);
             }
 
-            // Check for duplicate variants in request
-            var uniqueKeys = new HashSet<string>();
-            if (req.Any(x => !uniqueKeys.Add(GetVariantKey(x.VariantValues))))
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
-                };
-
-            // Validate variant names and product in one go
-            var variantNameIds = req.SelectMany(x => x.VariantValues.Select(v => v.VariantNameId))
-                .Distinct()
-                .ToList();
-
-            var variantNames = await variantNameRepository.GetVariantNamesByIdsAsync(
-                variantNameIds
-            );
-            if (!variantNames.IsSuccess || variantNames.Data?.Count != variantNameIds.Count)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.VariantNameNotFound,
-                };
-
-            var productResult = await productRepository.GetProductByIdAsync(productId);
-
-            if (!productResult.IsSuccess || productResult.Data == null)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = productResult.InternalErrorMessage,
-                };
-            if (
-                !productResult.IsSuccess
-                || productResult.Data == null
-                || productResult.Data.Status == ProductStatus.Deleted
-            )
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = productResult.InternalErrorMessage,
-                };
+            // Step 6: Add ProductVariants and VariantAttributes
+            var currentUserId = currentUser.Data.UserId;
+            var now = DateTime.Now;
 
             // Map product variants
             var productVariants = req.Select(x => new ProductVariant
                 {
                     ProductId = productId,
-                    // Sku = x.Sku,
                     Price = x.Price,
                     StockQuantity = x.StockQuantity,
                     VariantImage = x.VariantImage,
+                    SoldQuantity = 0,
                     Status =
                         x.StockQuantity > 0
-                            ? x.Status
+                            ? existingProduct.Data.Status == ProductStatus.Active
                                 ? ProductStatus.Active
                                 : ProductStatus.Inactive
                             : ProductStatus.OutOfStock,
-                    CreateById = currentUser.Data.UserId,
-                    CreatedAt = DateTime.Now,
+                    VariantAttributes = x
+                        .VariantValues.Select(v => new VariantAttribute
+                        {
+                            VariantNameId = v.VariantNameId,
+                            Value = v.VariantValue,
+                            CreatedById = currentUserId,
+                            CreatedAt = now,
+                        })
+                        .ToList(),
+                    CreateById = currentUserId,
+                    CreatedAt = now,
                 })
                 .ToList();
 
-            // Save product variants
-            var addResult = await productRepository.BulkAddProductVariantAsync(productVariants);
-            if (!addResult.IsSuccess)
+            // Add product variants => Update existing product
+            existingProduct.Data.StockQuantity += productVariants.Sum(x => x.StockQuantity);
+            if (existingProduct.Data.StockQuantity < 0)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = addResult.StatusCode,
-                    InternalErrorMessage = addResult.InternalErrorMessage,
+                    StatusCode = ErrorCode.InvalidStockQuantity,
                 };
 
-            // Map and save variant attributes
-            var variantAttributes = productVariants
-                .Zip(
-                    req,
-                    (productVariant, x) =>
-                        x.VariantValues.Select(v => new VariantAttribute
-                        {
-                            ProductVariantId = productVariant.ProductVariantId,
-                            VariantNameId = v.VariantNameId,
-                            Value = v.VariantValue,
-                            CreatedById = currentUser.Data.UserId,
-                            CreatedAt = DateTime.Now,
-                        })
-                )
-                .SelectMany(attributes => attributes)
-                .ToList();
+            // Convert from ICollection to List to use AddRange
+            var productVariantList =
+                existingProduct.Data.ProductVariants as List<ProductVariant>
+                ?? existingProduct.Data.ProductVariants.ToList();
+            productVariantList.AddRange(productVariants);
+            existingProduct.Data.ProductVariants = productVariantList;
 
-            var addVariantAttributesResult = await productRepository.BulkAddVariantAttributeAsync(
-                variantAttributes
+            existingProduct.Data.HasVariant = true;
+            existingProduct.Data.ModifiedById = currentUserId;
+            existingProduct.Data.ModifiedAt = now;
+
+            var updateProductResult = await productRepository.UpdateProductAsync(
+                existingProduct.Data
             );
-            if (!addVariantAttributesResult.IsSuccess)
+
+            if (!updateProductResult.IsSuccess || updateProductResult.Data is null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = addVariantAttributesResult.StatusCode,
-                    InternalErrorMessage = addVariantAttributesResult.InternalErrorMessage,
+                    StatusCode = updateProductResult.StatusCode,
+                    InternalErrorMessage = updateProductResult.InternalErrorMessage,
                 };
 
             transaction.Complete();
@@ -318,6 +393,7 @@ public class ProductService(
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
+                TotalRecord = productVariants.Count,
             };
         }
         catch (Exception ex)
@@ -332,140 +408,209 @@ public class ProductService(
         }
     }
 
-    // public async Task<Return<bool>> UpdateProductVariantAsync(
-    //     Guid variantId,
-    //     UpdateProductVariantReqDto req
-    // )
-    // {
-    //     using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-    //     try
-    //     {
-    //         var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-    //         if (!currentUser.IsSuccess || currentUser.Data == null)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = currentUser.StatusCode,
-    //                 InternalErrorMessage = currentUser.InternalErrorMessage,
-    //             };
-    //
-    //         var productVariant = await productRepository.GetProductVariantByIdAsync(variantId);
-    //         if (!productVariant.IsSuccess || productVariant.Data == null)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = productVariant.StatusCode,
-    //                 InternalErrorMessage = productVariant.InternalErrorMessage,
-    //             };
-    //
-    //         if (productVariant.Data.Status == GeneralStatus.Deleted)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = ErrorCode.ProductVariantNotFound,
-    //             };
-    //
-    //         // No change
-    //         if (
-    //             productVariant.Data.Sku == req.Sku
-    //             && productVariant.Data.Price == req.Price
-    //             && productVariant.Data.StockQuantity == req.StockQuantity
-    //             && productVariant.Data.Status == req.Status
-    //         )
-    //             return new Return<bool>
-    //             {
-    //                 Data = true,
-    //                 IsSuccess = true,
-    //                 StatusCode = ErrorCode.Ok,
-    //             };
-    //
-    //         var product = await productRepository.GetProductByIdAsync(
-    //             productVariant.Data.ProductId
-    //         );
-    //         if (product is not { IsSuccess: true, Data: not null })
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = product.StatusCode,
-    //                 InternalErrorMessage = product.InternalErrorMessage,
-    //             };
-    //
-    //         if (product.Data.Status == Status.Deleted)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = ErrorCode.ProductNotFound,
-    //             };
-    //
-    //         var variant = await variantNameRepository.GetVariantNameByIdAsync(
-    //             productVariant.Data.VariantNameId
-    //         );
-    //         if (!variant.IsSuccess || variant.Data == null)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = variant.StatusCode,
-    //                 InternalErrorMessage = variant.InternalErrorMessage,
-    //             };
-    //
-    //         var isVariantExisted = await productRepository.IsProductVariantExistAsync(
-    //             req.VariantValue,
-    //             productVariant.Data.ProductId
-    //         );
-    //         if (isVariantExisted is { IsSuccess: true, Data: true })
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = ErrorCode.ProductVariantAlreadyExists,
-    //             };
-    //
-    //         productVariant.Data.Sku = req.Sku;
-    //         productVariant.Data.Price = req.Price;
-    //         productVariant.Data.StockQuantity = req.StockQuantity;
-    //         productVariant.Data.Status =
-    //             req.StockQuantity > 0
-    //                 ? req.Status ?? Status.Active
-    //                 : Status.OutOfStock;
-    //         productVariant.Data.ModifiedById = currentUser.Data.UserId;
-    //         productVariant.Data.ModifiedAt = DateTime.Now;
-    //
-    //         var result = await productRepository.UpdateProductVariantAsync(productVariant.Data);
-    //         if (!result.IsSuccess || result.Data == false)
-    //             return new Return<bool>
-    //             {
-    //                 Data = false,
-    //                 IsSuccess = false,
-    //                 StatusCode = result.StatusCode,
-    //                 InternalErrorMessage = result.InternalErrorMessage,
-    //             };
-    //
-    //         transaction.Complete();
-    //
-    //         return new Return<bool>
-    //         {
-    //             Data = true,
-    //             IsSuccess = true,
-    //             StatusCode = ErrorCode.Ok,
-    //         };
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return new Return<bool>
-    //         {
-    //             Data = false,
-    //             IsSuccess = false,
-    //             StatusCode = ErrorCode.InternalServerError,
-    //             InternalErrorMessage = ex,
-    //         };
-    //     }
-    // }
+    public async Task<Return<bool>> UpdateProductVariantAsync(
+        Guid productId,
+        Guid productVariantId,
+        UpdateProductVariantReqDto req
+    )
+    {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Step 1: Check if the current user is a manager
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                };
+
+            // Step 2: Check product
+            var existingProduct = await productRepository.GetProductByIdForUpdateAsync(productId);
+            if (
+                !existingProduct.IsSuccess
+                || existingProduct.Data == null
+                || existingProduct.Data.Status == ProductStatus.Deleted
+            )
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage,
+                };
+
+            var existingVariants = existingProduct.Data.ProductVariants;
+            if (!existingProduct.Data.HasVariant || existingVariants.Count == 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.DataInconsistency,
+                };
+
+            // Step 3: Check ProductVariant to update;
+            var variantToUpdate = existingVariants.FirstOrDefault(pv =>
+                pv.ProductVariantId == productVariantId
+            );
+            if (variantToUpdate == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                };
+
+            // Step 4: Compare data with DB to check for changes
+            var hasChanges = false;
+            var stockChange = 0;
+
+            // Compare Price
+            if (req.Price != variantToUpdate.Price)
+            {
+                hasChanges = true;
+                variantToUpdate.Price = req.Price;
+            }
+
+            // Compare StockQuantity
+            var newStockQuantity =
+                req.StockQuantity != 0 ? req.StockQuantity : variantToUpdate.StockQuantity;
+            if (newStockQuantity != variantToUpdate.StockQuantity)
+            {
+                hasChanges = true;
+                stockChange = newStockQuantity - variantToUpdate.StockQuantity;
+                variantToUpdate.StockQuantity = newStockQuantity;
+            }
+
+            // Compare VariantImage
+            if (req.VariantImage != variantToUpdate.VariantImage)
+            {
+                hasChanges = true;
+                variantToUpdate.VariantImage = req.VariantImage;
+            }
+
+            // Compare Status
+            var newStatus = string.IsNullOrEmpty(req.Status) ? ProductStatus.Active : req.Status;
+            if (newStatus != variantToUpdate.Status)
+            {
+                hasChanges = true;
+                variantToUpdate.Status = newStatus;
+            }
+
+            // Compare VariantAttributes
+            if (req.VariantValues != null)
+            {
+                var existingVariantNameIds = variantToUpdate
+                    .VariantAttributes.Select(va => va.VariantNameId)
+                    .OrderBy(id => id)
+                    .ToList();
+                var newVariantNameIds = req
+                    .VariantValues.Select(vv => vv.VariantNameId)
+                    .OrderBy(id => id)
+                    .ToList();
+
+                // Check if number or type of VariantAttributes changed
+                if (
+                    existingVariantNameIds.Count != newVariantNameIds.Count
+                    || !existingVariantNameIds.SequenceEqual(newVariantNameIds)
+                )
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidVariantAttributeStructure,
+                    };
+
+                // Compare values using dictionary
+                var existingAttrDict = variantToUpdate.VariantAttributes.ToDictionary(
+                    va => va.VariantNameId,
+                    va => va.Value
+                );
+                var attributesChanged = false;
+
+                foreach (var newValue in req.VariantValues)
+                    if (existingAttrDict.TryGetValue(newValue.VariantNameId, out var existingValue))
+                        if (existingValue != newValue.VariantValue)
+                        {
+                            attributesChanged = true;
+                            var attrToUpdate = variantToUpdate.VariantAttributes.First(va =>
+                                va.VariantNameId == newValue.VariantNameId
+                            );
+                            attrToUpdate.Value = newValue.VariantValue;
+                            attrToUpdate.ModifiedById = currentUser.Data.UserId;
+                            attrToUpdate.ModifiedAt = DateTime.UtcNow;
+                        }
+
+                if (attributesChanged)
+                    hasChanges = true;
+            }
+
+            // If no changes, return without updating
+            if (!hasChanges)
+                return new Return<bool>
+                {
+                    Data = true,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = 0,
+                };
+
+            // Step 5: Update ProductVariant fields
+            var currentUserId = currentUser.Data.UserId;
+            var now = DateTime.Now;
+
+            variantToUpdate.ModifiedById = currentUserId;
+            variantToUpdate.ModifiedAt = now;
+
+            // Step 6: Update product
+            existingProduct.Data.StockQuantity += stockChange;
+            if (existingProduct.Data.StockQuantity < 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidStockQuantity,
+                };
+
+            existingProduct.Data.HasVariant = true;
+            existingProduct.Data.ModifiedById = currentUserId;
+            existingProduct.Data.ModifiedAt = now;
+
+            var updateProductResult = await productRepository.UpdateProductAsync(
+                existingProduct.Data
+            );
+            if (!updateProductResult.IsSuccess || updateProductResult.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = updateProductResult.StatusCode,
+                    InternalErrorMessage = updateProductResult.InternalErrorMessage,
+                };
+
+            transaction.Complete();
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
 
     #endregion
 
@@ -1486,6 +1631,51 @@ public class ProductService(
             "-",
             values.OrderBy(v => v.VariantNameId).Select(v => v.Value ?? v.VariantValue)
         );
+    }
+
+    private static Return<bool> IsProductVariantReqValidAsync(AddProductVariantReqDto req)
+    {
+        if (req.VariantValues.Count == 0)
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        if (req.Price < 0 || req.StockQuantity < 0)
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        foreach (var value in req.VariantValues)
+        {
+            if (value.VariantNameId == Guid.Empty)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+
+            if (string.IsNullOrWhiteSpace(value.VariantValue) || value.VariantValue.Length > 255)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+        }
+
+        return new Return<bool>
+        {
+            Data = true,
+            IsSuccess = true,
+            StatusCode = ErrorCode.Ok,
+        };
     }
 
     #endregion
