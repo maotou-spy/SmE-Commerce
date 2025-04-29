@@ -388,4 +388,30 @@ public class ProductController(IProductService productService, ILogger<AuthContr
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+
+    [HttpDelete("{productId:guid}/variants/{variantId:guid}")]
+    [OpenApiOperation("Delete Product Variant", "Delete Product Variant")]
+    [Authorize]
+    public async Task<IActionResult> DeleteProductVariantAsync(Guid productId, Guid variantId)
+    {
+        try
+        {
+            var result = await productService.DeleteProductVariantAsync(productId, variantId);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError(
+                    "Error at delete product variant user: {ex}",
+                    result.InternalErrorMessage
+                );
+
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at delete product variant user: {e}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 }

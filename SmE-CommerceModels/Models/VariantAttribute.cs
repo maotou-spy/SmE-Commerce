@@ -16,18 +16,8 @@ public class VariantAttribute
     [StringLength(255)]
     public string Value { get; set; } = null!;
 
-    [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
-
-    [Column("createdById")]
-    public Guid? CreatedById { get; set; }
-
     [Column("variantNameId")]
     public Guid VariantNameId { get; set; }
-
-    [ForeignKey("CreatedById")]
-    [InverseProperty("VariantAttributeCreatedBies")]
-    public virtual User? CreatedBy { get; set; }
 
     [ForeignKey("ProductVariantId")]
     [InverseProperty("VariantAttributes")]

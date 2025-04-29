@@ -648,11 +648,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.AttributeId).HasDefaultValueSql("gen_random_uuid()");
 
             entity
-                .HasOne(d => d.CreatedBy)
-                .WithMany(p => p.VariantAttributeCreatedBies)
-                .HasConstraintName("VariantAttributes_createdById_fkey");
-
-            entity
                 .HasOne(d => d.ProductVariant)
                 .WithMany(p => p.VariantAttributes)
                 .OnDelete(DeleteBehavior.ClientSetNull)

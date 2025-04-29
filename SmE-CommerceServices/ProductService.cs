@@ -344,8 +344,6 @@ public class ProductService(IProductRepository productRepository, IHelperService
                         {
                             VariantNameId = v.VariantNameId,
                             Value = v.VariantValue,
-                            CreatedById = currentUserId,
-                            CreatedAt = now,
                         })
                         .ToList(),
                     CreateById = currentUserId,
@@ -567,6 +565,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
             }
 
             // Step 8: Update variant
+            var now = DateTime.Now;
             var stockDifference = req.StockQuantity - variantToUpdate.StockQuantity;
             variantToUpdate.Price = req.Price;
             variantToUpdate.StockQuantity = req.StockQuantity;
@@ -581,6 +580,9 @@ public class ProductService(IProductRepository productRepository, IHelperService
             foreach (var va in variantToUpdate.VariantAttributes)
                 va.Value = newAttributesDict[va.VariantNameId];
 
+            variantToUpdate.ModifiedById = currentUser.Data.UserId;
+            variantToUpdate.ModifiedAt = now;
+
             existingProduct.Data.StockQuantity += stockDifference;
             if (existingProduct.Data.StockQuantity < 0)
                 return new Return<bool>
@@ -591,9 +593,114 @@ public class ProductService(IProductRepository productRepository, IHelperService
                 };
 
             existingProduct.Data.ModifiedById = currentUser.Data.UserId;
-            existingProduct.Data.ModifiedAt = DateTime.Now;
+            existingProduct.Data.ModifiedAt = now;
 
             // Step 9: Save changes
+            var updateResult = await productRepository.UpdateProductAsync(existingProduct.Data);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = updateResult.StatusCode,
+                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                };
+
+            transaction.Complete();
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> DeleteProductVariantAsync(Guid productId, Guid variantId)
+    {
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Step 1: Check if the current user is a manager
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                };
+
+            // Step 2: Check product
+            var existingProduct = await productRepository.GetProductByIdForUpdateAsync(productId);
+            if (
+                !existingProduct.IsSuccess
+                || existingProduct.Data == null
+                || existingProduct.Data.Status == ProductStatus.Deleted
+            )
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage,
+                };
+
+            if (!existingProduct.Data.HasVariant || existingProduct.Data.ProductVariants.Count == 0)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                };
+
+            // Step 3: Check variant and minimum requirement
+            var variant = existingProduct.Data.ProductVariants.FirstOrDefault(v =>
+                v.ProductVariantId == variantId
+            );
+            if (variant == null || variant.Status == ProductStatus.Deleted)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductVariantNotFound,
+                };
+
+            var activeVariantsCount = existingProduct.Data.ProductVariants.Count(v =>
+                v.Status != ProductStatus.Deleted
+            );
+            if (activeVariantsCount <= 2)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.MinimumVariantRequired,
+                };
+
+            // Step 4: Delete variant (soft delete)
+            var now = DateTime.Now;
+            variant.Status = ProductStatus.Deleted;
+            variant.ModifiedAt = now;
+            variant.ModifiedById = currentUser.Data.UserId;
+            variant.StockQuantity = 0;
+
+            existingProduct.Data.StockQuantity -= variant.StockQuantity;
+            existingProduct.Data.ModifiedById = currentUser.Data.UserId;
+            existingProduct.Data.ModifiedAt = now;
+
+            // Step 5: Save changes
             var updateResult = await productRepository.UpdateProductAsync(existingProduct.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>

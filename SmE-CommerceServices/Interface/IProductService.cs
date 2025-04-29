@@ -58,4 +58,6 @@ public interface IProductService
         Guid productVariantId,
         ProductVariantReqDto req
     );
+
+    Task<Return<bool>> DeleteProductVariantAsync(Guid productId, Guid variantId);
 }

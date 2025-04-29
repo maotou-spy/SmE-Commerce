@@ -26,6 +26,7 @@ public static class ErrorCode
     public const string InvalidImageUrl = "018";
     public const string AtLeastTwoProductVariant = "019";
     public const string InvalidVariantAttributeStructure = "020";
+    public const string MinimumVariantRequired = "021";
 
     // Not found
     public const string ProductNotFound = "101";
