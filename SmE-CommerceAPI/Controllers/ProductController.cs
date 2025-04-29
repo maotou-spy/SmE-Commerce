@@ -334,7 +334,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     [OpenApiOperation("Create Product Variant", "Create Product Variant")]
     [Authorize]
     public async Task<IActionResult> AddProductVariantAsync(
-        [FromBody] List<AddProductVariantReqDto> req,
+        [FromBody] List<ProductVariantReqDto> req,
         Guid productId
     )
     {
@@ -363,7 +363,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     [OpenApiOperation("Update Product Variant", "Update Product Variant")]
     [Authorize]
     public async Task<IActionResult> UpdateProductVariantAsync(
-        [FromBody] UpdateProductVariantReqDto req,
+        [FromBody] ProductVariantReqDto req,
         Guid productId,
         Guid variantId
     )

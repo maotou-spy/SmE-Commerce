@@ -22,22 +22,12 @@ public class VariantAttribute
     [Column("createdById")]
     public Guid? CreatedById { get; set; }
 
-    [Column("modifiedAt", TypeName = "timestamp without time zone")]
-    public DateTime? ModifiedAt { get; set; }
-
-    [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
-
     [Column("variantNameId")]
     public Guid VariantNameId { get; set; }
 
     [ForeignKey("CreatedById")]
     [InverseProperty("VariantAttributeCreatedBies")]
     public virtual User? CreatedBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("VariantAttributeModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [ForeignKey("ProductVariantId")]
     [InverseProperty("VariantAttributes")]

@@ -46,6 +46,7 @@ public static class ErrorCode
     public const string OrderItemNotFound = "116";
     public const string InvalidQuantity = "117";
     public const string ExceedMaxQuantity = "118";
+    public const string ProductNoVariant = "119";
 
     // Already exists
     public const string EmailAlreadyExists = "201";

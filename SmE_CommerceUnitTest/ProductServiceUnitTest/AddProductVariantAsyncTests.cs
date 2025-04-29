@@ -9,13 +9,13 @@ using SmE_CommerceServices.Interface;
 
 namespace SmE_CommerceUnitTest.ProductServiceUnitTest;
 
-public class AddProductVariantAsync
+public class AddProductVariantAsyncTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
     private readonly IProductService _productService;
 
-    public AddProductVariantAsync()
+    public AddProductVariantAsyncTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
         _helperServiceMock = new Mock<IHelperService>();
@@ -31,7 +31,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Prepare an empty request list to simulate invalid input
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>();
+        var request = new List<ProductVariantReqDto>();
 
         // Act - Call the method with the empty request
         var result = await _productService.AddProductVariantAsync(productId, request);
@@ -48,7 +48,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Set up a request with an empty VariantValues list
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -73,7 +73,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Create a request with a negative price
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -105,7 +105,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Set up a request with a negative stock quantity
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -137,7 +137,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Prepare a valid request but mock the user as non-Manager
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -145,7 +145,7 @@ public class AddProductVariantAsync
                 StockQuantity = 10,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto()
+                    new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
                         VariantValue = "value",
@@ -174,7 +174,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Set up a valid request and mock the user as Manager
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -214,7 +214,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Prepare a valid request and mock product retrieval to fail
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -261,7 +261,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Set up a valid request and mock a deleted product
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -313,7 +313,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Create a request with only 1 variant for a product with no variants
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -371,7 +371,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var variantNameId1 = Guid.NewGuid();
         var variantNameId2 = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -442,7 +442,7 @@ public class AddProductVariantAsync
         // Arrange - Prepare a request with a variant that matches an existing one
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -523,7 +523,7 @@ public class AddProductVariantAsync
         // Arrange - Create a request with two identical new variants
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -592,7 +592,7 @@ public class AddProductVariantAsync
     {
         // Arrange - Set up a request with empty VariantValues for a product with no variants
         var productId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -642,7 +642,7 @@ public class AddProductVariantAsync
         // Arrange - Prepare a valid request with 2 variants for a product without variants
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -727,7 +727,7 @@ public class AddProductVariantAsync
         // Arrange - Set up a request to add a new variant to a product with existing variants
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -815,7 +815,7 @@ public class AddProductVariantAsync
         // Arrange - Set up a valid request but mock product update to fail
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -901,7 +901,7 @@ public class AddProductVariantAsync
         // Arrange - Prepare a valid request and mock an exception during product retrieval
         var productId = Guid.NewGuid();
         var variantNameId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -950,7 +950,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1019,7 +1019,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1087,7 +1087,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1154,7 +1154,7 @@ public class AddProductVariantAsync
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
         var materialId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1223,7 +1223,7 @@ public class AddProductVariantAsync
         // Arrange - Set up a product with HasVariant = true but only 1 variant
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1288,7 +1288,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1378,7 +1378,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1468,7 +1468,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1544,7 +1544,7 @@ public class AddProductVariantAsync
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
         var materialId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {
@@ -1629,7 +1629,7 @@ public class AddProductVariantAsync
         var productId = Guid.NewGuid();
         var sizeId = Guid.NewGuid();
         var colorId = Guid.NewGuid();
-        var request = new List<AddProductVariantReqDto>
+        var request = new List<ProductVariantReqDto>
         {
             new()
             {

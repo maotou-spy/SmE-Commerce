@@ -28,7 +28,7 @@ public class AddProductReqDto
 
     public List<Guid> CategoryIds { get; set; } = [];
 
-    public List<AddProductVariantReqDto> ProductVariants { get; set; } = [];
+    public List<ProductVariantReqDto> ProductVariants { get; set; } = [];
 
     public string Status { get; set; } = ProductStatus.Active;
 

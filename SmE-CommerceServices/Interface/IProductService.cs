@@ -51,11 +51,11 @@ public interface IProductService
         List<Guid> categoryIds
     );
 
-    Task<Return<bool>> AddProductVariantAsync(Guid productId, List<AddProductVariantReqDto> req);
+    Task<Return<bool>> AddProductVariantAsync(Guid productId, List<ProductVariantReqDto> req);
 
     Task<Return<bool>> UpdateProductVariantAsync(
         Guid productId,
         Guid productVariantId,
-        UpdateProductVariantReqDto req
+        ProductVariantReqDto req
     );
 }
