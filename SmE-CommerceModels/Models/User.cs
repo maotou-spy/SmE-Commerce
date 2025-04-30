@@ -194,14 +194,6 @@ public class User
     public virtual ICollection<Setting> Settings { get; set; } = new List<Setting>();
 
     [InverseProperty("CreatedBy")]
-    public virtual ICollection<VariantAttribute> VariantAttributeCreatedBies { get; set; } =
-        new List<VariantAttribute>();
-
-    [InverseProperty("ModifiedBy")]
-    public virtual ICollection<VariantAttribute> VariantAttributeModifiedBies { get; set; } =
-        new List<VariantAttribute>();
-
-    [InverseProperty("CreatedBy")]
     public virtual ICollection<VariantName> VariantNameCreatedBies { get; set; } =
         new List<VariantName>();
 

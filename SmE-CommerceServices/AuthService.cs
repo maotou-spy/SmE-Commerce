@@ -27,7 +27,8 @@ public class AuthService(
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.UserNotFound,
+                    StatusCode = userResult.StatusCode,
+                    InternalErrorMessage = userResult.InternalErrorMessage,
                 };
 
             var user = userResult.Data;
