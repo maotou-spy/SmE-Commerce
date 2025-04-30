@@ -1419,7 +1419,7 @@ public class ProductService(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // Get the current user
+            // Step 1: Get the current user
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
@@ -1430,7 +1430,7 @@ public class ProductService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            // Get the product
+            // Step 2: Get the product with related data
             var product = await productRepository.GetProductByIdForUpdateAsync(productId);
             if (!product.IsSuccess || product.Data == null)
                 return new Return<bool>
@@ -1440,7 +1440,8 @@ public class ProductService(
                     StatusCode = product.StatusCode,
                     InternalErrorMessage = product.InternalErrorMessage,
                 };
-            // Check if the product is deleted
+
+            // Step 3: Check if the product is already deleted
             if (product.Data.Status == ProductStatus.Deleted)
                 return new Return<bool>
                 {
@@ -1449,21 +1450,32 @@ public class ProductService(
                     StatusCode = ErrorCode.ProductNotFound,
                 };
 
-            // Update product status to deleted
+            // Step 4: Update product status to deleted
+            var now = DateTime.Now;
             product.Data.Status = ProductStatus.Deleted;
             product.Data.ModifiedById = currentUser.Data.UserId;
-            product.Data.ModifiedAt = DateTime.Now;
+            product.Data.ModifiedAt = now;
 
-            var result = await productRepository.UpdateProductAsync(product.Data);
-            if (!result.IsSuccess)
+            // Step 5: Update status of ProductVariants if any
+            if (product.Data.HasVariant && product.Data.ProductVariants.Count != 0)
+                foreach (var variant in product.Data.ProductVariants)
+                {
+                    variant.Status = ProductStatus.Deleted;
+                    variant.ModifiedById = currentUser.Data.UserId;
+                    variant.ModifiedAt = now;
+                }
+
+            // Step 6: Update product in the database
+            var updateResult = await productRepository.UpdateProductAsync(product.Data);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    StatusCode = updateResult.StatusCode,
                 };
 
+            // Step 7: Complete the transaction
             transaction.Complete();
             return new Return<bool>
             {
@@ -1876,162 +1888,7 @@ public class ProductService(
 
     #endregion
 
-    #region private methods
-
-    private async Task<Return<GetProductDetailsResDto>> AddProductPrivateAsync(
-        AddProductReqDto req,
-        Guid currentUserId
-    )
-    {
-        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        try
-        {
-            // // Check if the product name is unique
-            // var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
-            // if (exitedProductResult.IsSuccess)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNameAlreadyExists,
-            //     };
-            //
-            // // Only add active categories
-            // var categoryResult = await categoryRepository.GetCategoriesAsync(
-            //     status: GeneralStatus.Active,
-            //     name: null,
-            //     pageNumber: null,
-            //     pageSize: null
-            // );
-            // if (!categoryResult.IsSuccess)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = categoryResult.StatusCode,
-            //         InternalErrorMessage = categoryResult.InternalErrorMessage,
-            //     };
-            //
-            // var categories = categoryResult
-            //     .Data?.Where(c => req.CategoryIds.Contains(c.CategoryId))
-            //     .ToList();
-            // if (categories == null)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.CategoryNotFound,
-            //     };
-            //
-            // // Initialize the product
-            // var product = new Product
-            // {
-            //     Name = req.Name.Trim(),
-            //     PrimaryImage = req.PrimaryImage,
-            //     Description = req.Description?.Trim(),
-            //     Price = req.Price < 0 ? 0 : req.Price,
-            //     StockQuantity = req.StockQuantity,
-            //     SoldQuantity = 0,
-            //     IsTopSeller = req.IsTopSeller,
-            //     Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
-            //     MetaTitle = (req.MetaTitle ?? req.Name).Trim(),
-            //     MetaDescription = (req.MetaDescription ?? req.Description ?? req.Name).Trim(),
-            //     Status =
-            //         req.StockQuantity > 0
-            //             ? req.Status != ProductStatus.Inactive
-            //                 ? ProductStatus.Active
-            //                 : ProductStatus.Inactive
-            //             : ProductStatus.OutOfStock,
-            //     CreateById = currentUserId,
-            //     CreatedAt = DateTime.Now,
-            //     ProductCategories = categories
-            //         .Select(c => new ProductCategory { CategoryId = c.CategoryId })
-            //         .ToList(),
-            //     ProductImages = req
-            //         .Images.Select(i => new ProductImage { Url = i.Url, AltText = i.AltText })
-            //         .ToList(),
-            //     ProductAttributes = req
-            //         .Attributes.Select(a => new ProductAttribute
-            //         {
-            //             AttributeName = a.AttributeName,
-            //             AttributeValue = a.AttributeValue,
-            //         })
-            //         .ToList(),
-            // };
-            //
-            // // Add Product to the database
-            // var result = await productRepository.AddProductAsync(product);
-            // if (!result.IsSuccess || result.Data == null)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = result.StatusCode,
-            //         InternalErrorMessage = result.InternalErrorMessage,
-            //     };
-            //
-            // transaction.Complete();
-            //
-            // return new Return<GetProductDetailsResDto>
-            // {
-            //     Data = new GetProductDetailsResDto
-            //     {
-            //         ProductId = product.ProductId,
-            //         ProductCode = product.ProductCode,
-            //         Name = product.Name,
-            //         PrimaryImage = result.Data.PrimaryImage,
-            //         Description = product.Description,
-            //         Price = product.Price,
-            //         StockQuantity = product.StockQuantity,
-            //         SoldQuantity = product.SoldQuantity,
-            //         IsTopSeller = product.IsTopSeller,
-            //         SeoMetadata = new SeoMetadata
-            //         {
-            //             Slug = result.Data.Slug,
-            //             MetaTitle = result.Data.MetaTitle,
-            //             MetaDescription = result.Data.MetaDescription,
-            //         },
-            //         Status = product.Status,
-            //         Images = result
-            //             .Data.ProductImages.Select(image => new GetProductImageResDto
-            //             {
-            //                 ImageId = image.ImageId,
-            //                 Url = image.Url,
-            //                 AltText = image.AltText,
-            //             })
-            //             .ToList(),
-            //         Categories = result
-            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-            //             {
-            //                 CategoryId = category.CategoryId,
-            //                 Name = category.Category.Name,
-            //             })
-            //             .ToList(),
-            //         Attributes = result
-            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-            //             {
-            //                 AttributeId = attribute.AttributeId,
-            //                 Name = attribute.AttributeName,
-            //                 Value = attribute.AttributeValue,
-            //             })
-            //             .ToList(),
-            //     },
-            //     IsSuccess = true,
-            //     StatusCode = ErrorCode.Ok,
-            // };
-            return null;
-        }
-        catch (Exception e)
-        {
-            return new Return<GetProductDetailsResDto>
-            {
-                Data = null,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
-            };
-        }
-    }
+    #region private method
 
     private static Return<bool> IsProductVariantReqValid(ProductVariantReqDto req)
     {
