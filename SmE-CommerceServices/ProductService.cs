@@ -694,11 +694,13 @@ public class ProductService(IProductRepository productRepository, IHelperService
             variant.Status = ProductStatus.Deleted;
             variant.ModifiedAt = now;
             variant.ModifiedById = currentUser.Data.UserId;
-            variant.StockQuantity = 0;
 
             existingProduct.Data.StockQuantity -= variant.StockQuantity;
             existingProduct.Data.ModifiedById = currentUser.Data.UserId;
             existingProduct.Data.ModifiedAt = now;
+
+            // Reset stock quantity to 0
+            variant.StockQuantity = 0;
 
             // Step 5: Save changes
             var updateResult = await productRepository.UpdateProductAsync(existingProduct.Data);
