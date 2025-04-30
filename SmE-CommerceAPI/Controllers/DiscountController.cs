@@ -193,7 +193,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpGet("codes/{id:guid}")]
-    [OpenApiOperation("Get Discount Code By Id", "Get Discount Code By Id")]
+    [OpenApiOperation("Get Discount Code By ReviewId", "Get Discount Code By ReviewId")]
     [Authorize]
     public async Task<IActionResult> GetDiscountCodeByIdAsync([FromRoute] Guid id)
     {
@@ -239,7 +239,10 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
     }
 
     [HttpGet("{id:guid}/codes")]
-    [OpenApiOperation("Get Discount Codes By Discount Id", "Get Discount Codes By Discount Id")]
+    [OpenApiOperation(
+        "Get Discount Codes By Discount ReviewId",
+        "Get Discount Codes By Discount ReviewId"
+    )]
     [Authorize]
     public async Task<IActionResult> GetDiscountCodesByDiscountIdAsync(
         [FromRoute] Guid id,

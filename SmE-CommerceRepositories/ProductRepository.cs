@@ -77,6 +77,8 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .Include(x => x.ProductImages)
                 .Include(x => x.ProductAttributes)
                 .Include(x => x.ProductVariants)
+                .Include(x => x.CreateBy)
+                .Include(x => x.ModifiedBy)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
@@ -104,47 +106,6 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
-            };
-        }
-    }
-
-    public async Task<Return<Product>> GetProductByProductVariantIdAsync(Guid variantId)
-    {
-        try
-        {
-            var product = await dbContext
-                .Products.Include(x => x.ProductVariants)
-                .Where(x => x.Status != ProductStatus.Deleted && x.Status != ProductStatus.Inactive)
-                .FirstOrDefaultAsync(x =>
-                    x.ProductVariants.Any(y => y.ProductVariantId == variantId)
-                );
-
-            if (product is null)
-                return new Return<Product>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
-                    TotalRecord = 0,
-                };
-
-            return new Return<Product>
-            {
-                Data = product,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
-            };
-        }
-        catch (Exception e)
-        {
-            return new Return<Product>
-            {
-                Data = null,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
                 TotalRecord = 0,
             };
         }

@@ -4,7 +4,7 @@ namespace SmE_CommerceModels.RequestDtos.Setting;
 
 public class SettingReqDto
 {
-    [Required(ErrorMessage = "Id is required")]
+    [Required(ErrorMessage = "ReviewId is required")]
     public Guid SettingId { get; set; }
 
     [Required(ErrorMessage = "Key is required")]

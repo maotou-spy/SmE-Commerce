@@ -6,11 +6,10 @@ namespace SmE_CommerceRepositories.Interface;
 public interface IProductRepository
 {
     Task<Return<Product>> GetProductByVariantIdForUpdateAsync(Guid productVariantId);
+
     Task<Return<Product>> GetProductByIdAsync(Guid productId);
 
     Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds);
-
-    Task<Return<Product>> GetProductByProductVariantIdAsync(Guid variantId);
 
     Task<Return<Product>> GetProductByNameAsync(string productName);
 

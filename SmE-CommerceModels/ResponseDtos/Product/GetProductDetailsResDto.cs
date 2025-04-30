@@ -28,9 +28,11 @@ public class GetProductDetailsResDto
 
     public List<GetProductImageResDto>? Images { get; set; } = [];
 
-    public List<GetProductAttributeResDto>? Attributes { get; set; } = [];
+    public List<GetProductAttributeResDto> Attributes { get; set; } = [];
 
-    public List<GetProductCategoryResDto>? Categories { get; set; } = [];
+    public List<GetProductCategoryResDto> Categories { get; set; } = [];
+
+    public List<GetProductVariantResDto> Variants { get; set; } = [];
 
     public required SeoMetadata SeoMetadata { get; set; }
 }

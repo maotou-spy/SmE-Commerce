@@ -2,6 +2,7 @@ using System.Transactions;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
+using SmE_CommerceModels.ResponseDtos;
 using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ResponseDtos.Product.Manager;
 using SmE_CommerceModels.ReturnResult;
@@ -413,7 +414,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
     )
     {
         // Step 1: Validate request
-        // No Variant values Id duplication
+        // No Variant values ReviewId duplication
         req.VariantValues = req
             .VariantValues.GroupBy(x => x.VariantNameId)
             .Select(g => g.First())
@@ -745,7 +746,7 @@ public class ProductService(IProductRepository productRepository, IHelperService
         try
         {
             var result = await productRepository.GetProductByIdAsync(productId);
-            if (!result.IsSuccess || result.Data is not { Status: ProductStatus.Active })
+            if (!result.IsSuccess || result.Data == null)
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
@@ -753,7 +754,11 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     StatusCode = result.StatusCode,
                     InternalErrorMessage = result.InternalErrorMessage,
                 };
-            if (result.Data.Status != ProductStatus.Active)
+
+            if (
+                result.Data.Status != ProductStatus.Active
+                && result.Data.Status != ProductStatus.OutOfStock
+            )
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = null,
@@ -761,54 +766,78 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     StatusCode = ErrorCode.ProductNotFound,
                 };
 
-            // return new Return<GetProductDetailsResDto>
-            // {
-            //     Data = new GetProductDetailsResDto
-            //     {
-            //         ProductId = result.Data.ProductId,
-            //         ProductCode = result.Data.ProductCode,
-            //         Name = result.Data.Name,
-            //         PrimaryImage = result.Data.PrimaryImage,
-            //         Description = result.Data.Description,
-            //         Price = result.Data.Price,
-            //         StockQuantity = result.Data.StockQuantity,
-            //         SoldQuantity = result.Data.SoldQuantity,
-            //         IsTopSeller = result.Data.IsTopSeller,
-            //         SeoMetadata = new SeoMetadata
-            //         {
-            //             Slug = result.Data.Slug,
-            //             MetaTitle = result.Data.MetaTitle,
-            //             MetaDescription = result.Data.MetaDescription,
-            //         },
-            //         Status = result.Data.Status,
-            //         Images = result
-            //             .Data.ProductImages.Select(image => new GetProductImageResDto
-            //             {
-            //                 ImageId = image.ImageId,
-            //                 Url = image.Url,
-            //                 AltText = image.AltText,
-            //             })
-            //             .ToList(),
-            //         Categories = result
-            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-            //             {
-            //                 CategoryId = category.CategoryId,
-            //                 Name = category.Category.Name,
-            //             })
-            //             .ToList(),
-            //         Attributes = result
-            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-            //             {
-            //                 AttributeId = attribute.AttributeId,
-            //                 Name = attribute.AttributeName,
-            //                 Value = attribute.AttributeValue,
-            //             })
-            //             .ToList(),
-            //     },
-            //     IsSuccess = true,
-            //     StatusCode = ErrorCode.Ok,
-            // };
-            return null;
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = new GetProductDetailsResDto
+                {
+                    ProductId = result.Data.ProductId,
+                    ProductCode = result.Data.ProductCode,
+                    Name = result.Data.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
+                    Description = result.Data.Description,
+                    Price =
+                        result.Data.Price ?? result.Data.ProductVariants.Select(x => x.Price).Min(), // Get the minimum price if there are variants
+                    StockQuantity = result.Data.StockQuantity,
+                    SoldQuantity = result.Data.SoldQuantity,
+                    IsTopSeller = result.Data.IsTopSeller,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
+                    Status = result.Data.Status,
+                    Images = result
+                        .Data.ProductImages.Select(image => new GetProductImageResDto
+                        {
+                            ImageId = image.ImageId,
+                            Url = image.Url,
+                            AltText = image.AltText,
+                        })
+                        .ToList(),
+                    Categories = result
+                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                        {
+                            CategoryId = category.CategoryId,
+                            Name = category.Category.Name,
+                        })
+                        .ToList(),
+                    Attributes = result
+                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                        {
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
+                        })
+                        .ToList(),
+                    // Variants info
+                    HasVariant = result.Data.HasVariant,
+                    AverageRating = result.Data.AverageRating,
+                    Variants = result
+                        .Data.ProductVariants.Where(v =>
+                            v.Status is ProductStatus.Active or ProductStatus.OutOfStock
+                        )
+                        .Select(variant => new GetProductVariantResDto
+                        {
+                            ProductVariantId = variant.ProductVariantId,
+                            Price = variant.Price,
+                            StockQuantity = variant.StockQuantity,
+                            VariantImage = variant.VariantImage,
+                            Status = variant.Status,
+                            VariantAttributes = variant
+                                .VariantAttributes.Select(attr => new GetVariantAttributeResDto
+                                {
+                                    VariantNameId = attr.VariantNameId,
+                                    Name = attr.VariantName.Name,
+                                    Value = attr.Value,
+                                })
+                                .ToList(),
+                        })
+                        .ToList(),
+                },
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
         }
         catch (Exception ex)
         {
@@ -828,82 +857,112 @@ public class ProductService(IProductRepository productRepository, IHelperService
     {
         try
         {
-            // var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            // if (!currentManager.IsSuccess || currentManager.Data == null)
-            //     return new Return<ManagerGetProductDetailResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = currentManager.StatusCode,
-            //         InternalErrorMessage = currentManager.InternalErrorMessage,
-            //     };
-            //
-            // var result = await productRepository.GetProductByIdAsync(productId);
-            // if (!result.IsSuccess || result.Data == null)
-            //     return new Return<ManagerGetProductDetailResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNotFound,
-            //     };
-            //
-            // return new Return<ManagerGetProductDetailResDto>
-            // {
-            //     Data = new ManagerGetProductDetailResDto
-            //     {
-            //         ProductId = result.Data.ProductId,
-            //         ProductCode = result.Data.ProductCode,
-            //         Name = result.Data.Name,
-            //         PrimaryImage = result.Data.PrimaryImage,
-            //         Description = result.Data.Description,
-            //         Price = result.Data.Price,
-            //         StockQuantity = result.Data.StockQuantity,
-            //         SoldQuantity = result.Data.SoldQuantity,
-            //         IsTopSeller = result.Data.IsTopSeller,
-            //         SeoMetadata = new SeoMetadata
-            //         {
-            //             Slug = result.Data.Slug,
-            //             MetaTitle = result.Data.MetaTitle,
-            //             MetaDescription = result.Data.MetaDescription,
-            //         },
-            //         Status = result.Data.Status,
-            //         Images = result
-            //             .Data.ProductImages.Select(image => new GetProductImageResDto
-            //             {
-            //                 ImageId = image.ImageId,
-            //                 Url = image.Url,
-            //                 AltText = image.AltText,
-            //             })
-            //             .ToList(),
-            //         Categories = result
-            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-            //             {
-            //                 CategoryId = category.CategoryId,
-            //                 Name = category.Category.Name,
-            //             })
-            //             .ToList(),
-            //         Attributes = result
-            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-            //             {
-            //                 AttributeId = attribute.AttributeId,
-            //                 Name = attribute.AttributeName,
-            //                 Value = attribute.AttributeValue,
-            //             })
-            //             .ToList(),
-            //         AuditMetadata = new AuditMetadata
-            //         {
-            //             CreatedById = result.Data.CreateById,
-            //             CreatedAt = result.Data.CreatedAt,
-            //             CreatedBy = result.Data.CreateBy?.FullName,
-            //             ModifiedById = result.Data.ModifiedById,
-            //             ModifiedAt = result.Data.ModifiedAt,
-            //             ModifiedBy = result.Data.ModifiedBy?.FullName,
-            //         },
-            //     },
-            //     IsSuccess = true,
-            //     StatusCode = ErrorCode.Ok,
-            // };
-            return null;
+            var currentManager = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentManager.IsSuccess || currentManager.Data == null)
+                return new Return<ManagerGetProductDetailResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = currentManager.StatusCode,
+                    InternalErrorMessage = currentManager.InternalErrorMessage,
+                };
+
+            var result = await productRepository.GetProductByIdAsync(productId);
+            if (!result.IsSuccess || result.Data == null)
+                return new Return<ManagerGetProductDetailResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                };
+
+            return new Return<ManagerGetProductDetailResDto>
+            {
+                Data = new ManagerGetProductDetailResDto
+                {
+                    ProductId = result.Data.ProductId,
+                    ProductCode = result.Data.ProductCode,
+                    Name = result.Data.Name,
+                    PrimaryImage = result.Data.PrimaryImage,
+                    Description = result.Data.Description,
+                    Price =
+                        result.Data.Price ?? result.Data.ProductVariants.Select(x => x.Price).Min(), // Get the minimum price if there are variants,
+                    StockQuantity = result.Data.StockQuantity,
+                    SoldQuantity = result.Data.SoldQuantity,
+                    IsTopSeller = result.Data.IsTopSeller,
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = result.Data.Slug,
+                        MetaTitle = result.Data.MetaTitle,
+                        MetaDescription = result.Data.MetaDescription,
+                    },
+                    Status = result.Data.Status,
+                    Images = result
+                        .Data.ProductImages.Select(image => new GetProductImageResDto
+                        {
+                            ImageId = image.ImageId,
+                            Url = image.Url,
+                            AltText = image.AltText,
+                        })
+                        .ToList(),
+                    Categories = result
+                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                        {
+                            CategoryId = category.CategoryId,
+                            Name = category.Category.Name,
+                        })
+                        .ToList(),
+                    Attributes = result
+                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                        {
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
+                        })
+                        .ToList(),
+                    AuditMetadata = new AuditMetadata
+                    {
+                        CreatedById = result.Data.CreateById,
+                        CreatedAt = result.Data.CreatedAt,
+                        CreatedBy = result.Data.CreateBy?.FullName,
+                        ModifiedById = result.Data.ModifiedById,
+                        ModifiedAt = result.Data.ModifiedAt,
+                        ModifiedBy = result.Data.ModifiedBy?.FullName,
+                    },
+                    // Variant info
+                    HasVariant = result.Data.HasVariant,
+                    AverageRating = result.Data.AverageRating,
+                    Variants = result
+                        .Data.ProductVariants.Select(variant => new ManagerGetProductVariantResDto
+                        {
+                            ProductVariantId = variant.ProductVariantId,
+                            Price = variant.Price,
+                            StockQuantity = variant.StockQuantity,
+                            VariantImage = variant.VariantImage,
+                            Status = variant.Status,
+                            AuditMetadata = new AuditMetadata
+                            {
+                                CreatedById = variant.CreateById,
+                                CreatedAt = variant.CreatedAt,
+                                CreatedBy = variant.CreateBy?.FullName,
+                                ModifiedById = variant.ModifiedById,
+                                ModifiedAt = variant.ModifiedAt,
+                                ModifiedBy = variant.ModifiedBy?.FullName,
+                            },
+                            VariantAttributes = variant
+                                .VariantAttributes.Select(attr => new GetVariantAttributeResDto
+                                {
+                                    VariantNameId = attr.VariantNameId,
+                                    Name = attr.VariantName.Name,
+                                    Value = attr.Value,
+                                })
+                                .ToList(),
+                        })
+                        .ToList(),
+                },
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
         }
         catch (Exception ex)
         {

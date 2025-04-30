@@ -32,7 +32,7 @@ public class Review
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [ForeignKey("ProductId")]
     [InverseProperty("Reviews")]
