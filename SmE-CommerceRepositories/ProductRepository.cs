@@ -799,6 +799,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         {
             var productVariant = await dbContext
                 .ProductVariants.Include(x => x.Product)
+                .Include(x => x.VariantAttributes)
                 .FirstOrDefaultAsync(x => x.ProductVariantId == productVariantId);
 
             if (productVariant is null)

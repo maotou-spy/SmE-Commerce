@@ -110,35 +110,49 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         }
     }
 
-    // Check OrderCode is existed?
-    public async Task<Return<bool>> CheckOrderCodeExistedAsync(string orderCode)
+    // Manager get order by status and userId
+    public async Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(Guid? userId, string statusFilter)
     {
         try
         {
-            var order = await defaultdb.Orders.FirstOrDefaultAsync(x => x.OrderCode == orderCode);
-            if (order == null)
+            var query = defaultdb.Orders
+                .Include(x => x.Address)
+                .Include(x => x.User)
+                .Include(x => x.OrderItems)
+                    .ThenInclude(x => x.ProductVariant)
+                    .ThenInclude(x => x!.Product)    
+                .AsQueryable();
+
+            if (userId.HasValue)
             {
-                return new Return<bool>
-                {
-                    Data = false,
-                    StatusCode = ErrorCode.Ok,
-                    IsSuccess = true,
-                    TotalRecord = 1,
-                };
+                query = query.Where(x => x.UserId == userId);
             }
-            return new Return<bool>
+            
+            query = query.Where(x => x.Status == statusFilter);
+            
+            var ordersList = await query.ToListAsync();
+            
+            if (ordersList.Count == 0)
+                return new Return<List<Order>>
+                {
+                    Data = null,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    IsSuccess = false,
+                    TotalRecord = 0,
+                };
+
+            return new Return<List<Order>>
             {
-                Data = true,
+                Data = ordersList,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1,
+                TotalRecord = ordersList.Count,
             };
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
-            return new Return<bool>
+            return new Return<List<Order>>
             {
-                Data = false,
+                Data = null,
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
@@ -146,4 +160,46 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
+
+    #region admin
+
+    // Manager Confirm Order
+    public async Task<Return<Order>> ManagerConfirmOrderAsync(Guid orderId)
+    {
+        try
+        {
+            var order = await defaultdb.Orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
+            if (order == null)
+                return new Return<Order>
+                {
+                    Data = null,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    IsSuccess = false,
+                    TotalRecord = 0
+                };
+            order.Status = OrderStatus.Confirmed;
+            defaultdb.Orders.Update(order);
+            await defaultdb.SaveChangesAsync();
+            return new Return<Order>
+            {
+                Data = order,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = 1,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<Order>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
+    #endregion
 }

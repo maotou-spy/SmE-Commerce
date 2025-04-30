@@ -12,4 +12,10 @@ public interface IOrderService
     Task<Return<CustomerGetOrderDetailResDto>> GetOrderByIdAsync(Guid orderId);
 
     #endregion
+
+    #region Admin
+
+    Task<Return<List<ManagerGetOrdersResDto>>> ManagerGetOrdersAsync(string statusFilter);
+
+    #endregion
 }

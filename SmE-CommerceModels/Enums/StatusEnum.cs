@@ -42,7 +42,7 @@ public static class UserStatus
 public static class OrderStatus
 {
     public const string Pending = "Pending"; // Order has been placed but not confirmed by the shop owner
-    public const string Confirmed = "Confirmed"; // Order has been confirmed by the shop owner
+    public const string Confirmed = "Stuffing"; // Order has been confirmed and stuffing by the shop owner
     public const string Shipped = "Shipped"; // Order has been shipped
     public const string Delivered = "Completed"; // Order has been delivered
     public const string Cancelled = "Cancelled"; // Order has been cancelled by the customer
