@@ -15,6 +15,8 @@ public interface ICategoryRepository
         int? pageSize
     );
 
+    Task<Return<List<Category>>> GetCategoriesByIdsAsync(List<Guid> ids);
+
     Task<Return<Category>> GetCategoryByIdAsync(Guid id);
     Task<Return<Category>> UpdateCategoryAsync(Category category);
     Task<Return<IEnumerable<Category>>> GetProductsByCategoryIdAsync(Guid id);

@@ -126,6 +126,38 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
         }
     }
 
+    public async Task<Return<List<Category>>> GetCategoriesByIdsAsync(List<Guid> ids)
+    {
+        try
+        {
+            var result = await dbContext
+                .Categories
+                // .Where(x => x.Status != GeneralStatus.Deleted)
+                .Where(x => ids.Contains(x.CategoryId))
+                .ToListAsync();
+
+            return new Return<List<Category>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = result.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Category>>
+            {
+                Data = null,
+                IsSuccess = false,
+
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<Category>> GetCategoryByIdAsync(Guid id)
     {
         try

@@ -11,6 +11,7 @@ namespace SmE_CommerceUnitTest.ProductServiceUnitTest;
 public class DeleteProductVariantAsyncTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
+    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
     private readonly IProductService _productService;
 
@@ -20,6 +21,7 @@ public class DeleteProductVariantAsyncTests
         _helperServiceMock = new Mock<IHelperService>();
         _productService = new ProductService(
             _productRepositoryMock.Object,
+            _categoryRepositoryMock.Object,
             _helperServiceMock.Object
         );
     }

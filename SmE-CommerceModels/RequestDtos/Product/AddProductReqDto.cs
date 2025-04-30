@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SmE_CommerceModels.Enums;
+using SmE_CommerceModels.ResponseDtos;
 
 namespace SmE_CommerceModels.RequestDtos.Product;
 
@@ -28,11 +29,9 @@ public class AddProductReqDto
 
     public List<Guid> CategoryIds { get; set; } = [];
 
-    public List<ProductVariantReqDto> ProductVariants { get; set; } = [];
-
     public string Status { get; set; } = ProductStatus.Active;
 
-    public string? MetaTitle { get; set; }
+    // public bool HasVariants { get; set; } = false;
 
-    public string? MetaDescription { get; set; }
+    public List<ProductVariantReqDto>? Variants { get; init; }
 }

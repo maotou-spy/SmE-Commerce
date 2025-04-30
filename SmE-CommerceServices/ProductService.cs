@@ -8,11 +8,15 @@ using SmE_CommerceModels.ResponseDtos.Product.Manager;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities;
 
 namespace SmE_CommerceServices;
 
-public class ProductService(IProductRepository productRepository, IHelperService helperService)
-    : IProductService
+public class ProductService(
+    IProductRepository productRepository,
+    ICategoryRepository categoryRepository,
+    IHelperService helperService
+) : IProductService
 {
     #region Product Category
 
@@ -370,6 +374,9 @@ public class ProductService(IProductRepository productRepository, IHelperService
             existingProduct.Data.ProductVariants = productVariantList;
 
             existingProduct.Data.HasVariant = true;
+            existingProduct.Data.Price = existingProduct
+                .Data.ProductVariants.Select(x => x.Price)
+                .Min();
             existingProduct.Data.ModifiedById = currentUserId;
             existingProduct.Data.ModifiedAt = now;
 
@@ -593,6 +600,9 @@ public class ProductService(IProductRepository productRepository, IHelperService
                     StatusCode = ErrorCode.InvalidStockQuantity,
                 };
 
+            existingProduct.Data.Price = existingProduct
+                .Data.ProductVariants.Select(x => x.Price)
+                .Min();
             existingProduct.Data.ModifiedById = currentUser.Data.UserId;
             existingProduct.Data.ModifiedAt = now;
 
@@ -989,49 +999,174 @@ public class ProductService(IProductRepository productRepository, IHelperService
 
     public async Task<Return<GetProductDetailsResDto>> AddProductAsync(AddProductReqDto req)
     {
-        try
-        {
-            // Get the current user
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            if (!currentUser.IsSuccess || currentUser.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
-                };
-
-            // Check if the product data is valid
-            if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
-                };
-
-            if (req.CategoryIds.Count == 0)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
-                };
-
-            // Initialize the product
-            var prdResult = await AddProductPrivateAsync(req, currentUser.Data.UserId);
-            if (!prdResult.IsSuccess || prdResult.Data == null)
-                return new Return<GetProductDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = prdResult.StatusCode,
-                };
-
+        // Step 1: Get the current user
+        var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+        if (!currentUser.IsSuccess || currentUser.Data == null)
             return new Return<GetProductDetailsResDto>
             {
-                Data = prdResult.Data,
+                Data = null,
+                IsSuccess = false,
+                StatusCode = currentUser.StatusCode,
+                InternalErrorMessage = currentUser.InternalErrorMessage,
+            };
+
+        // Step 2: Validate the request data
+        if (string.IsNullOrWhiteSpace(req.Name))
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        if (
+            string.IsNullOrWhiteSpace(req.PrimaryImage)
+            || req.Price < 0
+            || req.StockQuantity < 0
+            || req.CategoryIds.Count == 0
+        )
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        // Check the validity of the category IDs
+        var validCategories = await categoryRepository.GetCategoriesByIdsAsync(req.CategoryIds);
+        if (
+            validCategories.Data == null
+            || validCategories.Data.Any(x => x.Status == GeneralStatus.Deleted)
+            || validCategories.Data.Count != req.CategoryIds.Count
+        )
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.BadRequest,
+            };
+
+        // Step 3: Initialize the product
+        using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        try
+        {
+            // Generate SEO metadata
+            var slug = SlugUtil.GenerateSlug(req.Name);
+            var metaTitle = req.Name;
+            var metaDescription = req.Description ?? $"Buy {req.Name} at the best price!";
+
+            var now = DateTime.Now;
+            var curUserId = currentUser.Data.UserId;
+            var product = new Product
+            {
+                Name = req.Name,
+                Description = req.Description,
+                Price = req.Price,
+                StockQuantity = req.StockQuantity,
+                SoldQuantity = 0,
+                Status = req.StockQuantity > 0 ? ProductStatus.Active : ProductStatus.OutOfStock,
+                CreatedAt = now,
+                CreateById = curUserId,
+                ModifiedAt = now,
+                ModifiedById = curUserId,
+                Slug = slug,
+                MetaTitle = metaTitle,
+                MetaDescription = metaDescription,
+                IsTopSeller = req.IsTopSeller,
+                PrimaryImage = req.PrimaryImage,
+                HasVariant = false,
+                AverageRating = 0,
+            };
+
+            // Add ProductCategories
+            product.ProductCategories = req
+                .CategoryIds.Select(categoryId => new ProductCategory
+                {
+                    ProductId = product.ProductId,
+                    CategoryId = categoryId,
+                })
+                .ToList();
+
+            // Add ProductImages
+            if (req.Images.Count != 0)
+                product.ProductImages = req
+                    .Images.Select(image => new ProductImage
+                    {
+                        ProductId = product.ProductId,
+                        Url = image.Url,
+                        AltText = image.AltText,
+                    })
+                    .ToList();
+
+            // Add ProductAttributes
+            product.ProductAttributes = req
+                .Attributes.Select(attribute => new ProductAttribute
+                {
+                    ProductId = product.ProductId,
+                    AttributeName = attribute.AttributeName,
+                    AttributeValue = attribute.AttributeValue,
+                })
+                .ToList();
+
+            // Step 4: Save the product
+            var addedProduct = await productRepository.AddProductAsync(product);
+            if (!addedProduct.IsSuccess || addedProduct.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = addedProduct.StatusCode,
+                    InternalErrorMessage = addedProduct.InternalErrorMessage,
+                };
+
+            // Step 6: Map to response DTO
+            var response = new GetProductDetailsResDto
+            {
+                ProductId = addedProduct.Data.ProductId,
+                ProductCode = addedProduct.Data.ProductCode,
+                Name = addedProduct.Data.Name,
+                PrimaryImage = addedProduct.Data.PrimaryImage,
+                Description = addedProduct.Data.Description,
+                Price = addedProduct.Data.Price ?? 0,
+                StockQuantity = addedProduct.Data.StockQuantity,
+                SoldQuantity = addedProduct.Data.SoldQuantity,
+                IsTopSeller = addedProduct.Data.IsTopSeller,
+                SeoMetadata = new SeoMetadata
+                {
+                    Slug = addedProduct.Data.Slug,
+                    MetaTitle = addedProduct.Data.MetaTitle,
+                    MetaDescription = addedProduct.Data.MetaDescription,
+                },
+                Status = addedProduct.Data.Status,
+                Images = addedProduct
+                    .Data.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText,
+                    })
+                    .ToList(),
+                Categories = addedProduct
+                    .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category.Name,
+                    })
+                    .ToList(),
+                Attributes = addedProduct
+                    .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.AttributeId,
+                        Name = attribute.AttributeName,
+                        Value = attribute.AttributeValue,
+                    })
+                    .ToList(),
+            };
+
+            transaction.Complete();
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = response,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
             };
@@ -1056,135 +1191,216 @@ public class ProductService(IProductRepository productRepository, IHelperService
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         try
         {
-            // // Get the current user
-            // var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            // if (!currentUser.IsSuccess || currentUser.Data == null)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = currentUser.StatusCode,
-            //         InternalErrorMessage = currentUser.InternalErrorMessage,
-            //     };
-            //
-            // var productResult = await productRepository.GetProductByIdForUpdateAsync(productId);
-            // if (!productResult.IsSuccess || productResult.Data == null)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = productResult.StatusCode,
-            //         InternalErrorMessage = productResult.InternalErrorMessage,
-            //     };
-            //
-            // // Check if the product is deleted
-            // if (productResult.Data.Status == ProductStatus.Deleted)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNotFound,
-            //     };
-            //
-            // // Check if the product data is valid
-            // if (req.Description == null || req.Price < 0 || req.StockQuantity < 0)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.BadRequest,
-            //     };
-            //
-            // // Check if the product name is unique except the current product
-            // var exitedProductResult = await productRepository.GetProductByNameAsync(req.Name);
-            // if (
-            //     exitedProductResult is { IsSuccess: true, Data: not null }
-            //     && exitedProductResult.Data.ProductId != productId
-            // )
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = ErrorCode.ProductNameAlreadyExists,
-            //     };
-            //
-            // productResult.Data.Name = req.Name.Trim();
-            // productResult.Data.Description = req.Description.Trim();
-            // productResult.Data.Price = req.Price < 0 ? 0 : req.Price;
-            // productResult.Data.StockQuantity = req.StockQuantity;
-            // productResult.Data.IsTopSeller = req.IsTopSeller;
-            // productResult.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
-            // productResult.Data.MetaTitle = (req.MetaTitle ?? req.Name).Trim();
-            // productResult.Data.MetaDescription = (req.MetaDescription ?? req.Description).Trim();
-            // productResult.Data.Status =
-            //     req.StockQuantity > 0
-            //         ? req.Status != ProductStatus.Inactive
-            //             ? ProductStatus.Active
-            //             : ProductStatus.Inactive
-            //         : ProductStatus.OutOfStock;
-            // productResult.Data.ModifiedById = currentUser.Data.UserId;
-            // productResult.Data.ModifiedAt = DateTime.Now;
-            //
-            // // Update Product in the database
-            // var result = await productRepository.UpdateProductAsync(productResult.Data);
-            // if (!result.IsSuccess || result.Data == null)
-            //     return new Return<GetProductDetailsResDto>
-            //     {
-            //         Data = null,
-            //         IsSuccess = false,
-            //         StatusCode = result.StatusCode,
-            //     };
-            //
-            // // Mark the transaction as complete
-            // transaction.Complete();
-            // return new Return<GetProductDetailsResDto>
-            // {
-            //     Data = new GetProductDetailsResDto
-            //     {
-            //         ProductId = result.Data.ProductId,
-            //         ProductCode = result.Data.ProductCode,
-            //         Name = result.Data.Name,
-            //         PrimaryImage = result.Data.PrimaryImage,
-            //         Description = result.Data.Description,
-            //         Price = result.Data.Price,
-            //         StockQuantity = result.Data.StockQuantity,
-            //         SoldQuantity = result.Data.SoldQuantity,
-            //         IsTopSeller = result.Data.IsTopSeller,
-            //         Attributes = result
-            //             .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-            //             {
-            //                 AttributeId = attribute.AttributeId,
-            //                 Name = attribute.AttributeName,
-            //                 Value = attribute.AttributeValue,
-            //             })
-            //             .ToList(),
-            //         Categories = result
-            //             .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-            //             {
-            //                 CategoryId = category.CategoryId,
-            //                 Name = category.Category.Name,
-            //             })
-            //             .ToList(),
-            //         Images = result
-            //             .Data.ProductImages.Select(image => new GetProductImageResDto
-            //             {
-            //                 ImageId = image.ImageId,
-            //                 Url = image.Url,
-            //                 AltText = image.AltText,
-            //             })
-            //             .ToList(),
-            //         SeoMetadata = new SeoMetadata
-            //         {
-            //             Slug = result.Data.Slug,
-            //             MetaTitle = result.Data.MetaTitle,
-            //             MetaDescription = result.Data.MetaDescription,
-            //         },
-            //         Status = result.Data.Status,
-            //     },
-            //     IsSuccess = true,
-            //     StatusCode = ErrorCode.Ok,
-            // };
-            return null;
+            // Step 1: Get the current user
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                };
+
+            // Step 2: Get the product for update
+            var productResult = await productRepository.GetProductByIdForUpdateAsync(productId);
+            if (!productResult.IsSuccess || productResult.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = productResult.StatusCode,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
+                };
+
+            // Step 3: Check if the product is deleted
+            if (productResult.Data.Status == ProductStatus.Deleted)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNotFound,
+                };
+
+            // Step 4: Validate the request data
+            if (string.IsNullOrWhiteSpace(req.Name) || req.Price < 0 || req.StockQuantity < 0)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.BadRequest,
+                };
+
+            // Step 5: Check if the product name is unique (excluding the current product)
+            var existingProductByName = await productRepository.GetProductByNameAsync(req.Name);
+            if (
+                existingProductByName is { IsSuccess: true, Data: not null }
+                && existingProductByName.Data.ProductId != productId
+            )
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.ProductNameAlreadyExists,
+                };
+
+            // Step 6: Check if there are any changes to update
+            var product = productResult.Data;
+            var hasChanges = false;
+
+            var newStatus =
+                req.StockQuantity > 0
+                    ? req.Status != ProductStatus.Inactive
+                        ? ProductStatus.Active
+                        : ProductStatus.Inactive
+                    : ProductStatus.OutOfStock;
+
+            if (
+                product.Name != req.Name.Trim()
+                || product.Description != req.Description?.Trim()
+                || product.StockQuantity != req.StockQuantity
+                || product.IsTopSeller != req.IsTopSeller
+                || product.Status != newStatus
+            )
+                hasChanges = true;
+
+            // Check price can be change or not
+            var canUpdatePrice = product is { HasVariant: false, ProductVariants.Count: 0 };
+            if (canUpdatePrice && product.Price != req.Price)
+                hasChanges = true;
+
+            // If nothing updated, return the current product data
+            if (!hasChanges)
+            {
+                var response = new GetProductDetailsResDto
+                {
+                    ProductId = product.ProductId,
+                    ProductCode = product.ProductCode,
+                    Name = product.Name,
+                    PrimaryImage = product.PrimaryImage,
+                    Description = product.Description,
+                    Price = product.Price ?? 0,
+                    StockQuantity = product.StockQuantity,
+                    SoldQuantity = product.SoldQuantity,
+                    IsTopSeller = product.IsTopSeller,
+                    Attributes = product
+                        .ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                        {
+                            AttributeId = attribute.AttributeId,
+                            Name = attribute.AttributeName,
+                            Value = attribute.AttributeValue,
+                        })
+                        .ToList(),
+                    Categories = product
+                        .ProductCategories.Select(category => new GetProductCategoryResDto
+                        {
+                            CategoryId = category.CategoryId,
+                            Name = category.Category.Name,
+                        })
+                        .ToList(),
+                    Images = product
+                        .ProductImages.Select(image => new GetProductImageResDto
+                        {
+                            ImageId = image.ImageId,
+                            Url = image.Url,
+                            AltText = image.AltText,
+                        })
+                        .ToList(),
+                    SeoMetadata = new SeoMetadata
+                    {
+                        Slug = product.Slug,
+                        MetaTitle = product.MetaTitle,
+                        MetaDescription = product.MetaDescription,
+                    },
+                    Status = product.Status,
+                };
+
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = response,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                };
+            }
+
+            // Step 7: Update product fields
+            product.Name = req.Name.Trim();
+            product.Description = req.Description?.Trim();
+            if (canUpdatePrice)
+                product.Price = req.Price;
+            product.StockQuantity = req.StockQuantity;
+            product.IsTopSeller = req.IsTopSeller;
+            product.Slug = SlugUtil.GenerateSlug(req.Name.Trim());
+            product.MetaTitle = req.Name.Trim();
+            product.MetaDescription =
+                req.Description?.Trim() ?? $"Buy {req.Name.Trim()} at the best price!";
+            product.Status = newStatus;
+            product.ModifiedById = currentUser.Data.UserId;
+            product.ModifiedAt = DateTime.Now;
+
+            // Step 8: Update product in the database
+            var updateResult = await productRepository.UpdateProductAsync(product);
+            if (!updateResult.IsSuccess || updateResult.Data == null)
+                return new Return<GetProductDetailsResDto>
+                {
+                    Data = null,
+                    IsSuccess = false,
+                    StatusCode = updateResult.StatusCode,
+                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                };
+
+            // Step 9: Map to response DTO
+            var responseUpdated = new GetProductDetailsResDto
+            {
+                ProductId = updateResult.Data.ProductId,
+                ProductCode = updateResult.Data.ProductCode,
+                Name = updateResult.Data.Name,
+                PrimaryImage = updateResult.Data.PrimaryImage,
+                Description = updateResult.Data.Description,
+                Price = updateResult.Data.Price ?? 0,
+                StockQuantity = updateResult.Data.StockQuantity,
+                SoldQuantity = updateResult.Data.SoldQuantity,
+                IsTopSeller = updateResult.Data.IsTopSeller,
+                Attributes = updateResult
+                    .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                    {
+                        AttributeId = attribute.AttributeId,
+                        Name = attribute.AttributeName,
+                        Value = attribute.AttributeValue,
+                    })
+                    .ToList(),
+                Categories = updateResult
+                    .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                    {
+                        CategoryId = category.CategoryId,
+                        Name = category.Category.Name,
+                    })
+                    .ToList(),
+                Images = updateResult
+                    .Data.ProductImages.Select(image => new GetProductImageResDto
+                    {
+                        ImageId = image.ImageId,
+                        Url = image.Url,
+                        AltText = image.AltText,
+                    })
+                    .ToList(),
+                SeoMetadata = new SeoMetadata
+                {
+                    Slug = updateResult.Data.Slug,
+                    MetaTitle = updateResult.Data.MetaTitle,
+                    MetaDescription = updateResult.Data.MetaDescription,
+                },
+                Status = updateResult.Data.Status,
+            };
+
+            // Step 10: Complete the transaction
+            transaction.Complete();
+            return new Return<GetProductDetailsResDto>
+            {
+                Data = responseUpdated,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
         }
         catch (Exception ex)
         {
