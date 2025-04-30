@@ -1726,4 +1726,188 @@ public class AddProductVariantAsyncTests
         Assert.True(result.Data);
         Assert.Equal(2, result.TotalRecord);
     }
+    
+    // Thêm vào file AddProductVariantAsyncTests.cs
+
+// Test Case 28: Cập nhật StockQuantity khi sản phẩm không có biến thể ban đầu
+[Fact]
+public async Task AddProductVariantAsync_UpdatesStockQuantity_WhenProductHasNoVariants()
+{
+    var productId = Guid.NewGuid();
+    var sizeId = Guid.NewGuid();
+    var request = new List<ProductVariantReqDto>
+    {
+        new()
+        {
+            Price = 10,
+            StockQuantity = 5, 
+            VariantValues =
+            [
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+            ],
+        },
+        new()
+        {
+            Price = 20,
+            StockQuantity = 10, 
+            VariantValues =
+            [
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
+            ],
+        },
+    };
+    var userId = Guid.NewGuid();
+    var product = new Product
+    {
+        ProductId = productId,
+        HasVariant = false,
+        ProductVariants = new List<ProductVariant>(), 
+        StockQuantity = 0, 
+        Status = ProductStatus.Active,
+    };
+
+    _helperServiceMock
+        .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
+        .ReturnsAsync(
+            new Return<User>
+            {
+                IsSuccess = true,
+                Data = new User { UserId = userId },
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    _productRepositoryMock
+        .Setup(x => x.GetProductByIdForUpdateAsync(productId))
+        .ReturnsAsync(
+            new Return<Product>
+            {
+                IsSuccess = true,
+                Data = product,
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    _productRepositoryMock
+        .Setup(x => x.UpdateProductAsync(It.Is<Product>(p =>
+            p.StockQuantity == 15 && 
+            p.HasVariant == true 
+        )))
+        .ReturnsAsync(
+            new Return<Product>
+            {
+                IsSuccess = true,
+                Data = product,
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    var result = await _productService.AddProductVariantAsync(productId, request);
+
+    Assert.True(result.IsSuccess);
+    Assert.Equal(ErrorCode.Ok, result.StatusCode);
+    Assert.True(result.Data);
+    Assert.Equal(2, result.TotalRecord); 
+
+    _productRepositoryMock.Verify(x => x.UpdateProductAsync(It.Is<Product>(p =>
+        p.StockQuantity == 15 &&
+        p.HasVariant == true
+    )), Times.Once());
+}
+
+[Fact]
+public async Task AddProductVariantAsync_UpdatesStockQuantity_WhenProductHasExistingVariants()
+{
+    var productId = Guid.NewGuid();
+    var sizeId = Guid.NewGuid();
+    var colorId = Guid.NewGuid();
+    var request = new List<ProductVariantReqDto>
+    {
+        new()
+        {
+            Price = 30,
+            StockQuantity = 15, 
+            VariantValues =
+            [
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "L" },
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Green" },
+            ],
+        },
+    };
+    var userId = Guid.NewGuid();
+    var product = new Product
+    {
+        ProductId = productId,
+        HasVariant = true,
+        ProductVariants = new List<ProductVariant>
+        {
+            new()
+            {
+                StockQuantity = 20, 
+                VariantAttributes = new List<VariantAttribute>
+                {
+                    new() { VariantNameId = sizeId, Value = "S" },
+                    new() { VariantNameId = colorId, Value = "Red" },
+                },
+            },
+            new()
+            {
+                StockQuantity = 30, 
+                VariantAttributes = new List<VariantAttribute>
+                {
+                    new() { VariantNameId = sizeId, Value = "M" },
+                    new() { VariantNameId = colorId, Value = "Blue" },
+                },
+            },
+        },
+        StockQuantity = 50, 
+        Status = ProductStatus.Active,
+    };
+
+    _helperServiceMock
+        .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
+        .ReturnsAsync(
+            new Return<User>
+            {
+                IsSuccess = true,
+                Data = new User { UserId = userId },
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    _productRepositoryMock
+        .Setup(x => x.GetProductByIdForUpdateAsync(productId))
+        .ReturnsAsync(
+            new Return<Product>
+            {
+                IsSuccess = true,
+                Data = product,
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    _productRepositoryMock
+        .Setup(x => x.UpdateProductAsync(It.Is<Product>(p =>
+            p.StockQuantity == 65 
+        )))
+        .ReturnsAsync(
+            new Return<Product>
+            {
+                IsSuccess = true,
+                Data = product,
+                StatusCode = ErrorCode.Ok,
+            }
+        );
+
+    var result = await _productService.AddProductVariantAsync(productId, request);
+
+    Assert.True(result.IsSuccess);
+    Assert.Equal(ErrorCode.Ok, result.StatusCode);
+    Assert.True(result.Data);
+    Assert.Equal(1, result.TotalRecord); 
+
+    _productRepositoryMock.Verify(x => x.UpdateProductAsync(It.Is<Product>(p =>
+        p.StockQuantity == 65
+    )), Times.Once());
+    }
 }
