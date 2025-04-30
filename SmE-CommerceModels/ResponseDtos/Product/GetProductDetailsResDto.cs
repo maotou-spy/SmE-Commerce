@@ -34,5 +34,7 @@ public class GetProductDetailsResDto
 
     public List<GetProductVariantResDto> Variants { get; set; } = [];
 
+    public List<GetProductReviewResDto> Reviews { get; set; } = [];
+
     public required SeoMetadata SeoMetadata { get; set; }
 }

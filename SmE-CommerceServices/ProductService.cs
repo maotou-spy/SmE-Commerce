@@ -834,6 +834,17 @@ public class ProductService(IProductRepository productRepository, IHelperService
                                 .ToList(),
                         })
                         .ToList(),
+                    Reviews = result
+                        .Data.Reviews.Select(x => new GetProductReviewResDto
+                        {
+                            ReviewId = x.ReviewId,
+                            Rating = x.Rating,
+                            Comment = x.Comment,
+                            CreatedAt = x.CreatedAt,
+                            CreatedBy = x.User.FullName,
+                            UserImageUrl = x.User.Avatar,
+                        })
+                        .ToList(),
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
