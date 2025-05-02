@@ -497,13 +497,19 @@ public class OrderService(
             var orderHistory = new OrderStatusHistory
             {
                 OrderId = result.Data.OrderId,
-                // FromStatus = OrderStatus.Pending, // not needed as this is the first status  
                 Status = OrderStatus.Pending,
                 ModifiedAt = DateTime.Now,
                 ModifiedById = currentCustomer.Data.UserId,
-                Reason = req.Note?.Trim()
             };
             var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryasync(orderHistory);
+            if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = orderStatusHistory.StatusCode,
+                    InternalErrorMessage = orderStatusHistory.InternalErrorMessage,
+                };
 
             // update discount code status if this one can only be used once
             if (req.DiscountCodeId.HasValue)
