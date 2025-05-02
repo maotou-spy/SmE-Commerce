@@ -79,21 +79,21 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .Include(x => x.ProductVariants)
                 .Include(x => x.CreateBy)
                 .Include(x => x.ModifiedBy)
-                .Select(x => new Product
-                {
-                    ProductId = x.ProductId,
-                    ProductCategories = x.ProductCategories,
-                    ProductImages = x.ProductImages,
-                    ProductAttributes = x.ProductAttributes,
-                    ProductVariants = x.ProductVariants,
-                    CreateBy = x.CreateBy,
-                    ModifiedBy = x.ModifiedBy,
-                    Reviews = x
-                        .Reviews.Where(review => review.Status == GeneralStatus.Active)
-                        .OrderBy(review => review.IsTop)
-                        .Take(5)
-                        .ToList(),
-                })
+                // .Select(x => new Product
+                // {
+                //     ProductId = x.ProductId,
+                //     ProductCategories = x.ProductCategories,
+                //     ProductImages = x.ProductImages,
+                //     ProductAttributes = x.ProductAttributes,
+                //     ProductVariants = x.ProductVariants,
+                //     CreateBy = x.CreateBy,
+                //     ModifiedBy = x.ModifiedBy,
+                //     Reviews = x
+                //         .Reviews.Where(review => review.Status == GeneralStatus.Active)
+                //         .OrderBy(review => review.IsTop)
+                //         .Take(5)
+                //         .ToList(),
+                // })
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
