@@ -288,7 +288,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     [HttpGet("products/{productId:guid}")]
-    [OpenApiOperation("Active Product", "Active Product")]
+    [OpenApiOperation("Product Details", "Product Details")]
     [AllowAnonymous]
     public async Task<IActionResult> CustomerGetProductDetailsAsync(Guid productId)
     {
@@ -308,8 +308,8 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpGet("products/{productId:guid}")]
-    [OpenApiOperation("Get Product Details", "Get Product Details")]
+    [HttpGet("admin/products/{productId:guid}")]
+    [OpenApiOperation("Get Product Details By Manager", "Get Product Details By Manager")]
     [Authorize]
     public async Task<IActionResult> ManagerGetProductDetailsAsync(Guid productId)
     {
