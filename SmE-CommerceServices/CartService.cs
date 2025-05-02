@@ -96,12 +96,12 @@ public class CartService(
                             ProductSlug = product.Slug,
                             Quantity = quantity,
                             StockQuantity = stockQuantity,
-                            Price = productVariant?.Price ?? product.Price ?? 0,
+                            Price = productVariant?.Price ?? product.Price,
                             IsPriceUpdated = isPriceUpdated,
                             IsQuantityUpdated = isQuantityUpdated,
                             Status = product.Status,
                         };
-                    cartItem.Price = productVariant?.Price ?? product.Price ?? 0;
+                    cartItem.Price = productVariant?.Price ?? product.Price;
                     cartItem.Quantity = quantity;
                     cartItemsToUpdate.Add(cartItem);
 
@@ -115,7 +115,7 @@ public class CartService(
                         ProductSlug = product.Slug,
                         Quantity = quantity,
                         StockQuantity = stockQuantity,
-                        Price = product.Price ?? 0,
+                        Price = product.Price,
                         IsPriceUpdated = isPriceUpdated,
                         IsQuantityUpdated = isQuantityUpdated,
                         Status = product.Status,
@@ -251,7 +251,7 @@ public class CartService(
                         StatusCode = ErrorCode.InvalidPrice,
                     };
 
-                price = existingProduct.Data.Price ?? 0;
+                price = existingProduct.Data.Price;
                 stockQuantity = existingProduct.Data.StockQuantity;
             }
 

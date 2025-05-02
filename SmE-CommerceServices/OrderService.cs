@@ -252,7 +252,7 @@ public class OrderService(
                             productCart.Data.ProductId,
                             cartItem.Data.ProductVariantId,
                             cartItem.Data.Quantity,
-                            productCart.Data.Price ?? 0
+                            productCart.Data.Price
                         )
                     );
                 }
@@ -492,7 +492,7 @@ public class OrderService(
                     StatusCode = result.StatusCode,
                     InternalErrorMessage = result.InternalErrorMessage,
                 };
-            
+
             // update order status history
             var orderHistory = new OrderStatusHistory
             {
@@ -548,95 +548,95 @@ public class OrderService(
                 // Handle points payment
                 // Check if user has enough points to pay
                 case true:
-                {
-                    var pointToUse = Math.Min((int)totalAmount, currentCustomer.Data.Point);
-                    var remainingAmount = totalAmount - pointToUse;
-
-                    // pay by points
-                    if (pointToUse > 0)
                     {
-                        var pointPayment = await CreatePaymentAsync(
-                            new CreatePaymentReqDto
-                            {
-                                Amount = pointToUse,
-                                OrderId = result.Data.OrderId,
-                                PaymentMethodId = req.PaymentMethodId,
-                                Status = PaymentStatus.Paid,
-                            },
-                            currentCustomer.Data.UserId
-                        );
-                        if (!pointPayment.IsSuccess)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = pointPayment.StatusCode,
-                                InternalErrorMessage = pointPayment.InternalErrorMessage,
-                            };
+                        var pointToUse = Math.Min((int)totalAmount, currentCustomer.Data.Point);
+                        var remainingAmount = totalAmount - pointToUse;
 
-                        currentCustomer.Data.Point -= pointToUse;
-                        currentCustomer.Data.ModifiedAt = DateTime.Now;
-                        currentCustomer.Data.ModifiedById = currentCustomer.Data.UserId;
-                        var updatePointResult = await userRepository.UpdateUserAsync(
-                            currentCustomer.Data
-                        );
-                        if (!updatePointResult.IsSuccess)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = updatePointResult.StatusCode,
-                                InternalErrorMessage = updatePointResult.InternalErrorMessage,
-                            };
+                        // pay by points
+                        if (pointToUse > 0)
+                        {
+                            var pointPayment = await CreatePaymentAsync(
+                                new CreatePaymentReqDto
+                                {
+                                    Amount = pointToUse,
+                                    OrderId = result.Data.OrderId,
+                                    PaymentMethodId = req.PaymentMethodId,
+                                    Status = PaymentStatus.Paid,
+                                },
+                                currentCustomer.Data.UserId
+                            );
+                            if (!pointPayment.IsSuccess)
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = pointPayment.StatusCode,
+                                    InternalErrorMessage = pointPayment.InternalErrorMessage,
+                                };
+
+                            currentCustomer.Data.Point -= pointToUse;
+                            currentCustomer.Data.ModifiedAt = DateTime.Now;
+                            currentCustomer.Data.ModifiedById = currentCustomer.Data.UserId;
+                            var updatePointResult = await userRepository.UpdateUserAsync(
+                                currentCustomer.Data
+                            );
+                            if (!updatePointResult.IsSuccess)
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = updatePointResult.StatusCode,
+                                    InternalErrorMessage = updatePointResult.InternalErrorMessage,
+                                };
+                        }
+
+                        // if pointToUse < totalAmount => create payment for remaining amount
+                        if (remainingAmount > 0)
+                        {
+                            var remainingPayment = await CreatePaymentAsync(
+                                new CreatePaymentReqDto
+                                {
+                                    Amount = remainingAmount,
+                                    OrderId = result.Data.OrderId,
+                                    PaymentMethodId = req.PaymentMethodId,
+                                    Status = PaymentStatus.Pending, // payment method COD
+                                },
+                                currentCustomer.Data.UserId
+                            );
+                            if (!remainingPayment.IsSuccess)
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = remainingPayment.StatusCode,
+                                    InternalErrorMessage = remainingPayment.InternalErrorMessage,
+                                };
+                        }
+
+                        break;
                     }
-
-                    // if pointToUse < totalAmount => create payment for remaining amount
-                    if (remainingAmount > 0)
+                default:
                     {
-                        var remainingPayment = await CreatePaymentAsync(
+                        var paymentResult = await CreatePaymentAsync(
                             new CreatePaymentReqDto
                             {
-                                Amount = remainingAmount,
+                                Amount = totalAmount,
                                 OrderId = result.Data.OrderId,
                                 PaymentMethodId = req.PaymentMethodId,
                                 Status = PaymentStatus.Pending, // payment method COD
                             },
                             currentCustomer.Data.UserId
                         );
-                        if (!remainingPayment.IsSuccess)
+                        if (!paymentResult.IsSuccess || !paymentResult.Data)
                             return new Return<bool>
                             {
                                 Data = false,
                                 IsSuccess = false,
-                                StatusCode = remainingPayment.StatusCode,
-                                InternalErrorMessage = remainingPayment.InternalErrorMessage,
+                                StatusCode = paymentResult.StatusCode,
+                                InternalErrorMessage = paymentResult.InternalErrorMessage,
                             };
+                        break;
                     }
-
-                    break;
-                }
-                default:
-                {
-                    var paymentResult = await CreatePaymentAsync(
-                        new CreatePaymentReqDto
-                        {
-                            Amount = totalAmount,
-                            OrderId = result.Data.OrderId,
-                            PaymentMethodId = req.PaymentMethodId,
-                            Status = PaymentStatus.Pending, // payment method COD
-                        },
-                        currentCustomer.Data.UserId
-                    );
-                    if (!paymentResult.IsSuccess || !paymentResult.Data)
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = paymentResult.StatusCode,
-                            InternalErrorMessage = paymentResult.InternalErrorMessage,
-                        };
-                    break;
-                }
             }
 
             // Clear cart items
@@ -882,10 +882,11 @@ public class OrderService(
                             ProductName = ord.ProductName,
                             VariantName =
                                 ord
-                                    is {
-                                        ProductVariantId: not null,
-                                        ProductVariant.VariantAttributes: not null
-                                    }
+                                    is
+                                {
+                                    ProductVariantId: not null,
+                                    ProductVariant.VariantAttributes: not null
+                                }
                                 && ord.ProductVariant.VariantAttributes.Count != 0
                                     ? string.Join(
                                         "-",

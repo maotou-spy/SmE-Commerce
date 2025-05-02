@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using SmE_CommerceAPI.HelperClass;
+using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceServices.Interface;
 using ErrorCode = SmE_CommerceModels.Enums.ErrorCode;
@@ -32,7 +33,51 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create product user: {e}", ex);
+            logger.LogInformation("Error at create product user: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpGet("products")]
+    [OpenApiOperation("Get Products", "Get Products")]
+    [AllowAnonymous]
+    public async Task<IActionResult> CustomerGetProductsAsync(
+        [FromQuery] ProductFilterReqDto filter
+    )
+    {
+        try
+        {
+            var result = await productService.CustomerGetProductsAsync(filter);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get products: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get products: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpGet("admin/products")]
+    [OpenApiOperation("Get Products By Manager", "Get Products By Manager")]
+    [Authorize]
+    public async Task<IActionResult> ManagerGetProductsAsync([FromQuery] ProductFilterReqDto filter)
+    {
+        try
+        {
+            var result = await productService.ManagerGetProductsAsync(filter);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get products: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogInformation("Error at get products: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -60,7 +105,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create product attribute user: {e}", ex);
+            logger.LogInformation("Error at create product attribute user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -88,7 +133,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create product image user: {e}", ex);
+            logger.LogInformation("Error at create product image user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -117,7 +162,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update product category user: {e}", ex);
+            logger.LogInformation("Error at update product category user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -151,7 +196,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update product attribute user: {e}", ex);
+            logger.LogInformation("Error at update product attribute user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -177,7 +222,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete product attribute user: {e}", ex);
+            logger.LogInformation("Error at delete product attribute user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -207,7 +252,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update product image user: {e}", ex);
+            logger.LogInformation("Error at update product image user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -233,7 +278,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete product image user: {e}", ex);
+            logger.LogInformation("Error at delete product image user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -259,7 +304,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update product user: {e}", ex);
+            logger.LogInformation("Error at update product user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -282,7 +327,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete product user: {e}", ex);
+            logger.LogInformation("Error at delete product user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -303,7 +348,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get product by id: {e}", ex);
+            logger.LogInformation("Error at get product by id: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -324,7 +369,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get product by id: {e}", ex);
+            logger.LogInformation("Error at get product by id: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -354,7 +399,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create product variant user: {e}", ex);
+            logger.LogInformation("Error at create product variant user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -384,7 +429,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update product variant user: {e}", ex);
+            logger.LogInformation("Error at update product variant user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -410,7 +455,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete product variant user: {e}", ex);
+            logger.LogInformation("Error at delete product variant user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

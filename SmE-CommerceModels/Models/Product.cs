@@ -25,7 +25,7 @@ public class Product
 
     [Column("price")]
     [Precision(15, 0)]
-    public decimal? Price { get; set; }
+    public decimal Price { get; set; }
 
     [Column("stockQuantity")]
     public int StockQuantity { get; set; }

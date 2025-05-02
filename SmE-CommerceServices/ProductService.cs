@@ -373,6 +373,9 @@ public class ProductService(
             productVariantList.AddRange(productVariants);
             existingProduct.Data.ProductVariants = productVariantList;
 
+            existingProduct.Data.Price = existingProduct
+                .Data.ProductVariants.Select(x => x.Price)
+                .Min(); // Update the product price
             existingProduct.Data.HasVariant = true;
             existingProduct.Data.Price = existingProduct
                 .Data.ProductVariants.Select(x => x.Price)
@@ -602,6 +605,9 @@ public class ProductService(
 
             existingProduct.Data.Price = existingProduct
                 .Data.ProductVariants.Select(x => x.Price)
+                .Min(); // Update the product price
+            existingProduct.Data.Price = existingProduct
+                .Data.ProductVariants.Select(x => x.Price)
                 .Min();
             existingProduct.Data.ModifiedById = currentUser.Data.UserId;
             existingProduct.Data.ModifiedAt = now;
@@ -749,6 +755,155 @@ public class ProductService(
 
     #region Product
 
+    public async Task<Return<List<GetProductsResDto>>> CustomerGetProductsAsync(
+        ProductFilterReqDto filter
+    )
+    {
+        try
+        {
+            // Step 1: Get products from repository
+            var productResult = await productRepository.GetProductsAsync(filter);
+            if (!productResult.IsSuccess || productResult.Data == null)
+                return new Return<List<GetProductsResDto>>
+                {
+                    Data = [],
+                    IsSuccess = false,
+                    StatusCode = productResult.StatusCode,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
+                    PageNumber = filter.PageNumber,
+                    PageSize = filter.PageSize,
+                    TotalRecord = productResult.TotalRecord,
+                };
+
+            // Step 2: Map to DTO
+            var productDtos = productResult
+                .Data.Select(p => new GetProductsResDto
+                {
+                    ProductId = p.ProductId,
+                    ProductCode = p.ProductCode,
+                    ProductName = p.Name,
+                    Price = p.HasVariant ? p.ProductVariants.Select(x => x.Price).Min() : p.Price,
+                    StockQuantity = p.StockQuantity,
+                    SoldQuantity = p.SoldQuantity,
+                    Status = p.Status,
+                    IsTopSeller = p.IsTopSeller,
+                    PrimaryImage = p.PrimaryImage,
+                    AverageRating = p.AverageRating,
+                })
+                .ToList();
+
+            // Step 3: Return result
+            return new Return<List<GetProductsResDto>>
+            {
+                Data = productDtos,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalRecord = productResult.TotalRecord,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<GetProductsResDto>>
+            {
+                Data = [],
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<List<ManagerGetProductsResDto>>> ManagerGetProductsAsync(
+        ProductFilterReqDto filter
+    )
+    {
+        try
+        {
+            // Step 1: Check user role (Manager)
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
+                return new Return<List<ManagerGetProductsResDto>>
+                {
+                    Data = [],
+                    IsSuccess = false,
+                    StatusCode = currentUser.StatusCode,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    PageNumber = filter.PageNumber,
+                    PageSize = filter.PageSize,
+                    TotalRecord = 0,
+                };
+
+            // Step 2: Get products from repository
+            var productResult = await productRepository.GetProductsAsync(filter, true);
+            if (!productResult.IsSuccess || productResult.Data == null)
+                return new Return<List<ManagerGetProductsResDto>>
+                {
+                    Data = [],
+                    IsSuccess = false,
+                    StatusCode = productResult.StatusCode,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
+                    PageNumber = filter.PageNumber,
+                    PageSize = filter.PageSize,
+                    TotalRecord = productResult.TotalRecord,
+                };
+
+            // Step 3: Map to DTO
+            var productDtos = productResult
+                .Data.Select(p => new ManagerGetProductsResDto
+                {
+                    ProductId = p.ProductId,
+                    ProductCode = p.ProductCode,
+                    ProductName = p.Name,
+                    Price = p.HasVariant ? p.ProductVariants.Select(x => x.Price).Min() : p.Price,
+                    StockQuantity = p.StockQuantity,
+                    SoldQuantity = p.SoldQuantity,
+                    Status = p.Status,
+                    IsTopSeller = p.IsTopSeller,
+                    PrimaryImage = p.PrimaryImage,
+                    AverageRating = p.AverageRating,
+                    AuditMetadata = new AuditMetadata
+                    {
+                        CreatedById = p.CreateById,
+                        CreatedAt = p.CreatedAt,
+                        CreatedBy = p.CreateBy?.FullName,
+                        ModifiedById = p.ModifiedById,
+                        ModifiedAt = p.ModifiedAt,
+                        ModifiedBy = p.ModifiedBy?.FullName,
+                    },
+                })
+                .ToList();
+
+            // Step 4: Return result
+            return new Return<List<ManagerGetProductsResDto>>
+            {
+                Data = productDtos,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalRecord = productResult.TotalRecord,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<ManagerGetProductsResDto>>
+            {
+                Data = [],
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<GetProductDetailsResDto>> CustomerGetProductDetailsAsync(
         Guid productId
     )
@@ -785,8 +940,9 @@ public class ProductService(
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
-                    Price =
-                        result.Data.Price ?? result.Data.ProductVariants.Select(x => x.Price).Min(), // Get the minimum price if there are variants
+                    Price = result.Data.HasVariant
+                        ? result.Data.ProductVariants.Select(x => x.Price).Min() // Get the minimum price if there are variants
+                        : result.Data.Price,
                     StockQuantity = result.Data.StockQuantity,
                     SoldQuantity = result.Data.SoldQuantity,
                     IsTopSeller = result.Data.IsTopSeller,
@@ -845,7 +1001,10 @@ public class ProductService(
                         })
                         .ToList(),
                     Reviews = result
-                        .Data.Reviews.Select(x => new GetProductReviewResDto
+                        .Data.Reviews.Where(review => review.Status == GeneralStatus.Active)
+                        .OrderBy(review => review.IsTop)
+                        .Take(5) // Take the top 5 reviews
+                        .Select(x => new GetProductReviewResDto
                         {
                             ReviewId = x.ReviewId,
                             Rating = x.Rating,
@@ -906,8 +1065,9 @@ public class ProductService(
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
-                    Price =
-                        result.Data.Price ?? result.Data.ProductVariants.Select(x => x.Price).Min(), // Get the minimum price if there are variants,
+                    Price = result.Data.HasVariant
+                        ? result.Data.ProductVariants.Select(x => x.Price).Min() // Get the minimum price if there are variants
+                        : result.Data.Price,
                     StockQuantity = result.Data.StockQuantity,
                     SoldQuantity = result.Data.SoldQuantity,
                     IsTopSeller = result.Data.IsTopSeller,
@@ -1127,7 +1287,7 @@ public class ProductService(
                 Name = addedProduct.Data.Name,
                 PrimaryImage = addedProduct.Data.PrimaryImage,
                 Description = addedProduct.Data.Description,
-                Price = addedProduct.Data.Price ?? 0,
+                Price = addedProduct.Data.Price,
                 StockQuantity = addedProduct.Data.StockQuantity,
                 SoldQuantity = addedProduct.Data.SoldQuantity,
                 IsTopSeller = addedProduct.Data.IsTopSeller,
@@ -1279,7 +1439,9 @@ public class ProductService(
                     Name = product.Name,
                     PrimaryImage = product.PrimaryImage,
                     Description = product.Description,
-                    Price = product.Price ?? 0,
+                    Price = product.HasVariant
+                        ? product.ProductVariants.Select(x => x.Price).Min() // Get the minimum price if there are variants
+                        : product.Price,
                     StockQuantity = product.StockQuantity,
                     SoldQuantity = product.SoldQuantity,
                     IsTopSeller = product.IsTopSeller,
@@ -1357,7 +1519,7 @@ public class ProductService(
                 Name = updateResult.Data.Name,
                 PrimaryImage = updateResult.Data.PrimaryImage,
                 Description = updateResult.Data.Description,
-                Price = updateResult.Data.Price ?? 0,
+                Price = updateResult.Data.Price,
                 StockQuantity = updateResult.Data.StockQuantity,
                 SoldQuantity = updateResult.Data.SoldQuantity,
                 IsTopSeller = updateResult.Data.IsTopSeller,

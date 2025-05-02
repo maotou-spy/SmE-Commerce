@@ -2,6 +2,7 @@
 using SmE_CommerceModels.DBContext;
 using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
+using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 
@@ -12,54 +13,109 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
     #region Product
 
     public async Task<Return<List<Product>>> GetProductsAsync(
-        string keyword = "",
-        int pageSize = 20,
-        int page = 1,
-        string status = ProductStatus.Active
+        ProductFilterReqDto filter,
+        bool isAdmin = false
     )
     {
         try
         {
-            if (page < 1)
-                page = 1;
+            // Step 1: Build query with only necessary fields
+            var query = dbContext.Set<Product>().AsQueryable();
 
-            // Limit page size in range [1, 100]
-            if (pageSize < 1)
-                pageSize = 20;
-            if (pageSize > 100)
-                pageSize = 100;
+            // Apply filters
+            if (!isAdmin)
+                query = query.Where(p => p.Status == ProductStatus.Active);
+            else if (!string.IsNullOrEmpty(filter.Status))
+                query = query.Where(p => p.Status == filter.Status);
 
-            var query = dbContext.Products.Where(x => x.Status == status).AsQueryable();
+            if (filter.CategoryId.HasValue)
+                query = query.Where(p =>
+                    p.ProductCategories.Any(pc => pc.CategoryId == filter.CategoryId.Value)
+                );
 
-            if (!string.IsNullOrEmpty(keyword))
-                query = query.Where(x => x.Name.Contains(keyword.Trim()));
+            if (filter.MinPrice.HasValue)
+                query = query.Where(p =>
+                    p.HasVariant
+                        ? p.ProductVariants.Any(v => v.Price >= filter.MinPrice.Value)
+                        : p.Price >= filter.MinPrice.Value
+                );
 
-            var totalRecords = await query.CountAsync();
+            if (filter.MaxPrice.HasValue)
+                query = query.Where(p =>
+                    p.HasVariant
+                        ? p.ProductVariants.Any(v => v.Price <= filter.MaxPrice.Value)
+                        : p.Price <= filter.MaxPrice.Value
+                );
 
-            var products = await query
-                .Include(x => x.ProductCategories)
-                .ThenInclude(x => x.Category)
-                .OrderByDescending(x => x.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            if (filter.MinRating.HasValue)
+                query = query.Where(p => p.AverageRating >= filter.MinRating.Value);
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                var sortOrder = filter.SortOrder.ToUpper();
+                if (
+                    sortOrder != ProductFilterSortOrder.Descending
+                    && sortOrder != ProductFilterSortOrder.Ascending
+                )
+                    sortOrder = ProductFilterSortOrder.Ascending; // Default to "asc" if invalid
+
+                query = filter.SortBy.ToLower() switch
+                {
+                    ProductFilterSortBy.Price => sortOrder == ProductFilterSortOrder.Descending
+                        ? query.OrderByDescending(p =>
+                            p.HasVariant ? p.ProductVariants.Min(v => v.Price) : p.Price
+                        )
+                        : query.OrderBy(p =>
+                            p.HasVariant ? p.ProductVariants.Min(v => v.Price) : p.Price
+                        ),
+                    ProductFilterSortBy.AverageRating => sortOrder
+                    == ProductFilterSortOrder.Descending
+                        ? query.OrderByDescending(p => p.AverageRating)
+                        : query.OrderBy(p => p.AverageRating),
+                    ProductFilterSortBy.SoldQuantity => sortOrder
+                    == ProductFilterSortOrder.Descending
+                        ? query.OrderByDescending(p => p.SoldQuantity)
+                        : query.OrderBy(p => p.SoldQuantity),
+                    _ => query.OrderBy(p => p.Name),
+                };
+            }
+            else
+            {
+                query = query.OrderBy(p => p.Name); // Default sorting
+            }
+
+            // Apply pagination
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Include(x => x.ProductVariants)
+                .Include(x => x.CreateBy)
+                .Include(x => x.ModifiedBy)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
                 .ToListAsync();
 
+            // Step 3: Return result
             return new Return<List<Product>>
             {
-                Data = products,
+                Data = items,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords,
+                StatusCode = totalCount > 0 ? ErrorCode.Ok : ErrorCode.ProductNotFound,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalRecord = totalCount,
             };
         }
         catch (Exception ex)
         {
             return new Return<List<Product>>
             {
-                Data = null,
+                Data = [],
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
                 TotalRecord = 0,
             };
         }
@@ -79,21 +135,6 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .Include(x => x.ProductVariants)
                 .Include(x => x.CreateBy)
                 .Include(x => x.ModifiedBy)
-                // .Select(x => new Product
-                // {
-                //     ProductId = x.ProductId,
-                //     ProductCategories = x.ProductCategories,
-                //     ProductImages = x.ProductImages,
-                //     ProductAttributes = x.ProductAttributes,
-                //     ProductVariants = x.ProductVariants,
-                //     CreateBy = x.CreateBy,
-                //     ModifiedBy = x.ModifiedBy,
-                //     Reviews = x
-                //         .Reviews.Where(review => review.Status == GeneralStatus.Active)
-                //         .OrderBy(review => review.IsTop)
-                //         .Take(5)
-                //         .ToList(),
-                // })
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
@@ -126,41 +167,6 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
-    public async Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds)
-    {
-        try
-        {
-            var products = await dbContext
-                .Products.Where(x => productIds.Contains(x.ProductId))
-                .Include(x => x.ProductCategories)
-                .ThenInclude(x => x.Category)
-                .Include(x => x.ProductImages)
-                .Include(x => x.ProductAttributes)
-                .Include(x => x.ProductVariants)
-                .ThenInclude(x => x.VariantAttributes)
-                .ToListAsync();
-
-            return new Return<List<Product>>
-            {
-                Data = products,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = products.Count,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<List<Product>>
-            {
-                Data = null,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
-                TotalRecord = 0,
-            };
-        }
-    }
-
     public async Task<Return<Product>> GetProductByIdForUpdateAsync(Guid productId)
     {
         try
@@ -173,6 +179,8 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .Include(x => x.ProductAttributes)
                 .Include(x => x.ProductVariants)
                 .ThenInclude(x => x.VariantAttributes)
+                .Include(x => x.CreateBy)
+                .Include(x => x.ModifiedBy)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)

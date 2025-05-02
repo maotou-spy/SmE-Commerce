@@ -1,10 +1,14 @@
 ﻿namespace SmE_CommerceModels.Enums;
 
-public static class ProductFilterEnum
+public static class ProductFilterSortBy
 {
-    public const string Default = "Default";
-    public const string PriceLowToHigh = "PriceLowToHigh";
-    public const string PriceHighToLow = "PriceHighToLow";
-    public const string NameAscending = "NameAscending";
-    public const string NameDescending = "NameDescending";
+    public const string Price = "price";
+    public const string AverageRating = "averageRating";
+    public const string SoldQuantity = "soldQuantity";
+}
+
+public static class ProductFilterSortOrder
+{
+    public const string Ascending = "asc";
+    public const string Descending = "desc";
 }

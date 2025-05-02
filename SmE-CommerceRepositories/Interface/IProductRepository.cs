@@ -1,15 +1,16 @@
 ﻿using SmE_CommerceModels.Models;
+using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceRepositories.Interface;
 
 public interface IProductRepository
 {
+    Task<Return<List<Product>>> GetProductsAsync(ProductFilterReqDto filter, bool isAdmin = false);
+
     Task<Return<Product>> GetProductByVariantIdForUpdateAsync(Guid productVariantId);
 
     Task<Return<Product>> GetProductByIdAsync(Guid productId);
-
-    Task<Return<List<Product>>> GetProductsByIdsAsync(List<Guid> productIds);
 
     Task<Return<Product>> GetProductByNameAsync(string productName);
 
