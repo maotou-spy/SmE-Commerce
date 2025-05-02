@@ -10,12 +10,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/products")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class ProductController(IProductService productService, ILogger<AuthController> logger)
     : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("admin/products")]
     [OpenApiOperation("Create Product", "Create Product")]
     [Authorize]
     public async Task<IActionResult> AddProductAsync([FromBody] AddProductReqDto req)
@@ -37,7 +37,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPost("{productId:guid}/attributes")]
+    [HttpPost("admin/products/{productId:guid}/attributes")]
     [OpenApiOperation("Create Product Attribute", "Create Product Attribute")]
     [Authorize]
     public async Task<IActionResult> AddProductAttributeAsync(
@@ -65,7 +65,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPost("{productId:guid}/images")]
+    [HttpPost("admin/products/{productId:guid}/images")]
     [OpenApiOperation("Create Product Image", "Create Product Image")]
     [Authorize]
     public async Task<IActionResult> AddProductImageAsync(
@@ -93,7 +93,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPut("{productId:guid}/categories")]
+    [HttpPut("admin/products/{productId:guid}/categories")]
     [OpenApiOperation("Update Product Category", "Update Product Category")]
     [Authorize]
     public async Task<IActionResult> UpdateProductCategoryAsync(
@@ -122,7 +122,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPut("{productId:guid}/attributes/{attributeId:guid}")]
+    [HttpPut("admin/products/{productId:guid}/attributes/{attributeId:guid}")]
     [OpenApiOperation("Update Product Attribute", "Update Product Attribute")]
     [Authorize]
     public async Task<IActionResult> UpdateProductAttributeAsync(
@@ -156,7 +156,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpDelete("{productId:guid}/attributes/{attributeId:guid}")]
+    [HttpDelete("admin/products/{productId:guid}/attributes/{attributeId:guid}")]
     [OpenApiOperation("Delete Product Attribute", "Delete Product Attribute")]
     [Authorize]
     public async Task<IActionResult> DeleteProductAttributeAsync(Guid productId, Guid attributeId)
@@ -182,7 +182,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPut("{productId:guid}/images/{imageId:guid}")]
+    [HttpPut("admin/products/{productId:guid}/images/{imageId:guid}")]
     [OpenApiOperation("Update Product Image", "Update Product Image")]
     [Authorize]
     public async Task<IActionResult> UpdateProductImageAsync(
@@ -212,7 +212,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpDelete("{productId:guid}/images/{imageId:guid}")]
+    [HttpDelete("admin/products/{productId:guid}/images/{imageId:guid}")]
     [OpenApiOperation("Delete Product Image", "Delete Product Image")]
     [Authorize]
     public async Task<IActionResult> DeleteProductImageAsync(Guid productId, Guid imageId)
@@ -238,7 +238,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPut("{productId:guid}")]
+    [HttpPut("admin/products/{productId:guid}")]
     [OpenApiOperation("Update Product", "Update Product")]
     [Authorize]
     public async Task<IActionResult> UpdateProductAsync(
@@ -264,7 +264,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpDelete("{productId:guid}")]
+    [HttpDelete("admin/products/{productId:guid}")]
     [OpenApiOperation("Delete Product", "Delete Product")]
     [Authorize]
     public async Task<IActionResult> DeleteProductAsync(Guid productId)
@@ -287,7 +287,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpGet("{productId:guid}/active")]
+    [HttpGet("products/{productId:guid}")]
     [OpenApiOperation("Active Product", "Active Product")]
     [AllowAnonymous]
     public async Task<IActionResult> CustomerGetProductDetailsAsync(Guid productId)
@@ -308,7 +308,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpGet("{productId:guid}")]
+    [HttpGet("products/{productId:guid}")]
     [OpenApiOperation("Get Product Details", "Get Product Details")]
     [Authorize]
     public async Task<IActionResult> ManagerGetProductDetailsAsync(Guid productId)
@@ -330,7 +330,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
     }
 
     // Product Variant
-    [HttpPost("{productId:guid}/variants")]
+    [HttpPost("admin/products/{productId:guid}/variants")]
     [OpenApiOperation("Create Product Variant", "Create Product Variant")]
     [Authorize]
     public async Task<IActionResult> AddProductVariantAsync(
@@ -359,7 +359,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpPut("{productId:guid}/variants/{variantId:guid}")]
+    [HttpPut("admin/products/{productId:guid}/variants/{variantId:guid}")]
     [OpenApiOperation("Update Product Variant", "Update Product Variant")]
     [Authorize]
     public async Task<IActionResult> UpdateProductVariantAsync(
@@ -389,7 +389,7 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
-    [HttpDelete("{productId:guid}/variants/{variantId:guid}")]
+    [HttpDelete("admin/products/{productId:guid}/variants/{variantId:guid}")]
     [OpenApiOperation("Delete Product Variant", "Delete Product Variant")]
     [Authorize]
     public async Task<IActionResult> DeleteProductVariantAsync(Guid productId, Guid variantId)

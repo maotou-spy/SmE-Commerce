@@ -10,14 +10,14 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/variants")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class VariantController(
     IVariantNameService variantNameService,
     ILogger<AuthController> logger
 ) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("variants")]
     [OpenApiOperation("GetVariantNames", "Get all variant names")]
     [Authorize]
     public async Task<IActionResult> GetVariantNamesAsync()
@@ -41,7 +41,7 @@ public class VariantController(
         }
     }
 
-    [HttpPost]
+    [HttpPost("admin/variants")]
     [OpenApiOperation("CreateVariantName", "Create a new variant name")]
     [Authorize]
     public async Task<IActionResult> BulkCreateVariantNameAsync([FromBody] List<string> req)
@@ -67,7 +67,7 @@ public class VariantController(
         }
     }
 
-    [HttpPut("{variantId:guid}")]
+    [HttpPut("admin/variants/{variantId:guid}")]
     [OpenApiOperation("UpdateVariantName", "Update a variant name")]
     [Authorize]
     public async Task<IActionResult> UpdateVariantNameAsync(
@@ -96,7 +96,7 @@ public class VariantController(
         }
     }
 
-    [HttpDelete("{variantId:guid}")]
+    [HttpDelete("admmin/variants/{variantId:guid}")]
     [OpenApiOperation("DeleteVariantName", "Delete a variant name")]
     [Authorize]
     public async Task<IActionResult> DeleteVariantNameAsync(Guid variantId)

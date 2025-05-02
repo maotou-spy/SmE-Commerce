@@ -10,12 +10,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/settings")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class SettingController(ISettingService settingService, ILogger<AuthController> logger)
     : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("settings")]
     [OpenApiOperation("Get Settings", "Get all system's settings")]
     [AllowAnonymous]
     public async Task<IActionResult> GetSettings()
@@ -37,7 +37,7 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
         }
     }
 
-    [HttpGet("{key}")]
+    [HttpGet("settings/{key}")]
     [OpenApiOperation("Get Setting By Key", "Get a system's setting by key")]
     [AllowAnonymous]
     public async Task<IActionResult> GetSettingByKey(string key)
@@ -59,7 +59,7 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
         }
     }
 
-    [HttpPut]
+    [HttpPut("admin/settings")]
     [OpenApiOperation("Update Settings", "Update system's settings")]
     [Authorize]
     public async Task<IActionResult> UpdateSettings(List<SettingReqDto> settings)

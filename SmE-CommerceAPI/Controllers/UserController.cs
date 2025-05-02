@@ -43,7 +43,7 @@ public class UserController(
     //     }
     //     catch (Exception ex)
     //     {
-    //         logger.LogInformation("Error at create manager user: {e}", ex);
+    //         logger.LogInformation("Error at create manager user: {ex}", ex);
     //         return ErrorCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
     //     }
     // }
@@ -66,39 +66,10 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get user profile: {e}", ex);
+            logger.LogInformation("Error at get user profile: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
-            );
-        }
-    }
-
-    [HttpGet("{id:guid}/profile")]
-    [OpenApiOperation("Get User Profile By Manager", "Get user profile by manager")]
-    [Authorize]
-    public async Task<IActionResult> GetUserProfileByManager([FromRoute] Guid id)
-    {
-        try
-        {
-            var result = await userService.GetUserProfileByManagerAsync(id);
-
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError(
-                    "Error at get user profile by manager: {ex}",
-                    result.InternalErrorMessage
-                );
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get user profile by manager: {e}", ex);
-            return StatusCode(
-                500,
-                new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
             );
         }
     }
@@ -124,7 +95,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get user addresses: {e}", ex);
+            logger.LogInformation("Error at get user addresses: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -150,7 +121,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at add address: {e}", ex);
+            logger.LogInformation("Error at add address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -179,7 +150,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update address: {e}", ex);
+            logger.LogInformation("Error at update address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -205,7 +176,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete address: {e}", ex);
+            logger.LogInformation("Error at delete address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -231,7 +202,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at set default address: {e}", ex);
+            logger.LogInformation("Error at set default address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -257,48 +228,8 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update user profile: {e}", ex);
+            logger.LogInformation("Error at update user profile: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
-        }
-    }
-
-    [HttpGet]
-    [OpenApiOperation("Get All Users", "Get all users")]
-    [Authorize]
-    public async Task<IActionResult> GetAllUsers(
-        [FromQuery] string? status,
-        [FromQuery] int? pageSize,
-        [FromQuery] int? pageNumber,
-        [FromQuery] string? phone,
-        [FromQuery] string? email,
-        [FromQuery] string name
-    )
-    {
-        try
-        {
-            var result = await userService.GetAllUsersAsync(
-                status,
-                pageSize,
-                pageNumber,
-                phone,
-                email,
-                name
-            );
-
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get all users: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at get all users: {e}", ex);
-            return StatusCode(
-                500,
-                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
-            );
         }
     }
 
@@ -319,32 +250,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete user: {e}", ex);
-            return StatusCode(
-                500,
-                new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
-            );
-        }
-    }
-
-    [HttpPut("{id:guid}")]
-    [OpenApiOperation("Change User Status", "Change user status")]
-    [Authorize]
-    public async Task<IActionResult> ChangeUserStatus([FromRoute] Guid id)
-    {
-        try
-        {
-            var result = await userService.ChangeUserStatusAsync(id);
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at change user status: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogInformation("Error at change user status: {e}", ex);
+            logger.LogInformation("Error at delete user: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
@@ -369,7 +275,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discount code: {e}", ex);
+            logger.LogInformation("Error at get discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -392,7 +298,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at change password: {e}", ex);
+            logger.LogInformation("Error at change password: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

@@ -11,12 +11,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/categories")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class CategoryController(ICategoryService categoryService, ILogger<AuthController> logger)
     : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("admin/categories")]
     [OpenApiOperation("Add Category", "Add Category")]
     [Authorize]
     public async Task<IActionResult> AddCategoryAsync([FromBody] AddCategoryReqDto req)
@@ -38,7 +38,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
     }
 
-    [HttpGet("active")]
+    [HttpGet("categories")]
     [OpenApiOperation("Get Active Categories", "Get Active Categories")]
     [Authorize]
     public async Task<IActionResult> GetCategoriesForCustomerAsync(
@@ -70,7 +70,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
     }
 
-    [HttpGet]
+    [HttpGet("admin/categories")]
     [OpenApiOperation("Get Categories", "Get All Categories")]
     [Authorize]
     public async Task<IActionResult> GetCategoriesForManagerAsync(
@@ -103,7 +103,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("admin/categories/{id:guid}")]
     [OpenApiOperation("Update Category", "Update Category")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryDetailAsync(
@@ -131,7 +131,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("admin/categories/{id:guid}")]
     [OpenApiOperation("Delete Category", "Delete Category")]
     [Authorize]
     public async Task<IActionResult> DeleteCategoryAsync([FromRoute] Guid id)
@@ -154,7 +154,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
     }
 
-    [HttpPut("{id:guid}/status")]
+    [HttpPut("admin/categories/{id:guid}/status")]
     [OpenApiOperation("Update Category Status", "Update Category Status")]
     [Authorize]
     public async Task<IActionResult> UpdateCategoryStatusAsync([FromRoute] Guid id)

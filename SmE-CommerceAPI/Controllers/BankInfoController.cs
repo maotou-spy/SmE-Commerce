@@ -10,12 +10,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/banks")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class BankInfoController(ILogger<AuthController> logger, IBankInfoService bankInfoService)
     : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("admin/banks")]
     [OpenApiOperation("Add bank info", "Add bank info")]
     [Authorize]
     public async Task<IActionResult> AddBankInfoAsync([FromBody] AddBankInfoReqDto req)
@@ -37,7 +37,7 @@ public class BankInfoController(ILogger<AuthController> logger, IBankInfoService
         }
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("admin/{id:guid}")]
     [OpenApiOperation("Delete bank info", "Delete bank info")]
     [Authorize]
     public async Task<IActionResult> DeleteBankInfoAsync([FromRoute] Guid id)
