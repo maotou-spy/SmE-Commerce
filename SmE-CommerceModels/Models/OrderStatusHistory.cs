@@ -13,21 +13,18 @@ public class OrderStatusHistory
     [Column("orderId")]
     public Guid OrderId { get; set; }
 
-    [Column("fromStatus")]
+    [Column("status")]
     [StringLength(50)]
-    public string? FromStatus { get; set; }
-
-    [Column("toStatus")]
-    [StringLength(50)]
-    public string ToStatus { get; set; } = null!;
+    public string Status { get; set; } = null!;
 
     [Column(TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     public Guid? ModifiedById { get; set; }
 
-    [Column("note")]
-    public string? Note { get; set; }
+    [Column("reason")]
+    [StringLength(500)]
+    public string? Reason { get; set; }
 
     [ForeignKey("ModifiedById")]
     [InverseProperty("OrderStatusHistories")]
