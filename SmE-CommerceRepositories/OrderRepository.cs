@@ -31,7 +31,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -40,11 +40,11 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
     {
         try
         {
-            var order = await defaultdb.Orders
-                .Include(x => x.Address)
+            var order = await defaultdb
+                .Orders.Include(x => x.Address)
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.ProductVariant)
-                    .ThenInclude(x => x!.VariantAttributes)
+                .ThenInclude(x => x!.VariantAttributes)
                 .FirstOrDefaultAsync(x => x.OrderId == orderId && x.UserId == userId);
             if (order == null)
                 return new Return<Order>
@@ -111,27 +111,28 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
     }
 
     // Manager get order by status and userId
-    public async Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(Guid? userId, string statusFilter)
+    public async Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(
+        Guid? userId,
+        string statusFilter
+    )
     {
         try
         {
-            var query = defaultdb.Orders
-                .Include(x => x.Address)
+            var query = defaultdb
+                .Orders.Include(x => x.Address)
                 .Include(x => x.User)
                 .Include(x => x.OrderItems)
-                    .ThenInclude(x => x.ProductVariant)
-                    .ThenInclude(x => x!.Product)    
+                .ThenInclude(x => x.ProductVariant)
+                .ThenInclude(x => x!.Product)
                 .AsQueryable();
 
             if (userId.HasValue)
-            {
                 query = query.Where(x => x.UserId == userId);
-            }
-            
+
             query = query.Where(x => x.Status == statusFilter);
-            
+
             var ordersList = await query.ToListAsync();
-            
+
             if (ordersList.Count == 0)
                 return new Return<List<Order>>
                 {
@@ -148,7 +149,8 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 IsSuccess = true,
                 TotalRecord = ordersList.Count,
             };
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new Return<List<Order>>
             {
@@ -175,9 +177,9 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            order.Status = OrderStatus.Confirmed;
+            order.Status = OrderStatus.Stuffing;
             defaultdb.Orders.Update(order);
             await defaultdb.SaveChangesAsync();
             return new Return<Order>

@@ -28,7 +28,6 @@ public static class PaymentStatus
 {
     public const string Pending = "Pending";
     public const string Paid = "Paid";
-    public const string Completed = "Completed";
 }
 
 public static class UserStatus
@@ -42,12 +41,13 @@ public static class UserStatus
 public static class OrderStatus
 {
     public const string Pending = "Pending"; // Order has been placed but not confirmed by the shop owner
-    public const string Confirmed = "Stuffing"; // Order has been confirmed and stuffing by the shop owner
+    public const string Stuffing = "Stuffing"; // Order has been confirmed and stuffing by the shop owner
     public const string Shipped = "Shipped"; // Order has been shipped
-    public const string Delivered = "Completed"; // Order has been delivered
-    public const string Cancelled = "Cancelled"; // Order has been cancelled by the customer
+    public const string Completed = "Completed"; // Order has been delivered
+    public const string Cancelled = "Cancelled"; // Order has been canceled by the customer
+
     public const string Rejected = "Rejected"; // Order has been rejected by the shop owner
-    public const string Returned = "Returned"; // Order has been returned by the customer
+    // public const string Returned = "Returned"; // Order has been returned by the customer
 }
 
 public static class ProductStatus

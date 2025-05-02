@@ -15,7 +15,7 @@ public class OrderStatusHistory
 
     [Column("fromStatus")]
     [StringLength(50)]
-    public string FromStatus { get; set; } = null!;
+    public string? FromStatus { get; set; }
 
     [Column("toStatus")]
     [StringLength(50)]

@@ -32,14 +32,17 @@ public class OrderService(
         try
         {
             // validate order
-            var order = await orderRepository.CustomerGetOrderByIdAsync(reqDto.OrderId, currentCustomerId);
+            var order = await orderRepository.CustomerGetOrderByIdAsync(
+                reqDto.OrderId,
+                currentCustomerId
+            );
             if (!order.IsSuccess || order.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = order.StatusCode,
-                    InternalErrorMessage = order.InternalErrorMessage
+                    InternalErrorMessage = order.InternalErrorMessage,
                 };
 
             // validate amount
@@ -48,7 +51,7 @@ public class OrderService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidAmount
+                    StatusCode = ErrorCode.InvalidAmount,
                 };
 
             var payment = new Payment
@@ -59,7 +62,7 @@ public class OrderService(
                 Description = reqDto.Description ?? "",
                 Status = reqDto.Status,
                 CreatedAt = DateTime.Now,
-                CreateById = currentCustomerId
+                CreateById = currentCustomerId,
             };
 
             var result = await paymentRepository.CreatePaymentAsync(payment);
@@ -69,7 +72,7 @@ public class OrderService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage
+                    InternalErrorMessage = result.InternalErrorMessage,
                 };
 
             return new Return<bool>
@@ -77,7 +80,7 @@ public class OrderService(
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.StatusCode,
-                InternalErrorMessage = result.InternalErrorMessage
+                InternalErrorMessage = result.InternalErrorMessage,
             };
         }
         catch (Exception e)
@@ -87,7 +90,7 @@ public class OrderService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -102,7 +105,7 @@ public class OrderService(
             address.Address1.Trim(),
             address.Ward.Trim(),
             address.District.Trim(),
-            address.City.Trim()
+            address.City.Trim(),
         }
             .Where(part => !string.IsNullOrWhiteSpace(part))
             .ToList();
@@ -432,7 +435,9 @@ public class OrderService(
             {
                 var productResult = await productRepository.GetProductByIdAsync(item.ProductId);
                 var variantResult = item.ProductVariantId.HasValue
-                    ? await productRepository.GetProductVariantByIdAsync(item.ProductVariantId.Value)
+                    ? await productRepository.GetProductVariantByIdAsync(
+                        item.ProductVariantId.Value
+                    )
                     : null;
 
                 if (!productResult.IsSuccess || productResult.Data == null)
@@ -451,12 +456,14 @@ public class OrderService(
                         Quantity = item.Quantity,
                         Price = item.Price,
                         ProductName = productResult.Data.Name,
-                        VariantName = variantResult?.Data is not null ? string.Join("-", variantResult.Data.VariantAttributes) : "",
+                        VariantName = variantResult?.Data is not null
+                            ? string.Join("-", variantResult.Data.VariantAttributes)
+                            : "",
                         ProductId = item.ProductId, // Đảm bảo gán ProductId
                     }
                 );
             }
-            
+
             // Create order record
             var order = new Order
             {
@@ -616,7 +623,8 @@ public class OrderService(
 
             // Clear cart items
             var cartItems = await cartRepository.RemoveCartItemRangeByIdAsync(
-                req.CartItemId, currentCustomer.Data.UserId
+                req.CartItemId,
+                currentCustomer.Data.UserId
             );
             if (!cartItems.IsSuccess)
                 return new Return<bool>
@@ -629,39 +637,44 @@ public class OrderService(
 
             // Update stock quantity and sold quantity
             foreach (var item in orderItemsWithPrice)
-            {
                 if (item.ProductVariantId.HasValue)
                 {
-                    var variant = await productRepository.GetProductVariantByIdForUpdateAsync(item.ProductVariantId.Value);
+                    var variant = await productRepository.GetProductVariantByIdForUpdateAsync(
+                        item.ProductVariantId.Value
+                    );
                     if (!variant.IsSuccess || variant.Data == null)
                         return new Return<bool>
                         {
                             IsSuccess = false,
                             StatusCode = variant.StatusCode,
-                            InternalErrorMessage =  variant.InternalErrorMessage
+                            InternalErrorMessage = variant.InternalErrorMessage,
                         };
                     variant.Data.StockQuantity -= item.Quantity;
                     variant.Data.SoldQuantity += item.Quantity;
                     if (variant.Data.StockQuantity == 0)
                         variant.Data.Status = ProductStatus.OutOfStock;
-                    var updateResult = await productRepository.UpdateProductVariantAsync(variant.Data);
+                    var updateResult = await productRepository.UpdateProductVariantAsync(
+                        variant.Data
+                    );
                     if (!updateResult.IsSuccess)
                         return new Return<bool>
                         {
                             IsSuccess = false,
                             StatusCode = updateResult.StatusCode,
-                            InternalErrorMessage = updateResult.InternalErrorMessage
+                            InternalErrorMessage = updateResult.InternalErrorMessage,
                         };
                 }
                 else
                 {
-                    var product = await productRepository.GetProductByIdForUpdateAsync(item.ProductId);
+                    var product = await productRepository.GetProductByIdForUpdateAsync(
+                        item.ProductId
+                    );
                     if (!product.IsSuccess || product.Data == null)
                         return new Return<bool>
                         {
                             IsSuccess = false,
                             StatusCode = product.StatusCode,
-                            InternalErrorMessage = product.InternalErrorMessage
+                            InternalErrorMessage = product.InternalErrorMessage,
                         };
                     product.Data.StockQuantity -= item.Quantity;
                     product.Data.SoldQuantity += item.Quantity;
@@ -673,10 +686,9 @@ public class OrderService(
                         {
                             IsSuccess = false,
                             StatusCode = updateResult.StatusCode,
-                            InternalErrorMessage = updateResult.InternalErrorMessage
+                            InternalErrorMessage = updateResult.InternalErrorMessage,
                         };
                 }
-            }
 
             // Update user points
             currentCustomer.Data.Point += order.PointsEarned;
@@ -760,7 +772,7 @@ public class OrderService(
                 EstimatedDeliveryDate = order.Data.EstimatedDeliveryDate,
                 CancelReason = order.Data.CancelReason,
                 ActualDeliveryDate = order.Data.ActualDeliveryDate,
-                ReturnReason = order.Data.ReturnReason,
+                RejectReason = order.Data.RejectReason,
                 Status = order.Data.Status,
                 OrderItems = order
                     .Data.OrderItems.Select(x => new GetOrderItemResDto
@@ -808,7 +820,9 @@ public class OrderService(
 
     #region Admin
 
-    public async Task<Return<List<ManagerGetOrdersResDto>>> ManagerGetOrdersAsync(string statusFilter)
+    public async Task<Return<List<ManagerGetOrdersResDto>>> ManagerGetOrdersAsync(
+        string statusFilter
+    )
     {
         try
         {
@@ -821,7 +835,7 @@ public class OrderService(
                     StatusCode = currentUser.StatusCode,
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
-            
+
             var orders = await orderRepository.GetOrdersByStatusAndUserIdAsync(null, statusFilter);
             if (!orders.IsSuccess || orders.Data == null)
                 return new Return<List<ManagerGetOrdersResDto>>
@@ -832,44 +846,55 @@ public class OrderService(
                     InternalErrorMessage = orders.InternalErrorMessage,
                 };
 
-            var orderList = orders.Data.Select(x => new ManagerGetOrdersResDto
-            {
-                OrderId = x.OrderId,
-                UserId = x.UserId,
-                UserName = x.User.FullName,
-                AddressId = x.AddressId,
-                addressFull = CreateFullAddress(x.Address),
-                note = x.Note ?? null,
-                status = x.Status,
-                orderItems = x.OrderItems.Select(ord => new GetOrderItemResDto
+            var orderList = orders
+                .Data.Select(x => new ManagerGetOrdersResDto
                 {
-                    ProductId = ord.ProductId,
-                    VariantId = ord.ProductVariantId ?? Guid.Empty,
-                    Quantity = ord.Quantity,
-                    Price = ord.Price,
-                    ProductName = ord.ProductName,
-                    VariantName = ord is { ProductVariantId: not null, ProductVariant.VariantAttributes: not null }
-                                  && ord.ProductVariant.VariantAttributes.Any()
-                        ? string.Join(
-                            "-",
-                            ord.ProductVariant.VariantAttributes
-                                .Where(v => v?.Value != null)
-                                .Select(v => v.Value)
-                        )
-                        : ord.VariantName,
-                    VariantImage = ord.Product.PrimaryImage,
-                    OrderItemId = ord.OrderItemId,
-                }).ToList()
-            }).ToList();
-            
+                    OrderId = x.OrderId,
+                    UserId = x.UserId,
+                    UserName = x.User.FullName,
+                    AddressId = x.AddressId,
+                    addressFull = CreateFullAddress(x.Address),
+                    note = x.Note ?? null,
+                    status = x.Status,
+                    orderItems = x
+                        .OrderItems.Select(ord => new GetOrderItemResDto
+                        {
+                            ProductId = ord.ProductId,
+                            VariantId = ord.ProductVariantId ?? Guid.Empty,
+                            Quantity = ord.Quantity,
+                            Price = ord.Price,
+                            ProductName = ord.ProductName,
+                            VariantName =
+                                ord
+                                    is {
+                                        ProductVariantId: not null,
+                                        ProductVariant.VariantAttributes: not null
+                                    }
+                                && ord.ProductVariant.VariantAttributes.Count != 0
+                                    ? string.Join(
+                                        "-",
+                                        ord.ProductVariant.VariantAttributes.Where(v =>
+                                                v.Value != null
+                                            )
+                                            .Select(v => v.Value)
+                                    )
+                                    : ord.VariantName,
+                            VariantImage = ord.Product.PrimaryImage,
+                            OrderItemId = ord.OrderItemId,
+                        })
+                        .ToList(),
+                })
+                .ToList();
+
             return new Return<List<ManagerGetOrdersResDto>>
             {
                 Data = orderList,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = orderList.Count
+                TotalRecord = orderList.Count,
             };
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return new Return<List<ManagerGetOrdersResDto>>
             {

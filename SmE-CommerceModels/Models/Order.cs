@@ -55,7 +55,7 @@ public class Order
     [Column("note", TypeName = "character varying")]
     public string? Note { get; set; }
 
-    [Column("discountamount")]
+    [Column("discountAmount")]
     [Precision(15, 0)]
     public decimal? DiscountAmount { get; set; }
 
@@ -81,9 +81,9 @@ public class Order
     [StringLength(200)]
     public string? CancelReason { get; set; }
 
-    [Column("returnReason")]
+    [Column("rejectReason")]
     [StringLength(200)]
-    public string? ReturnReason { get; set; }
+    public string? RejectReason { get; set; }
 
     [Column("pointsUsed")]
     public int PointsUsed { get; set; }
