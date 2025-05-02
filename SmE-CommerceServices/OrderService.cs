@@ -492,6 +492,18 @@ public class OrderService(
                     StatusCode = result.StatusCode,
                     InternalErrorMessage = result.InternalErrorMessage,
                 };
+            
+            // update order status history
+            var orderHistory = new OrderStatusHistory
+            {
+                OrderId = result.Data.OrderId,
+                // FromStatus = OrderStatus.Pending, // not needed as this is the first status  
+                Status = OrderStatus.Pending,
+                ModifiedAt = DateTime.Now,
+                ModifiedById = currentCustomer.Data.UserId,
+                Reason = req.Note?.Trim()
+            };
+            var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryasync(orderHistory);
 
             // update discount code status if this one can only be used once
             if (req.DiscountCodeId.HasValue)
@@ -770,9 +782,7 @@ public class OrderService(
                 Note = order.Data.Note,
                 SubTotal = order.Data.SubTotal,
                 EstimatedDeliveryDate = order.Data.EstimatedDeliveryDate,
-                CancelReason = order.Data.CancelReason,
                 ActualDeliveryDate = order.Data.ActualDeliveryDate,
-                RejectReason = order.Data.RejectReason,
                 Status = order.Data.Status,
                 OrderItems = order
                     .Data.OrderItems.Select(x => new GetOrderItemResDto

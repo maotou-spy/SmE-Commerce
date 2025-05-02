@@ -162,7 +162,32 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
-
+    
+    public async Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryasync(OrderStatusHistory req)
+    {
+        try
+        {
+            await defaultdb.OrderStatusHistories.AddAsync(req);
+            await defaultdb.SaveChangesAsync();
+            return new Return<OrderStatusHistory>
+            {
+                Data = req,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = 1,
+                IsSuccess = true,
+            };
+        } catch (Exception ex)
+        {
+            return new Return<OrderStatusHistory>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex
+            };
+        }
+    }
     #region admin
 
     // Manager Confirm Order
