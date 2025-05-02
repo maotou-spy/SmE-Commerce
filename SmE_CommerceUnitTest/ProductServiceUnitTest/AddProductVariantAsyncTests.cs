@@ -19,6 +19,7 @@ public class AddProductVariantAsyncTests
     public AddProductVariantAsyncTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
+        _categoryRepositoryMock = new Mock<ICategoryRepository>();
         _helperServiceMock = new Mock<IHelperService>();
         _productService = new ProductService(
             _productRepositoryMock.Object,
