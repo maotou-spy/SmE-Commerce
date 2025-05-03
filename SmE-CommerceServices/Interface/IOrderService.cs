@@ -6,10 +6,9 @@ namespace SmE_CommerceServices.Interface;
 
 public interface IOrderService
 {
-    #region Order
-
     Task<Return<bool>> CustomerCreateOrderAsync(CreateOrderReqDto req);
+
     Task<Return<GetOrderDetailsResDto>> GetOrderByIdAsync(Guid orderId);
 
-    #endregion
+    Task<Return<IEnumerable<GetOrderResDto>>> GetOrdersAsync(OrderFilterReqDto filter);
 }

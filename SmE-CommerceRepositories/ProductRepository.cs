@@ -20,7 +20,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
     {
         try
         {
-            // Step 1: Build query with only necessary fields
+            // Step 1: Build a query with only necessary fields
             var query = dbContext.Set<Product>().AsQueryable();
 
             // Apply search filter
@@ -87,12 +87,10 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                         : query.OrderBy(p =>
                             p.HasVariant ? p.ProductVariants.Min(v => v.Price) : p.Price
                         ),
-                    ProductFilterSortBy.AverageRating => sortOrder
-                    == FilterSortOrder.Descending
+                    ProductFilterSortBy.AverageRating => sortOrder == FilterSortOrder.Descending
                         ? query.OrderByDescending(p => p.AverageRating)
                         : query.OrderBy(p => p.AverageRating),
-                    ProductFilterSortBy.SoldQuantity => sortOrder
-                    == FilterSortOrder.Descending
+                    ProductFilterSortBy.SoldQuantity => sortOrder == FilterSortOrder.Descending
                         ? query.OrderByDescending(p => p.SoldQuantity)
                         : query.OrderBy(p => p.SoldQuantity),
                     _ => query.OrderBy(p => p.Name)

@@ -10,12 +10,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}")]
+[Route("api/v{version:apiVersion}/orders")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class OrderController(IOrderService orderService, ILogger<AuthController> logger)
     : ControllerBase
 {
-    [HttpPost("orders")]
+    [HttpPost]
     [OpenApiOperation("Create Order", "Create Order")]
     [Authorize]
     public async Task<IActionResult> CreateOrderAsync([FromBody] CreateOrderReqDto req)
@@ -37,7 +37,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
 
-    [HttpGet("orders/{orderId:guid}")]
+    [HttpGet("{orderId:guid}")]
     [OpenApiOperation("Get Order Detail", "Get Order Detail")]
     [Authorize(AuthenticationSchemes = "JwtScheme")]
     public async Task<IActionResult> GetOrderByIdAsync([FromRoute] Guid orderId)
@@ -59,26 +59,25 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
 
-    // [HttpGet("orders")]
-    // [OpenApiOperation("Get orders", "get orders")]
-    // [Authorize]
-    // public async Task<IActionResult> GetOrdersAsync([FromQuery] Guid? userId, [FromQuery] string? statusFilter, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate)
-    // {
-    //     try
-    //     {
-    //         var result = await orderService.GetOrdersByUserIdAsync(userId, statusFilter, fromDate, toDate);
-    //
-    //         if (result.IsSuccess)
-    //             return StatusCode(200, result);
-    //         if (result.InternalErrorMessage is not null)
-    //             logger.LogError("Error at get orders: {ex}", result.InternalErrorMessage);
-    //
-    //         return Helper.GetErrorResponse(result.StatusCode);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         logger.LogError("Error at get orders: {ex}", ex);
-    //         return Helper.GetErrorResponse(ErrorCode.InternalServerError);
-    //     }
-    // }
+    [HttpGet]
+    [OpenApiOperation("Get orders", "get orders")]
+    [Authorize]
+    public async Task<IActionResult> GetOrdersAsync([FromQuery] OrderFilterReqDto filter)
+    {
+        try
+        {
+            var result = await orderService.GetOrdersAsync(filter);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get orders: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error at get orders: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 }

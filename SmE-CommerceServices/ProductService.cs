@@ -762,6 +762,12 @@ public class ProductService(
     {
         try
         {
+            if (filter.PageNumber <= 0)
+                filter.PageNumber = PagingEnum.PageNumber;
+
+            if (filter.PageSize <= 0)
+                filter.PageSize = PagingEnum.PageSize;
+
             // Step 1: Get products from repository
             var productResult = await productRepository.GetProductsAsync(filter);
             if (!productResult.IsSuccess || productResult.Data == null)
@@ -825,6 +831,12 @@ public class ProductService(
     {
         try
         {
+            if (filter.PageNumber <= 0)
+                filter.PageNumber = PagingEnum.PageNumber;
+
+            if (filter.PageSize <= 0)
+                filter.PageSize = PagingEnum.PageSize;
+
             // Step 1: Check user role (Manager)
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
