@@ -15,7 +15,6 @@ public interface IOrderService
 
     #region Admin
 
-    Task<Return<List<ManagerGetOrdersResDto>>> ManagerGetOrdersAsync(string statusFilter);
 
     #endregion
 }

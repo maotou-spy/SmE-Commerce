@@ -110,60 +110,82 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         }
     }
 
-    // Manager get order by status and userId
+    // Get order by status and userId
     public async Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(
-        Guid? userId,
-        string statusFilter
-    )
+    Guid userId,
+    string statusFilter,
+    DateTime? fromDate,
+    DateTime? toDate
+)
+{
+    try
     {
-        try
-        {
-            var query = defaultdb
-                .Orders.Include(x => x.Address)
-                .Include(x => x.User)
-                .Include(x => x.OrderItems)
-                .ThenInclude(x => x.ProductVariant)
-                .ThenInclude(x => x!.Product)
-                .AsQueryable();
+        var query = defaultdb
+            .Orders.Include(x => x.Address)
+            .Include(x => x.User)
+            .Include(x => x.DiscountCode)
+            .Include(x => x.OrderItems)
+            .ThenInclude(x => x.ProductVariant)
+            .Include(x => x.ModifiedBy)
+            .AsQueryable();
 
-            if (userId.HasValue)
-                query = query.Where(x => x.UserId == userId);
+        query = query.Where(x => x.UserId == userId);
 
+        if (!string.IsNullOrEmpty(statusFilter))
             query = query.Where(x => x.Status == statusFilter);
 
-            var ordersList = await query.ToListAsync();
+        if (fromDate.HasValue || toDate.HasValue)
+        {
+            var fromDateValue = fromDate?.Date ?? DateTime.MinValue.Date;
+            var toDateValue = toDate?.Date ?? DateTime.MaxValue.Date;
 
-            if (ordersList.Count == 0)
+            if (fromDate.HasValue && toDate.HasValue && fromDate.Value.Date > toDate.Value.Date)
+            {
                 return new Return<List<Order>>
                 {
                     Data = null,
-                    StatusCode = ErrorCode.OrderNotFound,
+                    StatusCode = ErrorCode.BadRequest,
                     IsSuccess = false,
                     TotalRecord = 0,
                 };
+            }
 
-            return new Return<List<Order>>
-            {
-                Data = ordersList,
-                StatusCode = ErrorCode.Ok,
-                IsSuccess = true,
-                TotalRecord = ordersList.Count,
-            };
+            query = query.Where(x => x.CreatedAt.HasValue && x.CreatedAt.Value.Date >= fromDateValue && x.CreatedAt.Value.Date <= toDateValue);
         }
-        catch (Exception ex)
-        {
+
+        var ordersList = await query.ToListAsync();
+
+        if (ordersList.Count == 0)
             return new Return<List<Order>>
             {
                 Data = null,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.OrderNotFound,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
             };
-        }
+
+        return new Return<List<Order>>
+        {
+            Data = ordersList,
+            StatusCode = ErrorCode.Ok,
+            IsSuccess = true,
+            TotalRecord = ordersList.Count,
+        };
     }
+    catch (Exception ex)
+    {
+        return new Return<List<Order>>
+        {
+            Data = null,
+            StatusCode = ErrorCode.InternalServerError,
+            IsSuccess = false,
+            TotalRecord = 0,
+            InternalErrorMessage = ex,
+        };
+    }
+}
     
-    public async Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryasync(OrderStatusHistory req)
+    public async Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req)
     {
         try
         {

@@ -59,26 +59,26 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
 
-    [HttpGet("admin/orders")]
-    [OpenApiOperation("Manager get orders", "manager get orders")]
-    [Authorize]
-    public async Task<IActionResult> ManagerGetOrdersAsync([FromQuery] string statusFilter)
-    {
-        try
-        {
-            var result = await orderService.ManagerGetOrdersAsync(statusFilter);
-
-            if (result.IsSuccess)
-                return StatusCode(200, result);
-            if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get orders: {ex}", result.InternalErrorMessage);
-
-            return Helper.GetErrorResponse(result.StatusCode);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Error at get orders: {ex}", ex);
-            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
-        }
-    }
+    // [HttpGet("orders")]
+    // [OpenApiOperation("Get orders", "get orders")]
+    // [Authorize]
+    // public async Task<IActionResult> GetOrdersAsync([FromQuery] Guid? userId, [FromQuery] string? statusFilter, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate)
+    // {
+    //     try
+    //     {
+    //         var result = await orderService.GetOrdersByUserIdAsync(userId, statusFilter, fromDate, toDate);
+    //
+    //         if (result.IsSuccess)
+    //             return StatusCode(200, result);
+    //         if (result.InternalErrorMessage is not null)
+    //             logger.LogError("Error at get orders: {ex}", result.InternalErrorMessage);
+    //
+    //         return Helper.GetErrorResponse(result.StatusCode);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         logger.LogError("Error at get orders: {ex}", ex);
+    //         return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+    //     }
+    // }
 }

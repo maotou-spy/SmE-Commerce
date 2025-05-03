@@ -7,7 +7,7 @@ public static class ProductFilterSortBy
     public const string SoldQuantity = "soldquantity";
 }
 
-public static class ProductFilterSortOrder
+public static class FilterSortOrder
 {
     public const string Ascending = "asc";
     public const string Descending = "desc";
