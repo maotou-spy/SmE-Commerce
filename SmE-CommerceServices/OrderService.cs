@@ -239,14 +239,6 @@ public class OrderService(
                             StatusCode = ErrorCode.OutOfStock
                         };
 
-                    if (productCart.Data.Price == null)
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = ErrorCode.InvalidPrice
-                        };
-
                     orderItemsWithPrice.Add(
                         (
                             productCart.Data.ProductId,
@@ -741,101 +733,102 @@ public class OrderService(
     }
 
     public async Task<Return<GetOrderDetailsResDto>> GetOrderByIdAsync(Guid orderId)
+{
+    try
     {
-        try
-        {
-            // Validate user
-            var validUser = await helperService.GetCurrentUser();
-            if (!validUser.IsSuccess || validUser.Data == null)
-                return new Return<GetOrderDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = validUser.StatusCode,
-                    TotalRecord = 0
-                };
-
-            var userId = validUser.Data.Role == RoleEnum.Customer ? validUser.Data.UserId : (Guid?)null;
-            // Get order
-            var order = await orderRepository.GetOrderByIdAsync(
-                orderId,
-                validUser.Data.UserId
-            );
-            if (!order.IsSuccess || order.Data == null)
-                return new Return<GetOrderDetailsResDto>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = order.StatusCode,
-                    InternalErrorMessage = order.InternalErrorMessage
-                };
-
-            // Map to response dto
-            var orderDetail = new GetOrderDetailsResDto
-            {
-                OrderId = order.Data.OrderId,
-                OrderCode = order.Data.OrderCode,
-                UserId = order.Data.UserId,
-                FullName = order.Data.User.FullName,
-                ReceiverName = order.Data.Address.ReceiverName,
-                ReceiverPhone = order.Data.Address.ReceiverPhone,
-                AddressFull = CreateFullAddressString(order.Data.Address),
-                TotalAmount = order.Data.TotalAmount,
-                ShippingFee = order.Data.ShippingFee,
-                DiscountCode = order.Data.DiscountCode?.Code,
-                DiscountAmount = order.Data.DiscountAmount,
-                PointsEarned = order.Data.PointsEarned,
-                PointsUsed = order.Data.PointsUsed,
-                Note = order.Data.Note,
-                SubTotal = order.Data.SubTotal,
-                Status = order.Data.Status,
-                CreateAt = order.Data.CreatedAt,
-                CreatedBy = order.Data.CreateById,
-                CreatedByUserName = order.Data.CreateBy?.FullName,
-                ModifiedAt = order.Data.ModifiedAt,
-                ModifiedBy = order.Data.ModifiedById,
-                ModifiedByUserName = order.Data.ModifiedBy?.FullName,
-                OrderItems = order
-                    .Data.OrderItems.Select(x => new GetOrderItemResDto
-                    {
-                        ProductId = x.ProductId,
-                        VariantId = x.ProductVariantId,
-                        Quantity = x.Quantity,
-                        Price = x.Price,
-                        ProductName = x.ProductName,
-                        VariantName =
-                            x is { ProductVariantId: not null, ProductVariant: not null }
-                            && x.ProductVariant.VariantAttributes.Any()
-                                ? string.Join(
-                                    "-",
-                                    x.ProductVariant.VariantAttributes.Select(v => v.Value)
-                                )
-                                : x.VariantName,
-                        VariantImage = x.Product.PrimaryImage,
-                        OrderItemId = x.OrderItemId
-                    })
-                    .ToList()
-            };
-
-            return new Return<GetOrderDetailsResDto>
-            {
-                Data = orderDetail,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
-            };
-        }
-        catch (Exception e)
-        {
+        // Validate user
+        var validUser = await helperService.GetCurrentUser();
+        if (!validUser.IsSuccess || validUser.Data == null)
             return new Return<GetOrderDetailsResDto>
             {
                 Data = null,
                 IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e
+                StatusCode = validUser.StatusCode,
+                TotalRecord = 0
             };
-        }
+
+        var userId = validUser.Data.Role == RoleEnum.Customer ? validUser.Data.UserId : (Guid?)null;
+        // Get order
+        var order = await orderRepository.GetOrderByIdAsync(
+            orderId,
+            userId
+        );
+        if (!order.IsSuccess || order.Data == null)
+            return new Return<GetOrderDetailsResDto>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = order.StatusCode,
+                InternalErrorMessage = order.InternalErrorMessage
+            };
+
+        // Map to response dto
+        var orderDetail = new GetOrderDetailsResDto
+        {
+            OrderId = order.Data.OrderId,
+            OrderCode = order.Data.OrderCode,
+            UserId = order.Data.UserId,
+            FullName = order.Data.User.FullName,
+            ReceiverName = order.Data.Address.ReceiverName,
+            ReceiverPhone = order.Data.Address.ReceiverPhone,
+            AddressFull = CreateFullAddressString(order.Data.Address),
+            TotalAmount = order.Data.TotalAmount,
+            ShippingFee = order.Data.ShippingFee,
+            DiscountCode = order.Data.DiscountCode?.Code,
+            DiscountAmount = order.Data.DiscountAmount,
+            PointsEarned = order.Data.PointsEarned,
+            PointsUsed = order.Data.PointsUsed,
+            Note = order.Data.Note,
+            SubTotal = order.Data.SubTotal,
+            Status = order.Data.Status,
+            CreateAt = order.Data.CreatedAt,
+            CreatedBy = order.Data.CreateById,
+            CreatedByUserName = order.Data.CreateBy?.FullName,
+            ModifiedAt = order.Data.ModifiedAt,
+            ModifiedBy = order.Data.ModifiedById,
+            ModifiedByUserName = order.Data.ModifiedBy?.FullName,
+            OrderItems = order
+                .Data.OrderItems.Select(x => new GetOrderItemResDto
+                {
+                    ProductId = x.ProductId,
+                    VariantId = x.ProductVariantId,
+                    Quantity = x.Quantity,
+                    Price = x.Price,
+                    ProductName = x.ProductName,
+                    VariantName =
+                        x is { ProductVariantId: not null, ProductVariant: not null }
+                        && x.ProductVariant.VariantAttributes?.Any() == true
+                            ? string.Join(
+                                "-",
+                                x.ProductVariant.VariantAttributes.Select(v => v.Value)
+                            )
+                            : x.VariantName,
+                    VariantImage = x.Product.PrimaryImage,
+                    OrderItemId = x.OrderItemId
+                })
+                .ToList()
+        };
+        Console.WriteLine(orderDetail);
+
+        return new Return<GetOrderDetailsResDto>
+        {
+            Data = orderDetail,
+            IsSuccess = true,
+            StatusCode = ErrorCode.Ok,
+            TotalRecord = 1
+        };
     }
+    catch (Exception e)
+    {
+        return new Return<GetOrderDetailsResDto>
+        {
+            Data = null,
+            IsSuccess = false,
+            StatusCode = ErrorCode.InternalServerError,
+            InternalErrorMessage = e
+        };
+    }
+}
     #endregion
     
 }

@@ -43,9 +43,12 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             var query = defaultdb
                 .Orders.Include(x => x.Address)
                 .Include(x => x.User)
+                .Include(x => x.DiscountCode)
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.ProductVariant)
                 .ThenInclude(x => x!.VariantAttributes)
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.Product)
                 .Where(x => x.OrderId == orderId);
 
             if (userId.HasValue)
