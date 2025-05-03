@@ -21,7 +21,7 @@ public class ProductFilterReqDto
     /// <summary>
     /// Sort order: "Ascending" or "Descending"
     /// </summary>
-    public string SortOrder { get; set; } = ProductFilterSortOrder.Ascending;
+    public string SortOrder { get; set; } = FilterSortOrder.Ascending;
 
     public int PageNumber { get; set; } = PagingEnum.PageNumber;
 

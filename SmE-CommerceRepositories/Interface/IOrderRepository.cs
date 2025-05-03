@@ -8,6 +8,6 @@ public interface IOrderRepository
     Task<Return<Order>> CreateOrderAsync(Order order);
     Task<Return<Order>> CustomerGetOrderByIdAsync(Guid orderId, Guid userId);
     Task<Return<List<Order>>> GetOrderByUserIdAsync(Guid userId);
-    Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(Guid? userId, string statusFilter);
-    Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryasync(OrderStatusHistory req);
+    Task<Return<List<Order>>> GetOrdersByStatusAndUserIdAsync(Guid userId, string statusFilter, DateTime? fromDate, DateTime? toDate);
+    Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req);
 }

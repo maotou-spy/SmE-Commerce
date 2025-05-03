@@ -73,14 +73,14 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
 
                 // Default to Ascending if sortOrder is invalid
                 if (
-                    sortOrder != ProductFilterSortOrder.Ascending
-                    && sortOrder != ProductFilterSortOrder.Descending
+                    sortOrder != FilterSortOrder.Ascending
+                    && sortOrder != FilterSortOrder.Descending
                 )
-                    sortOrder = ProductFilterSortOrder.Ascending;
+                    sortOrder = FilterSortOrder.Ascending;
 
                 query = sortBy switch
                 {
-                    ProductFilterSortBy.Price => sortOrder == ProductFilterSortOrder.Descending
+                    ProductFilterSortBy.Price => sortOrder == FilterSortOrder.Descending
                         ? query.OrderByDescending(p =>
                             p.HasVariant ? p.ProductVariants.Min(v => v.Price) : p.Price
                         )
@@ -88,11 +88,11 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                             p.HasVariant ? p.ProductVariants.Min(v => v.Price) : p.Price
                         ),
                     ProductFilterSortBy.AverageRating => sortOrder
-                    == ProductFilterSortOrder.Descending
+                    == FilterSortOrder.Descending
                         ? query.OrderByDescending(p => p.AverageRating)
                         : query.OrderBy(p => p.AverageRating),
                     ProductFilterSortBy.SoldQuantity => sortOrder
-                    == ProductFilterSortOrder.Descending
+                    == FilterSortOrder.Descending
                         ? query.OrderByDescending(p => p.SoldQuantity)
                         : query.OrderBy(p => p.SoldQuantity),
                     _ => query.OrderBy(p => p.Name),

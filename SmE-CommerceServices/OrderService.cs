@@ -95,7 +95,7 @@ public class OrderService(
         }
     }
 
-    private static string CreateFullAddress(Address? address)
+    private static string CreateFullAddressString(Address? address)
     {
         if (address == null)
             return string.Empty;
@@ -501,7 +501,7 @@ public class OrderService(
                 ModifiedAt = DateTime.Now,
                 ModifiedById = currentCustomer.Data.UserId,
             };
-            var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryasync(orderHistory);
+            var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryAsync(orderHistory);
             if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
                 return new Return<bool>
                 {
@@ -778,7 +778,7 @@ public class OrderService(
                 OrderCode = order.Data.OrderCode,
                 ReceiverName = order.Data.Address.ReceiverName,
                 ReceiverPhone = order.Data.Address.ReceiverPhone,
-                AddressFull = CreateFullAddress(order.Data.Address),
+                AddressFull = CreateFullAddressString(order.Data.Address),
                 ShippingCode = order.Data.ShippingCode,
                 TotalAmount = order.Data.TotalAmount,
                 ShippingFee = order.Data.ShippingFee,
@@ -833,95 +833,5 @@ public class OrderService(
     }
 
     #endregion
-
-    #region Admin
-
-    public async Task<Return<List<ManagerGetOrdersResDto>>> ManagerGetOrdersAsync(
-        string statusFilter
-    )
-    {
-        try
-        {
-            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
-            if (!currentUser.IsSuccess || currentUser.Data == null)
-                return new Return<List<ManagerGetOrdersResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
-                };
-
-            var orders = await orderRepository.GetOrdersByStatusAndUserIdAsync(null, statusFilter);
-            if (!orders.IsSuccess || orders.Data == null)
-                return new Return<List<ManagerGetOrdersResDto>>
-                {
-                    Data = null,
-                    IsSuccess = false,
-                    StatusCode = orders.StatusCode,
-                    InternalErrorMessage = orders.InternalErrorMessage,
-                };
-
-            var orderList = orders
-                .Data.Select(x => new ManagerGetOrdersResDto
-                {
-                    OrderId = x.OrderId,
-                    UserId = x.UserId,
-                    UserName = x.User.FullName,
-                    AddressId = x.AddressId,
-                    addressFull = CreateFullAddress(x.Address),
-                    note = x.Note ?? null,
-                    status = x.Status,
-                    orderItems = x
-                        .OrderItems.Select(ord => new GetOrderItemResDto
-                        {
-                            ProductId = ord.ProductId,
-                            VariantId = ord.ProductVariantId ?? Guid.Empty,
-                            Quantity = ord.Quantity,
-                            Price = ord.Price,
-                            ProductName = ord.ProductName,
-                            VariantName =
-                                ord
-                                    is
-                                {
-                                    ProductVariantId: not null,
-                                    ProductVariant.VariantAttributes: not null
-                                }
-                                && ord.ProductVariant.VariantAttributes.Count != 0
-                                    ? string.Join(
-                                        "-",
-                                        ord.ProductVariant.VariantAttributes.Where(v =>
-                                                v.Value != null
-                                            )
-                                            .Select(v => v.Value)
-                                    )
-                                    : ord.VariantName,
-                            VariantImage = ord.Product.PrimaryImage,
-                            OrderItemId = ord.OrderItemId,
-                        })
-                        .ToList(),
-                })
-                .ToList();
-
-            return new Return<List<ManagerGetOrdersResDto>>
-            {
-                Data = orderList,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = orderList.Count,
-            };
-        }
-        catch (Exception e)
-        {
-            return new Return<List<ManagerGetOrdersResDto>>
-            {
-                Data = null,
-                IsSuccess = false,
-                StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
-            };
-        }
-    }
-
-    #endregion
+    
 }
