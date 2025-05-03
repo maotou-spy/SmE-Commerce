@@ -20,7 +20,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = variants.Count,
+                TotalRecord = variants.Count
             };
         }
         catch (Exception ex)
@@ -31,7 +31,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -49,7 +49,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = variant,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -60,7 +60,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -78,7 +78,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = variants.Count,
+                TotalRecord = variants.Count
             };
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -106,7 +106,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = variants.Count,
+                TotalRecord = variants.Count
             };
         }
         catch (Exception ex)
@@ -117,7 +117,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -134,7 +134,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -145,7 +145,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -162,7 +162,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -173,7 +173,7 @@ public class VariantNameRepository(SmECommerceContext dbContext) : IVariantNameR
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }

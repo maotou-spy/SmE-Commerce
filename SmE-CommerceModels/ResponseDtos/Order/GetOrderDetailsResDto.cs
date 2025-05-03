@@ -10,13 +10,15 @@ public class GetOrderDetailsResDto
     
     public string? FullName { get; set; }
     
-    public Guid AddressId { get; set; }
+    public required string ReceiverName { get; set; }
+
+    public required string ReceiverPhone { get; set; }
     
     public string? AddressFull { get; set; }
     
     public decimal TotalAmount { get; set; }
     
-    public Guid? DiscountCodeId { get; set; }
+    public decimal? ShippingFee { get; set; }
     
     public string? DiscountCode { get; set; }
     
@@ -25,6 +27,11 @@ public class GetOrderDetailsResDto
     public int PointsEarned { get; set; }
     
     public int PointsUsed { get; set; }
+    
+    public string? Note { get; set; }
+    
+    public decimal? SubTotal { get; set; }
+    
     public string? Status { get; set; }
     
     public DateTime? CreateAt { get; set; }
@@ -35,15 +42,9 @@ public class GetOrderDetailsResDto
     
     public DateTime? ModifiedAt { get; set; }
     
-    public Guid ModifiedBy { get; set; }
+    public Guid? ModifiedBy { get; set; }
     
     public string? ModifiedByUserName { get; set; }
-    
-    public string? Note { get; set; }
-    
-    public decimal? ShippingFee { get; set; }
-    
-    public decimal? SubTotal { get; set; }
     
     public List<GetOrderItemResDto>? OrderItems { get; set; }
 }

@@ -20,7 +20,7 @@ public class FirebaseService(IUserRepository userRepository) : IFirebaseAuthServ
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
                 InternalErrorMessage = null,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -32,7 +32,7 @@ public class FirebaseService(IUserRepository userRepository) : IFirebaseAuthServ
                     IsSuccess = false,
                     StatusCode = ErrorCode.InvalidToken,
                     InternalErrorMessage = null,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<FirebaseToken>
@@ -41,7 +41,7 @@ public class FirebaseService(IUserRepository userRepository) : IFirebaseAuthServ
                 IsSuccess = false,
                 StatusCode = ErrorCode.InvalidToken,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }

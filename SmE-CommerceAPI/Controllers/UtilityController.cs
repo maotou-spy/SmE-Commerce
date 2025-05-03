@@ -41,8 +41,8 @@ public class UtilityController : ControllerBase
                 timeZone.Id,
                 timeZone.DisplayName,
                 timeZone.BaseUtcOffset,
-                IsDaylightSavingTime = timeZone.IsDaylightSavingTime(DateTime.Now),
-            },
+                IsDaylightSavingTime = timeZone.IsDaylightSavingTime(DateTime.Now)
+            }
         };
         return Ok(serverTime);
     }

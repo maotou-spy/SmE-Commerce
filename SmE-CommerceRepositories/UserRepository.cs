@@ -50,7 +50,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result.Count != 0 ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = totalRecord,
+                TotalRecord = totalRecord
             };
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -80,7 +80,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0,
+                TotalRecord = result != null ? 1 : 0
             };
         }
         catch (Exception ex)
@@ -92,7 +92,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -110,7 +110,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0,
+                TotalRecord = result != null ? 1 : 0
             };
         }
         catch (Exception ex)
@@ -122,7 +122,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -140,7 +140,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0,
+                TotalRecord = result != null ? 1 : 0
             };
         }
         catch (Exception ex)
@@ -152,7 +152,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -170,7 +170,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0,
+                TotalRecord = result != null ? 1 : 0
             };
         }
         catch (Exception ex)
@@ -182,7 +182,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -200,7 +200,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
 
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -212,7 +212,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -229,7 +229,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = user,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -241,7 +241,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -263,7 +263,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = discountCodes,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = discountCodes.Count,
+                TotalRecord = discountCodes.Count
             };
         }
         catch (Exception e)
@@ -274,7 +274,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }

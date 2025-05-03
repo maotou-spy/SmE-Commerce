@@ -17,7 +17,7 @@ public class BearerTokenUtil(IConfiguration configuration)
         List<Claim> claims =
         [
             new(ClaimTypes.Sid, userId.ToString()),
-            new(ClaimTypes.Role, encryptedRole),
+            new(ClaimTypes.Role, encryptedRole)
         ];
 
         // Get security key from configuration
@@ -38,7 +38,7 @@ public class BearerTokenUtil(IConfiguration configuration)
                     TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
                 )
                 .AddDays(7),
-            SigningCredentials = creds,
+            SigningCredentials = creds
         };
 
         // Create the token

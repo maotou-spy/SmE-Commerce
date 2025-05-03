@@ -36,7 +36,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Get current categories of the product
@@ -47,7 +47,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentCategories.StatusCode,
-                    InternalErrorMessage = currentCategories.InternalErrorMessage,
+                    InternalErrorMessage = currentCategories.InternalErrorMessage
                 };
 
             // Get current category ids
@@ -65,7 +65,7 @@ public class ProductService(
                     .Select(categoryId => new ProductCategory
                     {
                         ProductId = productId,
-                        CategoryId = categoryId,
+                        CategoryId = categoryId
                     })
                     .ToList();
 
@@ -77,7 +77,7 @@ public class ProductService(
                     {
                         Data = null,
                         IsSuccess = false,
-                        StatusCode = addResult.StatusCode,
+                        StatusCode = addResult.StatusCode
                     };
             }
 
@@ -94,7 +94,7 @@ public class ProductService(
                         Data = null,
                         IsSuccess = false,
                         StatusCode = deleteResult.StatusCode,
-                        InternalErrorMessage = deleteResult.InternalErrorMessage,
+                        InternalErrorMessage = deleteResult.InternalErrorMessage
                     };
             }
 
@@ -106,7 +106,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = updatedCategories.StatusCode,
-                    InternalErrorMessage = updatedCategories.InternalErrorMessage,
+                    InternalErrorMessage = updatedCategories.InternalErrorMessage
                 };
 
             transaction.Complete();
@@ -116,11 +116,11 @@ public class ProductService(
                     .Data?.Select(category => new GetProductCategoryResDto
                     {
                         CategoryId = category.CategoryId,
-                        Name = category.Category.Name,
+                        Name = category.Category.Name
                     })
                     .ToList(),
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -130,7 +130,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -150,7 +150,7 @@ public class ProductService(
             {
                 Data = false,
                 IsSuccess = false,
-                StatusCode = ErrorCode.BadRequest,
+                StatusCode = ErrorCode.BadRequest
             };
 
         // Step 2: Check if the request is valid
@@ -163,7 +163,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = isValid.StatusCode,
-                InternalErrorMessage = isValid.InternalErrorMessage,
+                InternalErrorMessage = isValid.InternalErrorMessage
             };
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -177,7 +177,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Step 4: Check product
@@ -192,7 +192,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = existingProduct.InternalErrorMessage,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage
                 };
 
             var hasVariants = existingProduct.Data.HasVariant;
@@ -206,7 +206,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.DataInconsistency,
+                        StatusCode = ErrorCode.DataInconsistency
                     };
 
                 // If product does not have variants, ensure at least two variants are added
@@ -215,7 +215,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.AtLeastTwoProductVariant,
+                        StatusCode = ErrorCode.AtLeastTwoProductVariant
                     };
             }
 
@@ -231,7 +231,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.DataInconsistency,
+                        StatusCode = ErrorCode.DataInconsistency
                     };
 
                 var firstExistingVariant = existingProduct.Data.ProductVariants.First();
@@ -257,7 +257,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.BadRequest,
+                        StatusCode = ErrorCode.BadRequest
                     };
 
                 expectedVariantNameIds = req.First()
@@ -281,7 +281,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.DataInconsistency,
+                        StatusCode = ErrorCode.DataInconsistency
                     };
 
                 // Check duplication
@@ -304,7 +304,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.ProductVariantAlreadyExists,
+                        StatusCode = ErrorCode.ProductVariantAlreadyExists
                     };
 
                 // Duplicate with new variants
@@ -321,7 +321,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.BadRequest,
+                        StatusCode = ErrorCode.BadRequest
                     };
 
                 newAttributeDicts.Add(newAttributeDict);
@@ -349,11 +349,11 @@ public class ProductService(
                         .VariantValues.Select(v => new VariantAttribute
                         {
                             VariantNameId = v.VariantNameId,
-                            Value = v.VariantValue,
+                            Value = v.VariantValue
                         })
                         .ToList(),
                     CreateById = currentUserId,
-                    CreatedAt = now,
+                    CreatedAt = now
                 })
                 .ToList();
 
@@ -364,7 +364,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidStockQuantity,
+                    StatusCode = ErrorCode.InvalidStockQuantity
                 };
 
             // Convert from ICollection to List to use AddRange
@@ -394,7 +394,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = updateProductResult.StatusCode,
-                    InternalErrorMessage = updateProductResult.InternalErrorMessage,
+                    InternalErrorMessage = updateProductResult.InternalErrorMessage
                 };
 
             transaction.Complete();
@@ -403,7 +403,7 @@ public class ProductService(
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = productVariants.Count,
+                TotalRecord = productVariants.Count
             };
         }
         catch (Exception ex)
@@ -413,7 +413,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -437,7 +437,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = validationResult.StatusCode,
-                InternalErrorMessage = validationResult.InternalErrorMessage,
+                InternalErrorMessage = validationResult.InternalErrorMessage
             };
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -451,7 +451,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Step 3: Check product
@@ -466,7 +466,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = existingProduct.InternalErrorMessage,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage
                 };
 
             // if (existingProduct.Data.Status == ProductStatus.OutOfStock && req.StockQuantity <= 0)
@@ -483,7 +483,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNoVariant,
+                    StatusCode = ErrorCode.ProductNoVariant
                 };
 
             // Step 4: Check ProductVariant to update
@@ -495,7 +495,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    StatusCode = ErrorCode.ProductVariantNotFound
                 };
 
             // Step 5: Check if there are changes
@@ -526,7 +526,7 @@ public class ProductService(
                     Data = true,
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             // Step 6: Check uniformity of VariantAttributes (only check keys, not values)
@@ -545,7 +545,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.DataInconsistency,
+                        StatusCode = ErrorCode.DataInconsistency
                     };
             }
 
@@ -572,7 +572,7 @@ public class ProductService(
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = ErrorCode.ProductVariantAlreadyExists,
+                        StatusCode = ErrorCode.ProductVariantAlreadyExists
                     };
             }
 
@@ -601,7 +601,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidStockQuantity,
+                    StatusCode = ErrorCode.InvalidStockQuantity
                 };
 
             existingProduct.Data.Price = existingProduct
@@ -621,7 +621,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = updateResult.StatusCode,
-                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                    InternalErrorMessage = updateResult.InternalErrorMessage
                 };
 
             transaction.Complete();
@@ -630,7 +630,7 @@ public class ProductService(
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -640,7 +640,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -658,7 +658,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Step 2: Check product
@@ -673,7 +673,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.ProductNotFound,
-                    InternalErrorMessage = existingProduct.InternalErrorMessage,
+                    InternalErrorMessage = existingProduct.InternalErrorMessage
                 };
 
             if (!existingProduct.Data.HasVariant || existingProduct.Data.ProductVariants.Count == 0)
@@ -681,7 +681,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    StatusCode = ErrorCode.ProductVariantNotFound
                 };
 
             // Step 3: Check variant and minimum requirement
@@ -693,7 +693,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductVariantNotFound,
+                    StatusCode = ErrorCode.ProductVariantNotFound
                 };
 
             var activeVariantsCount = existingProduct.Data.ProductVariants.Count(v =>
@@ -704,7 +704,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.MinimumVariantRequired,
+                    StatusCode = ErrorCode.MinimumVariantRequired
                 };
 
             // Step 4: Delete variant (soft delete)
@@ -728,7 +728,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = updateResult.StatusCode,
-                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                    InternalErrorMessage = updateResult.InternalErrorMessage
                 };
 
             transaction.Complete();
@@ -737,7 +737,7 @@ public class ProductService(
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -747,7 +747,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -773,7 +773,7 @@ public class ProductService(
                     InternalErrorMessage = productResult.InternalErrorMessage,
                     PageNumber = filter.PageNumber,
                     PageSize = filter.PageSize,
-                    TotalRecord = productResult.TotalRecord,
+                    TotalRecord = productResult.TotalRecord
                 };
 
             // Step 2: Map to DTO
@@ -789,7 +789,7 @@ public class ProductService(
                     Status = p.Status,
                     IsTopSeller = p.IsTopSeller,
                     PrimaryImage = p.PrimaryImage,
-                    AverageRating = p.AverageRating,
+                    AverageRating = p.AverageRating
                 })
                 .ToList();
 
@@ -801,7 +801,7 @@ public class ProductService(
                 StatusCode = ErrorCode.Ok,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = productResult.TotalRecord,
+                TotalRecord = productResult.TotalRecord
             };
         }
         catch (Exception ex)
@@ -814,7 +814,7 @@ public class ProductService(
                 InternalErrorMessage = ex,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -836,7 +836,7 @@ public class ProductService(
                     InternalErrorMessage = currentUser.InternalErrorMessage,
                     PageNumber = filter.PageNumber,
                     PageSize = filter.PageSize,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             // Step 2: Get products from repository
@@ -850,7 +850,7 @@ public class ProductService(
                     InternalErrorMessage = productResult.InternalErrorMessage,
                     PageNumber = filter.PageNumber,
                     PageSize = filter.PageSize,
-                    TotalRecord = productResult.TotalRecord,
+                    TotalRecord = productResult.TotalRecord
                 };
 
             // Step 3: Map to DTO
@@ -874,8 +874,8 @@ public class ProductService(
                         CreatedBy = p.CreateBy?.FullName,
                         ModifiedById = p.ModifiedById,
                         ModifiedAt = p.ModifiedAt,
-                        ModifiedBy = p.ModifiedBy?.FullName,
-                    },
+                        ModifiedBy = p.ModifiedBy?.FullName
+                    }
                 })
                 .ToList();
 
@@ -887,7 +887,7 @@ public class ProductService(
                 StatusCode = ErrorCode.Ok,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = productResult.TotalRecord,
+                TotalRecord = productResult.TotalRecord
             };
         }
         catch (Exception ex)
@@ -900,7 +900,7 @@ public class ProductService(
                 InternalErrorMessage = ex,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -918,7 +918,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             if (
@@ -929,7 +929,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             return new Return<GetProductDetailsResDto>
@@ -951,7 +951,7 @@ public class ProductService(
                     {
                         Slug = result.Data.Slug,
                         MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
+                        MetaDescription = result.Data.MetaDescription
                     },
                     Status = result.Data.Status,
                     Images = result
@@ -959,14 +959,14 @@ public class ProductService(
                         {
                             ImageId = image.ImageId,
                             Url = image.Url,
-                            AltText = image.AltText,
+                            AltText = image.AltText
                         })
                         .ToList(),
                     Categories = result
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
+                            Name = category.Category.Name
                         })
                         .ToList(),
                     Attributes = result
@@ -974,7 +974,7 @@ public class ProductService(
                         {
                             AttributeId = attribute.AttributeId,
                             Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
+                            Value = attribute.AttributeValue
                         })
                         .ToList(),
                     // Variants info
@@ -996,9 +996,9 @@ public class ProductService(
                                 {
                                     VariantNameId = attr.VariantNameId,
                                     Name = attr.VariantName.Name,
-                                    Value = attr.Value,
+                                    Value = attr.Value
                                 })
-                                .ToList(),
+                                .ToList()
                         })
                         .ToList(),
                     Reviews = result
@@ -1012,12 +1012,12 @@ public class ProductService(
                             Comment = x.Comment,
                             CreatedAt = x.CreatedAt,
                             CreatedBy = x.User.FullName,
-                            UserImageUrl = x.User.Avatar,
+                            UserImageUrl = x.User.Avatar
                         })
-                        .ToList(),
+                        .ToList()
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1027,7 +1027,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1045,7 +1045,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentManager.StatusCode,
-                    InternalErrorMessage = currentManager.InternalErrorMessage,
+                    InternalErrorMessage = currentManager.InternalErrorMessage
                 };
 
             var result = await productRepository.GetProductByIdAsync(productId);
@@ -1054,7 +1054,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             return new Return<ManagerGetProductDetailResDto>
@@ -1076,7 +1076,7 @@ public class ProductService(
                     {
                         Slug = result.Data.Slug,
                         MetaTitle = result.Data.MetaTitle,
-                        MetaDescription = result.Data.MetaDescription,
+                        MetaDescription = result.Data.MetaDescription
                     },
                     Status = result.Data.Status,
                     Images = result
@@ -1084,14 +1084,14 @@ public class ProductService(
                         {
                             ImageId = image.ImageId,
                             Url = image.Url,
-                            AltText = image.AltText,
+                            AltText = image.AltText
                         })
                         .ToList(),
                     Categories = result
                         .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
+                            Name = category.Category.Name
                         })
                         .ToList(),
                     Attributes = result
@@ -1099,7 +1099,7 @@ public class ProductService(
                         {
                             AttributeId = attribute.AttributeId,
                             Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
+                            Value = attribute.AttributeValue
                         })
                         .ToList(),
                     AuditMetadata = new AuditMetadata
@@ -1109,7 +1109,7 @@ public class ProductService(
                         CreatedBy = result.Data.CreateBy?.FullName,
                         ModifiedById = result.Data.ModifiedById,
                         ModifiedAt = result.Data.ModifiedAt,
-                        ModifiedBy = result.Data.ModifiedBy?.FullName,
+                        ModifiedBy = result.Data.ModifiedBy?.FullName
                     },
                     // Variant info
                     HasVariant = result.Data.HasVariant,
@@ -1129,21 +1129,21 @@ public class ProductService(
                                 CreatedBy = variant.CreateBy?.FullName,
                                 ModifiedById = variant.ModifiedById,
                                 ModifiedAt = variant.ModifiedAt,
-                                ModifiedBy = variant.ModifiedBy?.FullName,
+                                ModifiedBy = variant.ModifiedBy?.FullName
                             },
                             VariantAttributes = variant
                                 .VariantAttributes.Select(attr => new GetVariantAttributeResDto
                                 {
                                     VariantNameId = attr.VariantNameId,
                                     Name = attr.VariantName.Name,
-                                    Value = attr.Value,
+                                    Value = attr.Value
                                 })
-                                .ToList(),
+                                .ToList()
                         })
-                        .ToList(),
+                        .ToList()
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1153,7 +1153,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1168,7 +1168,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = currentUser.StatusCode,
-                InternalErrorMessage = currentUser.InternalErrorMessage,
+                InternalErrorMessage = currentUser.InternalErrorMessage
             };
 
         // Step 2: Validate the request data
@@ -1177,7 +1177,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                StatusCode = ErrorCode.BadRequest,
+                StatusCode = ErrorCode.BadRequest
             };
 
         if (
@@ -1190,7 +1190,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                StatusCode = ErrorCode.BadRequest,
+                StatusCode = ErrorCode.BadRequest
             };
 
         // Check the validity of the category IDs
@@ -1204,7 +1204,7 @@ public class ProductService(
             {
                 Data = null,
                 IsSuccess = false,
-                StatusCode = ErrorCode.BadRequest,
+                StatusCode = ErrorCode.BadRequest
             };
 
         // Step 3: Initialize the product
@@ -1238,7 +1238,7 @@ public class ProductService(
                 IsTopSeller = req.IsTopSeller,
                 PrimaryImage = req.PrimaryImage,
                 HasVariant = false,
-                AverageRating = 0,
+                AverageRating = 0
             };
 
             // Add ProductCategories
@@ -1246,7 +1246,7 @@ public class ProductService(
                 .CategoryIds.Select(categoryId => new ProductCategory
                 {
                     ProductId = product.ProductId,
-                    CategoryId = categoryId,
+                    CategoryId = categoryId
                 })
                 .ToList();
 
@@ -1257,7 +1257,7 @@ public class ProductService(
                     {
                         ProductId = product.ProductId,
                         Url = image.Url,
-                        AltText = image.AltText,
+                        AltText = image.AltText
                     })
                     .ToList();
 
@@ -1267,7 +1267,7 @@ public class ProductService(
                 {
                     ProductId = product.ProductId,
                     AttributeName = attribute.AttributeName,
-                    AttributeValue = attribute.AttributeValue,
+                    AttributeValue = attribute.AttributeValue
                 })
                 .ToList();
 
@@ -1279,7 +1279,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = addedProduct.StatusCode,
-                    InternalErrorMessage = addedProduct.InternalErrorMessage,
+                    InternalErrorMessage = addedProduct.InternalErrorMessage
                 };
 
             // Step 6: Map to response DTO
@@ -1298,7 +1298,7 @@ public class ProductService(
                 {
                     Slug = addedProduct.Data.Slug,
                     MetaTitle = addedProduct.Data.MetaTitle,
-                    MetaDescription = addedProduct.Data.MetaDescription,
+                    MetaDescription = addedProduct.Data.MetaDescription
                 },
                 Status = addedProduct.Data.Status,
                 Images = addedProduct
@@ -1306,14 +1306,14 @@ public class ProductService(
                     {
                         ImageId = image.ImageId,
                         Url = image.Url,
-                        AltText = image.AltText,
+                        AltText = image.AltText
                     })
                     .ToList(),
                 Categories = addedProduct
                     .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                     {
                         CategoryId = category.CategoryId,
-                        Name = category.Category.Name,
+                        Name = category.Category.Name
                     })
                     .ToList(),
                 Attributes = addedProduct
@@ -1321,9 +1321,9 @@ public class ProductService(
                     {
                         AttributeId = attribute.AttributeId,
                         Name = attribute.AttributeName,
-                        Value = attribute.AttributeValue,
+                        Value = attribute.AttributeValue
                     })
-                    .ToList(),
+                    .ToList()
             };
 
             transaction.Complete();
@@ -1331,7 +1331,7 @@ public class ProductService(
             {
                 Data = response,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1341,7 +1341,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1362,7 +1362,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Step 2: Get the product for update
@@ -1373,7 +1373,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = productResult.StatusCode,
-                    InternalErrorMessage = productResult.InternalErrorMessage,
+                    InternalErrorMessage = productResult.InternalErrorMessage
                 };
 
             // Step 3: Check if the product is deleted
@@ -1382,7 +1382,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             // Step 4: Validate the request data
@@ -1391,7 +1391,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.BadRequest,
+                    StatusCode = ErrorCode.BadRequest
                 };
 
             // Step 5: Check if the product name is unique (excluding the current product)
@@ -1404,7 +1404,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNameAlreadyExists,
+                    StatusCode = ErrorCode.ProductNameAlreadyExists
                 };
 
             // Step 6: Check if there are any changes to update
@@ -1453,14 +1453,14 @@ public class ProductService(
                         {
                             AttributeId = attribute.AttributeId,
                             Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
+                            Value = attribute.AttributeValue
                         })
                         .ToList(),
                     Categories = product
                         .ProductCategories.Select(category => new GetProductCategoryResDto
                         {
                             CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
+                            Name = category.Category.Name
                         })
                         .ToList(),
                     Images = product
@@ -1468,23 +1468,23 @@ public class ProductService(
                         {
                             ImageId = image.ImageId,
                             Url = image.Url,
-                            AltText = image.AltText,
+                            AltText = image.AltText
                         })
                         .ToList(),
                     SeoMetadata = new SeoMetadata
                     {
                         Slug = product.Slug,
                         MetaTitle = product.MetaTitle,
-                        MetaDescription = product.MetaDescription,
+                        MetaDescription = product.MetaDescription
                     },
-                    Status = product.Status,
+                    Status = product.Status
                 };
 
                 return new Return<GetProductDetailsResDto>
                 {
                     Data = response,
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok,
+                    StatusCode = ErrorCode.Ok
                 };
             }
 
@@ -1512,7 +1512,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = updateResult.StatusCode,
-                    InternalErrorMessage = updateResult.InternalErrorMessage,
+                    InternalErrorMessage = updateResult.InternalErrorMessage
                 };
 
             // Step 9: Map to response DTO
@@ -1532,14 +1532,14 @@ public class ProductService(
                     {
                         AttributeId = attribute.AttributeId,
                         Name = attribute.AttributeName,
-                        Value = attribute.AttributeValue,
+                        Value = attribute.AttributeValue
                     })
                     .ToList(),
                 Categories = updateResult
                     .Data.ProductCategories.Select(category => new GetProductCategoryResDto
                     {
                         CategoryId = category.CategoryId,
-                        Name = category.Category.Name,
+                        Name = category.Category.Name
                     })
                     .ToList(),
                 Images = updateResult
@@ -1547,16 +1547,16 @@ public class ProductService(
                     {
                         ImageId = image.ImageId,
                         Url = image.Url,
-                        AltText = image.AltText,
+                        AltText = image.AltText
                     })
                     .ToList(),
                 SeoMetadata = new SeoMetadata
                 {
                     Slug = updateResult.Data.Slug,
                     MetaTitle = updateResult.Data.MetaTitle,
-                    MetaDescription = updateResult.Data.MetaDescription,
+                    MetaDescription = updateResult.Data.MetaDescription
                 },
-                Status = updateResult.Data.Status,
+                Status = updateResult.Data.Status
             };
 
             // Step 10: Complete the transaction
@@ -1565,7 +1565,7 @@ public class ProductService(
             {
                 Data = responseUpdated,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1575,7 +1575,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1593,7 +1593,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             // Step 2: Get the product with related data
@@ -1604,7 +1604,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = product.StatusCode,
-                    InternalErrorMessage = product.InternalErrorMessage,
+                    InternalErrorMessage = product.InternalErrorMessage
                 };
 
             // Step 3: Check if the product is already deleted
@@ -1613,7 +1613,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductNotFound,
+                    StatusCode = ErrorCode.ProductNotFound
                 };
 
             // Step 4: Update product status to deleted
@@ -1638,7 +1638,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = updateResult.StatusCode,
+                    StatusCode = updateResult.StatusCode
                 };
 
             // Step 7: Complete the transaction
@@ -1647,7 +1647,7 @@ public class ProductService(
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1657,7 +1657,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1680,14 +1680,14 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productImage = new ProductImage
             {
                 ProductId = productId,
                 Url = req.Url,
-                AltText = req.AltText,
+                AltText = req.AltText
             };
 
             var result = await productRepository.AddProductImageAsync(productImage);
@@ -1697,7 +1697,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<GetProductImageResDto>
@@ -1706,10 +1706,10 @@ public class ProductService(
                 {
                     ImageId = result.Data.ImageId,
                     Url = result.Data.Url,
-                    AltText = result.Data.AltText,
+                    AltText = result.Data.AltText
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1719,7 +1719,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1739,7 +1739,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productImageResult = await productRepository.GetProductImageByIdAsync(imageId);
@@ -1749,7 +1749,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = productImageResult.StatusCode,
-                    InternalErrorMessage = productImageResult.InternalErrorMessage,
+                    InternalErrorMessage = productImageResult.InternalErrorMessage
                 };
             // Check if the image belongs to the product
             if (productImageResult.Data.ProductId != productId)
@@ -1757,7 +1757,7 @@ public class ProductService(
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductImageNotFound,
+                    StatusCode = ErrorCode.ProductImageNotFound
                 };
 
             productImageResult.Data.Url = req.Url;
@@ -1770,7 +1770,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<GetProductImageResDto>
@@ -1779,10 +1779,10 @@ public class ProductService(
                 {
                     ImageId = result.Data.ImageId,
                     Url = result.Data.Url,
-                    AltText = result.Data.AltText,
+                    AltText = result.Data.AltText
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1792,7 +1792,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1808,7 +1808,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productImagesResult = await productRepository.GetProductImagesAsync(productId);
@@ -1818,7 +1818,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = productImagesResult.StatusCode,
-                    InternalErrorMessage = productImagesResult.InternalErrorMessage,
+                    InternalErrorMessage = productImagesResult.InternalErrorMessage
                 };
             // Check if the image belongs to the product
             if (productImagesResult.Data.All(i => i.ImageId != imageId))
@@ -1826,7 +1826,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductImageNotFound,
+                    StatusCode = ErrorCode.ProductImageNotFound
                 };
             // Check if only one image is left
             if (productImagesResult.Data.Count == 1)
@@ -1834,7 +1834,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductImageMinimum,
+                    StatusCode = ErrorCode.ProductImageMinimum
                 };
 
             var result = await productRepository.DeleteProductImageAsync(imageId);
@@ -1844,14 +1844,14 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1861,7 +1861,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1884,14 +1884,14 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productAttribute = new ProductAttribute
             {
                 ProductId = productId,
                 AttributeName = req.AttributeName,
-                AttributeValue = req.AttributeValue,
+                AttributeValue = req.AttributeValue
             };
 
             var result = await productRepository.AddProductAttributeAsync(productAttribute);
@@ -1901,7 +1901,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<GetProductAttributeResDto>
@@ -1910,10 +1910,10 @@ public class ProductService(
                 {
                     AttributeId = result.Data.AttributeId,
                     Name = result.Data.AttributeName,
-                    Value = result.Data.AttributeValue,
+                    Value = result.Data.AttributeValue
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1923,7 +1923,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1943,7 +1943,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productAttribute = new ProductAttribute
@@ -1951,7 +1951,7 @@ public class ProductService(
                 ProductId = productId,
                 AttributeId = attributeId,
                 AttributeName = req.AttributeName,
-                AttributeValue = req.AttributeValue,
+                AttributeValue = req.AttributeValue
             };
 
             var result = await productRepository.UpdateProductAttributeAsync(productAttribute);
@@ -1961,7 +1961,7 @@ public class ProductService(
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<GetProductAttributeResDto>
@@ -1970,10 +1970,10 @@ public class ProductService(
                 {
                     AttributeId = result.Data.AttributeId,
                     Name = result.Data.AttributeName,
-                    Value = result.Data.AttributeValue,
+                    Value = result.Data.AttributeValue
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -1983,7 +1983,7 @@ public class ProductService(
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -1999,7 +1999,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage
                 };
 
             var productAttributeResult = await productRepository.GetProductAttributeByIdAsync(
@@ -2011,7 +2011,7 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = productAttributeResult.StatusCode,
-                    InternalErrorMessage = productAttributeResult.InternalErrorMessage,
+                    InternalErrorMessage = productAttributeResult.InternalErrorMessage
                 };
 
             // Check if the attribute belongs to the product
@@ -2020,7 +2020,7 @@ public class ProductService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.ProductAttributeNotFound,
+                    StatusCode = ErrorCode.ProductAttributeNotFound
                 };
 
             var result = await productRepository.DeleteProductAttributeAsync(attributeId);
@@ -2030,14 +2030,14 @@ public class ProductService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -2047,7 +2047,7 @@ public class ProductService(
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -2072,14 +2072,14 @@ public class ProductService(
             {
                 Data = false,
                 IsSuccess = false,
-                StatusCode = ErrorCode.BadRequest,
+                StatusCode = ErrorCode.BadRequest
             };
 
         return new Return<bool>
         {
             Data = true,
             IsSuccess = true,
-            StatusCode = ErrorCode.Ok,
+            StatusCode = ErrorCode.Ok
         };
     }
 

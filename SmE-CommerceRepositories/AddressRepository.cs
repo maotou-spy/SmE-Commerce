@@ -22,7 +22,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 Data = result,
                 StatusCode = result.Count > 0 ? ErrorCode.Ok : ErrorCode.AddressNotFound,
                 IsSuccess = true,
-                TotalRecord = result.Count,
+                TotalRecord = result.Count
             };
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -51,7 +51,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = result,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.AddressNotFound,
-                IsSuccess = true,
+                IsSuccess = true
             };
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -78,7 +78,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 StatusCode = ErrorCode.Ok,
-                IsSuccess = true,
+                IsSuccess = true
             };
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -105,7 +105,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = address,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -116,7 +116,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -134,7 +134,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AddressNotFound,
+                    StatusCode = ErrorCode.AddressNotFound
                 };
 
             address.Status = GeneralStatus.Deleted;
@@ -145,7 +145,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -156,7 +156,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -179,7 +179,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -190,7 +190,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -210,14 +210,14 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AddressNotFound,
+                    StatusCode = ErrorCode.AddressNotFound
                 };
 
             return new Return<Address>
             {
                 Data = address,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -228,7 +228,7 @@ public class AddressRepository(SmECommerceContext defaultdbContext) : IAddressRe
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
 
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }

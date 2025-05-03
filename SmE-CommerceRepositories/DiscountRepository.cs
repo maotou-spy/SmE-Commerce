@@ -24,7 +24,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -36,7 +36,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -54,14 +54,14 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
             return new Return<Discount>
             {
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -72,7 +72,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -93,7 +93,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             await dbContext.Database.ExecuteSqlRawAsync(
@@ -106,7 +106,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -117,7 +117,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -134,7 +134,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -144,7 +144,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -160,7 +160,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<Discount>
@@ -168,7 +168,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discount,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -179,7 +179,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -211,7 +211,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords,
+                TotalRecord = totalRecords
             };
         }
         catch (Exception e)
@@ -222,7 +222,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -244,7 +244,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -256,7 +256,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -273,7 +273,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -285,7 +285,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -303,7 +303,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<DiscountCode>
@@ -311,7 +311,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -322,7 +322,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -345,7 +345,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.DiscountCodeNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             // Đánh dấu bản ghi FOR UPDATE để thực hiện đồng bộ
@@ -360,7 +360,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -372,7 +372,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -392,7 +392,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.DiscountCodeNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<DiscountCode>
@@ -400,7 +400,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = discountCode,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -411,7 +411,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
 
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -440,7 +440,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords,
+                TotalRecord = totalRecords
             };
         }
         catch (Exception e)
@@ -451,7 +451,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -479,7 +479,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords,
+                TotalRecord = totalRecords
             };
         }
         catch (Exception e)
@@ -491,7 +491,7 @@ public class DiscountRepository(SmECommerceContext dbContext) : IDiscountReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }

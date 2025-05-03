@@ -22,7 +22,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = true,
 
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -53,7 +53,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CategoryNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<Category>
@@ -61,7 +61,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -73,7 +73,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -109,7 +109,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = totalRecords,
+                TotalRecord = totalRecords
             };
         }
         catch (Exception ex)
@@ -121,7 +121,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -141,7 +141,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = result.Count,
+                TotalRecord = result.Count
             };
         }
         catch (Exception ex)
@@ -153,7 +153,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -169,7 +169,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CategoryNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             return new Return<Category>
@@ -177,7 +177,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -189,7 +189,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
 
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -208,7 +208,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                     Data = null,
                     IsSuccess = false,
                     StatusCode = ErrorCode.CategoryNotFound,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
 
             await dbContext.Database.ExecuteSqlRawAsync(
@@ -221,7 +221,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = category,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -232,7 +232,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -249,7 +249,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = category,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -260,7 +260,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }
@@ -280,7 +280,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = result.Count,
+                TotalRecord = result.Count
             };
         }
         catch (Exception ex)
@@ -291,7 +291,7 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
         }
     }

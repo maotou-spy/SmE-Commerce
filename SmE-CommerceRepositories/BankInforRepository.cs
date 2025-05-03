@@ -21,7 +21,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = true,
                 Data = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -31,7 +31,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = false,
                 Data = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -49,7 +49,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -59,7 +59,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -77,7 +77,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -87,7 +87,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -105,7 +105,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = true,
                 Data = result,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception e)
@@ -115,7 +115,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 IsSuccess = false,
                 Data = null,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -132,7 +132,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
             {
                 Data = result,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -142,7 +142,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -160,7 +160,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 Data = result,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = result.Count,
+                TotalRecord = result.Count
             };
         }
         catch (Exception e)
@@ -170,7 +170,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -186,7 +186,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -196,7 +196,7 @@ public class BankInforRepository(SmECommerceContext dbContext) : IBankInfoReposi
                 Data = false,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
