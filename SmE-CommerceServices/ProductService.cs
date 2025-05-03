@@ -1222,7 +1222,7 @@ public class ProductService(
             var product = new Product
             {
                 Name = req.Name.Trim(),
-                NameUnaccent = VietnameseStringNormalizer.RemoveDiacritics(req.Name.Trim()),
+                NameUnaccent = VietnameseStringNormalizer.Normalize(req.Name.Trim()),
                 Description = req.Description?.Trim(),
                 Price = req.Price,
                 StockQuantity = req.StockQuantity,
@@ -1490,7 +1490,7 @@ public class ProductService(
 
             // Step 7: Update product fields
             product.Name = req.Name.Trim();
-            product.NameUnaccent = VietnameseStringNormalizer.RemoveDiacritics(req.Name.Trim());
+            product.NameUnaccent = VietnameseStringNormalizer.Normalize(req.Name.Trim());
             product.Description = req.Description?.Trim();
             if (canUpdatePrice)
                 product.Price = req.Price;

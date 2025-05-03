@@ -27,7 +27,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             if (!string.IsNullOrEmpty(filter.SearchTerm))
             {
                 var searchTerm = VietnameseStringNormalizer
-                    .RemoveDiacritics(filter.SearchTerm)
+                    .Normalize(filter.SearchTerm)
                     .ToLower()
                     .Trim();
 

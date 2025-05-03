@@ -1,26 +1,11 @@
-﻿using System.Globalization;
-using System.Text;
+﻿using Unidecode.NET;
 
 namespace SmE_CommerceUtilities.Utils;
 
-public class VietnameseStringNormalizer
+public abstract class VietnameseStringNormalizer
 {
-    public static string RemoveDiacritics(string text)
+    public static string Normalize(string str = "")
     {
-        if (string.IsNullOrEmpty(text))
-            return text;
-
-        var normalizedString = text.Normalize(NormalizationForm.FormD);
-        var stringBuilder = new StringBuilder();
-
-        foreach (
-            var c in from c in normalizedString
-            let unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c)
-            where unicodeCategory != UnicodeCategory.NonSpacingMark
-            select c
-        )
-            stringBuilder.Append(c);
-
-        return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLower();
+        return string.IsNullOrEmpty(str) ? str : str.Unidecode().ToLower();
     }
 }
