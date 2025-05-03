@@ -29,7 +29,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = ErrorCode.BankCodeAlreadyExists,
-                    Data = false,
+                    Data = false
                 };
 
             // Check BankName isExisted?
@@ -39,7 +39,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = ErrorCode.BankNameAlreadyExists,
-                    Data = false,
+                    Data = false
                 };
 
             // Check AccountNumber isExisted?
@@ -51,7 +51,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = ErrorCode.AccountNumberAlreadyExists,
-                    Data = false,
+                    Data = false
                 };
 
             // Add BankInfo
@@ -65,7 +65,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 Status = GeneralStatus.Active,
                 CreateBy = currentUser.Data,
                 CreatedAt = DateTime.Now,
-                CreateById = currentUser.Data.UserId,
+                CreateById = currentUser.Data.UserId
             };
 
             var result = await bankInfoRepository.AddBankInfoByManagerAsync(bankInfo);
@@ -74,14 +74,14 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     InternalErrorMessage = result.InternalErrorMessage,
-                    StatusCode = result.StatusCode,
+                    StatusCode = result.StatusCode
                 };
 
             return new Return<bool>
             {
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.StatusCode,
-                Data = result.Data,
+                Data = result.Data
             };
         }
         catch (Exception e)
@@ -90,7 +90,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
             {
                 IsSuccess = false,
                 InternalErrorMessage = e,
-                StatusCode = ErrorCode.InternalServerError,
+                StatusCode = ErrorCode.InternalServerError
             };
         }
     }
@@ -113,7 +113,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = ErrorCode.BankInfoNotFound,
-                    Data = false,
+                    Data = false
                 };
 
             bankInfo.Data!.Status = GeneralStatus.Deleted;
@@ -126,14 +126,14 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             return new Return<bool>
             {
                 IsSuccess = true,
                 StatusCode = result.StatusCode,
-                Data = result.Data,
+                Data = result.Data
             };
         }
         catch (Exception e)
@@ -143,7 +143,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 Data = true,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -158,7 +158,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 {
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    InternalErrorMessage = result.InternalErrorMessage,
+                    InternalErrorMessage = result.InternalErrorMessage
                 };
 
             var banks = result
@@ -170,7 +170,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                     BankLogoUrl = bankInfo.BankLogoUrl,
                     AccountNumber = bankInfo.AccountNumber,
                     AccountHolderName = bankInfo.AccountHolderName,
-                    Status = bankInfo.Status,
+                    Status = bankInfo.Status
                 })
                 .ToList();
 
@@ -179,7 +179,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 Data = banks,
                 IsSuccess = true,
                 StatusCode = result.StatusCode,
-                TotalRecord = result.TotalRecord,
+                TotalRecord = result.TotalRecord
             };
         }
         catch (Exception e)
@@ -189,7 +189,7 @@ public class BankInfoService(IHelperService helperService, IBankInfoRepository b
                 Data = null,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }

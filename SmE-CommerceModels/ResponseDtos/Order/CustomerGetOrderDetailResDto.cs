@@ -32,10 +32,6 @@ public class CustomerGetOrderDetailResDto
 
     public DateTime? ActualDeliveryDate { get; set; }
 
-    public string? CancelReason { get; set; }
-
-    public string? RejectReason { get; set; }
-
     public required string Status { get; set; }
 
     public required List<GetOrderItemResDto> OrderItems { get; set; }

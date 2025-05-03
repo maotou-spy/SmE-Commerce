@@ -58,7 +58,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
                 IsSuccess = false,
                 Data = false,
-                ValidationErrors = errors,
+                ValidationErrors = errors
             }
         );
     };
@@ -170,7 +170,7 @@ builder
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
+                ClockSkew = TimeSpan.Zero
             };
         }
     );
@@ -192,7 +192,7 @@ builder.Services.AddOpenApiDocument(document =>
             In = OpenApiSecurityApiKeyLocation.Header,
             Type = OpenApiSecuritySchemeType.Http,
             Scheme = "Bearer",
-            BearerFormat = "JWT",
+            BearerFormat = "JWT"
         }
     );
 

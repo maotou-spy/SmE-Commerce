@@ -19,7 +19,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = settings,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = settings.Count,
+                TotalRecord = settings.Count
             };
         }
         catch (Exception ex)
@@ -29,7 +29,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -46,7 +46,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = settings,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = settings.Count,
+                TotalRecord = settings.Count
             };
         }
         catch (Exception ex)
@@ -56,7 +56,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -70,7 +70,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
             {
                 Data = setting,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -80,7 +80,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -95,7 +95,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
             {
                 Data = settings,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception ex)
@@ -105,7 +105,7 @@ public class SettingRepository(SmECommerceContext defaultdbContext) : ISettingRe
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }

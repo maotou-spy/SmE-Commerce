@@ -22,7 +22,7 @@ public class PaymentRepository(SmECommerceContext dbContext) : IPaymentRepositor
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -32,7 +32,7 @@ public class PaymentRepository(SmECommerceContext dbContext) : IPaymentRepositor
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }
@@ -53,14 +53,14 @@ public class PaymentRepository(SmECommerceContext dbContext) : IPaymentRepositor
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.PaymentMethodNotFound,
+                    StatusCode = ErrorCode.PaymentMethodNotFound
                 };
 
             return new Return<PaymentMethod>
             {
                 Data = paymentMethod,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
+                StatusCode = ErrorCode.Ok
             };
         }
         catch (Exception e)
@@ -70,7 +70,7 @@ public class PaymentRepository(SmECommerceContext dbContext) : IPaymentRepositor
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
+                InternalErrorMessage = e
             };
         }
     }

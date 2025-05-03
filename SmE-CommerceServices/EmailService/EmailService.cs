@@ -21,7 +21,7 @@ public class EmailService(IConfiguration configuration) : IEmailService
                     configuration["Smtp:Username"],
                     configuration["Smtp:Password"]
                 ),
-                EnableSsl = bool.Parse(configuration["Smtp:EnableSsl"] ?? string.Empty),
+                EnableSsl = bool.Parse(configuration["Smtp:EnableSsl"] ?? string.Empty)
             };
 
             var mailMessage = new MailMessage
@@ -30,7 +30,7 @@ public class EmailService(IConfiguration configuration) : IEmailService
                 Subject = "Password Reset Request",
                 Body =
                     $"<p>Click <a href='{resetLink}?token={token}'>here</a> to reset your password.</p>",
-                IsBodyHtml = true,
+                IsBodyHtml = true
             };
             mailMessage.To.Add(email);
 

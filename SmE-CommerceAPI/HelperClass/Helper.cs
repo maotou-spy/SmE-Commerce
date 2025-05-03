@@ -104,7 +104,7 @@ public static class Helper
             ErrorCode.InternalServerError => HttpStatusCode.InternalServerError, // 500
 
             // 🚫 Default fallback
-            _ => HttpStatusCode.InternalServerError,
+            _ => HttpStatusCode.InternalServerError
         };
     }
 }

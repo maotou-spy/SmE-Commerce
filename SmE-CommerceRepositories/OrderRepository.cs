@@ -20,7 +20,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-                IsSuccess = true,
+                IsSuccess = true
             };
         }
         catch (Exception ex)
@@ -31,35 +31,45 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
 
-    public async Task<Return<Order>> CustomerGetOrderByIdAsync(Guid orderId, Guid userId)
+    public async Task<Return<Order>> GetOrderByIdAsync(Guid orderId, Guid? userId)
     {
         try
         {
-            var order = await defaultdb
+            var query = defaultdb
                 .Orders.Include(x => x.Address)
+                .Include(x => x.User)
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.ProductVariant)
                 .ThenInclude(x => x!.VariantAttributes)
-                .FirstOrDefaultAsync(x => x.OrderId == orderId && x.UserId == userId);
+                .Where(x => x.OrderId == orderId);
+
+            if (userId.HasValue)
+            {
+                query = query.Where(x => x.UserId == userId.Value);
+            }
+
+            var order = await query.FirstOrDefaultAsync();
+
             if (order == null)
                 return new Return<Order>
                 {
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
+
             return new Return<Order>
             {
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -70,7 +80,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -87,14 +97,14 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
             return new Return<List<Order>>
             {
                 Data = orders,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = orders.Count,
+                TotalRecord = orders.Count
             };
         }
         catch (Exception ex)
@@ -105,7 +115,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
@@ -146,7 +156,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.BadRequest,
                     IsSuccess = false,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
             }
 
@@ -161,7 +171,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = null,
                 StatusCode = ErrorCode.OrderNotFound,
                 IsSuccess = false,
-                TotalRecord = 0,
+                TotalRecord = 0
             };
 
         return new Return<List<Order>>
@@ -169,7 +179,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             Data = ordersList,
             StatusCode = ErrorCode.Ok,
             IsSuccess = true,
-            TotalRecord = ordersList.Count,
+            TotalRecord = ordersList.Count
         };
     }
     catch (Exception ex)
@@ -180,7 +190,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             StatusCode = ErrorCode.InternalServerError,
             IsSuccess = false,
             TotalRecord = 0,
-            InternalErrorMessage = ex,
+            InternalErrorMessage = ex
         };
     }
 }
@@ -196,7 +206,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = req,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-                IsSuccess = true,
+                IsSuccess = true
             };
         } catch (Exception ex)
         {
@@ -224,7 +234,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0,
+                    TotalRecord = 0
                 };
             order.Status = OrderStatus.Stuffing;
             defaultdb.Orders.Update(order);
@@ -234,7 +244,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1,
+                TotalRecord = 1
             };
         }
         catch (Exception ex)
@@ -245,7 +255,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex,
+                InternalErrorMessage = ex
             };
         }
     }
