@@ -43,7 +43,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discount codes: {e}", ex);
+            logger.LogError("Error at get discount codes: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -64,7 +64,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create discount: {e}", ex);
+            logger.LogError("Error at create discount: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -90,7 +90,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update discount: {ex}", ex);
+            logger.LogError("Error at update discount: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -118,7 +118,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discounts: {e}", ex);
+            logger.LogError("Error at get discounts: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -141,7 +141,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete discount: {e}", ex);
+            logger.LogError("Error at delete discount: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -170,7 +170,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create discount code: {e}", ex);
+            logger.LogError("Error at create discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -192,7 +192,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discount code: {e}", ex);
+            logger.LogError("Error at get discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -217,7 +217,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update discount code: {e}", ex);
+            logger.LogError("Error at update discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -239,7 +239,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discount codes: {e}", ex);
+            logger.LogError("Error at get discount codes: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -263,7 +263,7 @@ public class DiscountController(ILogger<AuthController> logger, IDiscountService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete discount code: {e}", ex);
+            logger.LogError("Error at delete discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

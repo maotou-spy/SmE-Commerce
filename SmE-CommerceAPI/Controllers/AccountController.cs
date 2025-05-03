@@ -43,7 +43,7 @@ public class AccountController(
     //     }
     //     catch (Exception ex)
     //     {
-    //         logger.LogInformation("Error at create manager user: {ex}", ex);
+    //         logger.LogError("Error at create manager user: {ex}", ex);
     //         return ErrorCode(500, new Return<bool> { Message = ErrorMessage.InternalServerError });
     //     }
     // }
@@ -66,7 +66,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get user profile: {ex}", ex);
+            logger.LogError("Error at get user profile: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
@@ -95,7 +95,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get user addresses: {ex}", ex);
+            logger.LogError("Error at get user addresses: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -121,7 +121,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at add address: {ex}", ex);
+            logger.LogError("Error at add address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -150,7 +150,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update address: {ex}", ex);
+            logger.LogError("Error at update address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -176,7 +176,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete address: {ex}", ex);
+            logger.LogError("Error at delete address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -202,7 +202,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at set default address: {ex}", ex);
+            logger.LogError("Error at set default address: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -228,7 +228,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update user profile: {ex}", ex);
+            logger.LogError("Error at update user profile: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -250,7 +250,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete user: {ex}", ex);
+            logger.LogError("Error at delete user: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
@@ -275,7 +275,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get discount code: {ex}", ex);
+            logger.LogError("Error at get discount code: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -298,7 +298,7 @@ public class AccountController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at change password: {ex}", ex);
+            logger.LogError("Error at change password: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

@@ -5,6 +5,7 @@ using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
+using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceRepositories;
 
@@ -22,7 +23,21 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             // Step 1: Build query with only necessary fields
             var query = dbContext.Set<Product>().AsQueryable();
 
-            // Apply filters
+            // Apply search filter
+            if (!string.IsNullOrEmpty(filter.SearchTerm))
+            {
+                var searchTerm = VietnameseStringNormalizer
+                    .RemoveDiacritics(filter.SearchTerm)
+                    .ToLower()
+                    .Trim();
+
+                // Use EF.Functions.ToTsVector for full-text search (PostgreSQL)
+                query = query.Where(p =>
+                    p.Name.Contains(searchTerm)
+                    || EF.Functions.ToTsVector("simple", p.NameUnaccent).Matches(searchTerm)
+                );
+            }
+
             if (!isAdmin)
                 query = query.Where(p => p.Status == ProductStatus.Active);
             else if (!string.IsNullOrEmpty(filter.Status))
@@ -53,14 +68,17 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             // Apply sorting
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
-                var sortOrder = filter.SortOrder.ToUpper();
-                if (
-                    sortOrder != ProductFilterSortOrder.Descending
-                    && sortOrder != ProductFilterSortOrder.Ascending
-                )
-                    sortOrder = ProductFilterSortOrder.Ascending; // Default to "asc" if invalid
+                var sortBy = filter.SortBy.ToLower();
+                var sortOrder = filter.SortOrder.ToLower();
 
-                query = filter.SortBy.ToLower() switch
+                // Default to Ascending if sortOrder is invalid
+                if (
+                    sortOrder != ProductFilterSortOrder.Ascending
+                    && sortOrder != ProductFilterSortOrder.Descending
+                )
+                    sortOrder = ProductFilterSortOrder.Ascending;
+
+                query = sortBy switch
                 {
                     ProductFilterSortBy.Price => sortOrder == ProductFilterSortOrder.Descending
                         ? query.OrderByDescending(p =>
@@ -88,9 +106,30 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
             // Apply pagination
             var totalCount = await query.CountAsync();
             var items = await query
-                .Include(x => x.ProductVariants)
-                .Include(x => x.CreateBy)
-                .Include(x => x.ModifiedBy)
+                .Select(p => new Product
+                {
+                    ProductId = p.ProductId,
+                    ProductCode = p.ProductCode,
+                    Name = p.Name,
+                    NameUnaccent = p.NameUnaccent,
+                    Price = p.Price,
+                    StockQuantity = p.StockQuantity,
+                    SoldQuantity = p.SoldQuantity,
+                    Status = p.Status,
+                    CreatedAt = p.CreatedAt,
+                    CreateById = p.CreateById,
+                    CreateBy =
+                        p.CreateBy != null ? new User { FullName = p.CreateBy.FullName } : null,
+                    ModifiedAt = p.ModifiedAt,
+                    ModifiedById = p.ModifiedById,
+                    ModifiedBy =
+                        p.ModifiedBy != null ? new User { FullName = p.ModifiedBy.FullName } : null,
+                    IsTopSeller = p.IsTopSeller,
+                    PrimaryImage = p.PrimaryImage,
+                    AverageRating = p.AverageRating,
+                })
+                // .Include(x => x.CreateBy)
+                // .Include(x => x.ModifiedBy)
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();

@@ -9,6 +9,7 @@ using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
 using SmE_CommerceUtilities;
+using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceServices;
 
@@ -782,7 +783,7 @@ public class ProductService(
                     ProductId = p.ProductId,
                     ProductCode = p.ProductCode,
                     ProductName = p.Name,
-                    Price = p.HasVariant ? p.ProductVariants.Select(x => x.Price).Min() : p.Price,
+                    Price = p.Price,
                     StockQuantity = p.StockQuantity,
                     SoldQuantity = p.SoldQuantity,
                     Status = p.Status,
@@ -859,7 +860,7 @@ public class ProductService(
                     ProductId = p.ProductId,
                     ProductCode = p.ProductCode,
                     ProductName = p.Name,
-                    Price = p.HasVariant ? p.ProductVariants.Select(x => x.Price).Min() : p.Price,
+                    Price = p.Price,
                     StockQuantity = p.StockQuantity,
                     SoldQuantity = p.SoldQuantity,
                     Status = p.Status,
@@ -1211,16 +1212,18 @@ public class ProductService(
         try
         {
             // Generate SEO metadata
-            var slug = SlugUtil.GenerateSlug(req.Name);
-            var metaTitle = req.Name;
-            var metaDescription = req.Description ?? $"Buy {req.Name} at the best price!";
+            var slug = SlugUtil.GenerateSlug(req.Name.Trim());
+            var metaTitle = req.Name.Trim();
+            var metaDescription =
+                req.Description?.Trim() ?? $"Buy {req.Name.Trim()} at the best price!";
 
             var now = DateTime.Now;
             var curUserId = currentUser.Data.UserId;
             var product = new Product
             {
-                Name = req.Name,
-                Description = req.Description,
+                Name = req.Name.Trim(),
+                NameUnaccent = VietnameseStringNormalizer.RemoveDiacritics(req.Name.Trim()),
+                Description = req.Description?.Trim(),
                 Price = req.Price,
                 StockQuantity = req.StockQuantity,
                 SoldQuantity = 0,
@@ -1487,6 +1490,7 @@ public class ProductService(
 
             // Step 7: Update product fields
             product.Name = req.Name.Trim();
+            product.NameUnaccent = VietnameseStringNormalizer.RemoveDiacritics(req.Name.Trim());
             product.Description = req.Description?.Trim();
             if (canUpdatePrice)
                 product.Price = req.Price;

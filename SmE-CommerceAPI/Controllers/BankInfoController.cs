@@ -32,7 +32,7 @@ public class BankInfoController(ILogger<AuthController> logger, IBankInfoService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create category user: {e}", ex);
+            logger.LogError("Error at create category user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -54,7 +54,7 @@ public class BankInfoController(ILogger<AuthController> logger, IBankInfoService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete category user: {e}", ex);
+            logger.LogError("Error at delete category user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -76,7 +76,7 @@ public class BankInfoController(ILogger<AuthController> logger, IBankInfoService
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get bank info: {e}", ex);
+            logger.LogError("Error at get bank info: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

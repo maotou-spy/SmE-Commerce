@@ -36,7 +36,7 @@ public class VariantController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get variant attributes: {e}", ex);
+            logger.LogError("Error at get variant attributes: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -62,7 +62,7 @@ public class VariantController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at bulk create variant attribute: {e}", ex);
+            logger.LogError("Error at bulk create variant attribute: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -91,7 +91,7 @@ public class VariantController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update variant attribute: {e}", ex);
+            logger.LogError("Error at update variant attribute: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -117,7 +117,7 @@ public class VariantController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete variant attribute: {e}", ex);
+            logger.LogError("Error at delete variant attribute: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

@@ -3,8 +3,8 @@
 public static class ProductFilterSortBy
 {
     public const string Price = "price";
-    public const string AverageRating = "averageRating";
-    public const string SoldQuantity = "soldQuantity";
+    public const string AverageRating = "averagerating";
+    public const string SoldQuantity = "soldquantity";
 }
 
 public static class ProductFilterSortOrder

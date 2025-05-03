@@ -27,12 +27,12 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get settings: {e}", result.InternalErrorMessage);
+                logger.LogError("Error at get settings: {ex}", result.InternalErrorMessage);
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get settings: {e}", ex);
+            logger.LogError("Error at get settings: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -49,12 +49,12 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at get setting by key: {e}", result.InternalErrorMessage);
+                logger.LogError("Error at get setting by key: {ex}", result.InternalErrorMessage);
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get setting by key: {e}", ex);
+            logger.LogError("Error at get setting by key: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -71,12 +71,12 @@ public class SettingController(ISettingService settingService, ILogger<AuthContr
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)
-                logger.LogError("Error at update settings: {e}", result.InternalErrorMessage);
+                logger.LogError("Error at update settings: {ex}", result.InternalErrorMessage);
             return Helper.GetErrorResponse(result.StatusCode);
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update settings: {e}", ex);
+            logger.LogError("Error at update settings: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

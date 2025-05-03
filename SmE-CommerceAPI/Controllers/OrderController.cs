@@ -32,7 +32,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create order: {ex}", ex);
+            logger.LogError("Error at create order: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -54,7 +54,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get order detail: {ex}", ex);
+            logger.LogError("Error at get order detail: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -77,7 +77,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get orders: {ex}", ex);
+            logger.LogError("Error at get orders: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

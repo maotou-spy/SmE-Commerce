@@ -40,7 +40,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get user profile by manager: {ex}", ex);
+            logger.LogError("Error at get user profile by manager: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<dynamic> { StatusCode = ErrorCode.InternalServerError }
@@ -80,7 +80,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get all users: {ex}", ex);
+            logger.LogError("Error at get all users: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }
@@ -105,7 +105,7 @@ public class UserController(
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at change user status: {ex}", ex);
+            logger.LogError("Error at change user status: {ex}", ex);
             return StatusCode(
                 500,
                 new Return<IEnumerable<User>> { StatusCode = ErrorCode.InternalServerError }

@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace SmE_CommerceModels.Models;
 
 [Index("Status", Name = "idx_products_status")]
+[Index("Name", Name = "idx_products_name")]
+[Index("NameUnaccent", Name = "idx_product_name_unaccent")]
 [Index("ProductCode", Name = "products_code_key", IsUnique = true)]
 public class Product
 {
@@ -19,6 +21,10 @@ public class Product
     [Column("name")]
     [StringLength(100)]
     public string Name { get; set; } = null!;
+
+    [Column("nameUnaccent")]
+    [StringLength(100)]
+    public string NameUnaccent { get; set; } = null!;
 
     [Column("description")]
     public string? Description { get; set; }

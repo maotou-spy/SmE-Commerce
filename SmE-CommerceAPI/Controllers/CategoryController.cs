@@ -33,7 +33,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at create category user: {e}", ex);
+            logger.LogError("Error at create category user: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -65,7 +65,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get categories for customer: {e}", ex);
+            logger.LogError("Error at get categories for customer: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -98,7 +98,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at get categories for manager: {e}", ex);
+            logger.LogError("Error at get categories for manager: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -126,7 +126,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update category detail: {e}", ex);
+            logger.LogError("Error at update category detail: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -149,7 +149,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at delete category: {e}", ex);
+            logger.LogError("Error at delete category: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -175,7 +175,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         }
         catch (Exception ex)
         {
-            logger.LogInformation("Error at update category status: {e}", ex);
+            logger.LogError("Error at update category status: {ex}", ex);
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
