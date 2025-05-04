@@ -804,7 +804,6 @@ public class OrderService(
                     })
                     .ToList(),
             };
-            Console.WriteLine(orderDetail);
 
             return new Return<GetOrderDetailsResDto>
             {
@@ -924,6 +923,96 @@ public class OrderService(
             };
         }
     }
+    
+    // Manager update status from pending => stuffing, stuffing => Shipped, Shipped => Completed Or Pending => Rejected
+    // Only from Pending or Stuffing can be updated to Rejected
+    public async Task<Return<bool>> ManagerUpdateOrderStatusAsync(UpdateOrderStatusReqDto req)
+    {
+        try
+        {
+            var validUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
+            if (!validUser.IsSuccess || validUser.Data == null)
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.UserNotFound,
+                    InternalErrorMessage = validUser.InternalErrorMessage
+                };
+            }
 
+            // Validate input
+            if (!req.OrderIds.Any() || string.IsNullOrEmpty(req.Status))
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidInput
+                };
+            }
+
+            var orders = await orderRepository.GetOrdersByIdsAsync(req.OrderIds);
+            if (!orders.Any())
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    TotalRecord = 0
+                };
+            }
+
+            var validTransitions = new Dictionary<string, List<string>>
+            {
+                { OrderStatus.Pending, [OrderStatus.Stuffing, OrderStatus.Rejected] },
+                { OrderStatus.Stuffing, [OrderStatus.Shipped, OrderStatus.Rejected] },
+                // { OrderStatus.Shipped, [OrderStatus.DeliveryFailed] }
+            };
+            
+            if (orders.Any(order => !validTransitions.ContainsKey(order.Status) || !validTransitions[order.Status].Contains(req.Status)))
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InvalidStatus
+                };
+            }
+
+            var updateResult = await orderRepository.UpdateOrderStatusRangeAsync(orders, req.Status, req.Reason);
+            if (!updateResult)
+            {
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = ErrorCode.InternalServerError
+                };
+            }
+
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = orders.Count
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = e,
+                TotalRecord = 0
+            };
+        }
+    }
+    
     #endregion
 }

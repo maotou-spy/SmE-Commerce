@@ -27,6 +27,8 @@ public static class ErrorCode
     public const string AtLeastTwoProductVariant = "019";
     public const string InvalidVariantAttributeStructure = "020";
     public const string MinimumVariantRequired = "021";
+    public const string InvalidInput = "022";
+    public const string InvalidStatus = "023";
 
     // Not found
     public const string ProductNotFound = "101";

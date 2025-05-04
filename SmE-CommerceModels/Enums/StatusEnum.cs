@@ -47,6 +47,7 @@ public static class OrderStatus
     public const string Cancelled = "Cancelled"; // Order has been canceled by the customer
 
     public const string Rejected = "Rejected"; // Order has been rejected by the shop owner
+    // public const string DeliveryFailed = "DeliveryFailed"; // Delivery has been returned to the sender because cannot be delivered
     // public const string Returned = "Returned"; // Order has been returned by the customer
 }
 
