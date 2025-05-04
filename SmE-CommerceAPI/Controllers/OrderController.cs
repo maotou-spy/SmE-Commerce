@@ -10,12 +10,12 @@ namespace SmE_CommerceAPI.Controllers;
 
 [ApiVersion("1.0")]
 [ApiController]
-[Route("api/v{version:apiVersion}/orders")]
+[Route("api/v{version:apiVersion}")]
 [Authorize(AuthenticationSchemes = "JwtScheme")]
 public class OrderController(IOrderService orderService, ILogger<AuthController> logger)
     : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("orders")]
     [OpenApiOperation("Create Order", "Create Order")]
     [Authorize]
     public async Task<IActionResult> CreateOrderAsync([FromBody] CreateOrderReqDto req)
@@ -37,7 +37,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
 
-    [HttpGet("{orderId:guid}")]
+    [HttpGet("orders/{orderId:guid}")]
     [OpenApiOperation("Get Order Detail", "Get Order Detail")]
     [Authorize(AuthenticationSchemes = "JwtScheme")]
     public async Task<IActionResult> GetOrderByIdAsync([FromRoute] Guid orderId)
@@ -59,7 +59,7 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
 
-    [HttpGet]
+    [HttpGet("orders")]
     [OpenApiOperation("Get orders", "get orders")]
     [Authorize]
     public async Task<IActionResult> GetOrdersAsync([FromQuery] OrderFilterReqDto filter)
@@ -80,4 +80,27 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
+    
+    [HttpPut("admin/orders/status")]
+    [OpenApiOperation("Update Order Status", "Update Order Status")]
+    [Authorize]
+    public async Task<IActionResult> UpdateOrderStatusAsync([FromBody] UpdateOrderStatusReqDto req)
+    {
+        try
+        {
+            var result = await orderService.ManagerUpdateOrderStatusAsync(req);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update order status: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error at update order status: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+    
 }

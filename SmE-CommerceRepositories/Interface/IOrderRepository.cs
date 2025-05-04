@@ -15,4 +15,8 @@ public interface IOrderRepository
     Task<Return<IEnumerable<Order>>> GetOrdersAsync(OrderFilterReqDto filter, Guid userId);
 
     Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req);
+
+    Task<bool> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason);
+
+    Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds);
 }
