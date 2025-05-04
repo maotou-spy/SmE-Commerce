@@ -280,7 +280,6 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         {
             return new Return<Order>
             {
-                Data = null,
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
@@ -288,7 +287,6 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
-
     public async Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds)
     {
         return await defaultdb
