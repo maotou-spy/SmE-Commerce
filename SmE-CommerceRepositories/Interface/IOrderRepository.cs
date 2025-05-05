@@ -18,7 +18,7 @@ public interface IOrderRepository
 
     Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req);
 
-    Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason);
+    Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders);
 
     Task<Return<bool>> UpdateOrderAsync(Order order);
 
