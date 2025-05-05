@@ -296,7 +296,8 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             .ToListAsync();
     }
 
-    public async Task<bool> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason)
+    // Manager update order status
+    public async Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason)
     {
         try
         {
@@ -311,15 +312,57 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     ModifiedAt = order.ModifiedAt,
                     ModifiedBy = order.ModifiedBy
                 });
+                order.ModifiedAt = DateTime.Now;
+                order.ModifiedBy = order.ModifiedBy;
             }
 
             defaultdb.Orders.UpdateRange(orders);
             await defaultdb.SaveChangesAsync();
-            return true;
+            return new Return<bool>
+            {
+                Data = true,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = orders.Count
+            };
         }
         catch
         {
-            return false;
+            return new Return<bool>
+            {
+                Data = false,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0
+            };
+        }
+    }
+
+    // Customer update order status
+    public async Task<Return<bool>> UpdateOrderAsync(Order order)
+    {
+        try
+        {
+            defaultdb.Orders.Update(order);
+            await defaultdb.SaveChangesAsync();
+            
+            return new Return<bool>
+            {
+                Data = true,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = 1
+            };
+        } catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex
+            };
         }
     }
 }

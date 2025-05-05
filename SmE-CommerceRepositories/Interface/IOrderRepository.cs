@@ -1,4 +1,6 @@
-﻿using SmE_CommerceModels.Models;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using SmE_CommerceModels.Enums;
+using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Order;
 using SmE_CommerceModels.ReturnResult;
 
@@ -16,7 +18,11 @@ public interface IOrderRepository
 
     Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req);
 
-    Task<bool> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason);
+    Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason);
+
+    Task<Return<bool>> UpdateOrderAsync(Order order);
 
     Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds);
+
+    Task<Return<Order>> GetOrderByIdForUpdateAsync(Guid orderId);
 }

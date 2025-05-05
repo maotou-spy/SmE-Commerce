@@ -10,7 +10,9 @@ public interface IOrderService
 
     Task<Return<GetOrderDetailsResDto>> GetOrderByIdAsync(Guid orderId);
     
-    Task<Return<bool>> ManagerUpdateOrderStatusAsync(UpdateOrderStatusReqDto req);
+    Task<Return<bool>> ManagerUpdateOrderStatusAsync(ManagerUpdateOrderStatusReqDto req);
+
+    Task<Return<bool>> CustomerUpdateOrderStatusAsync(CustomerUpdateOrderStatusReqDto req);
     
     Task<Return<IEnumerable<GetOrderResDto>>> GetOrdersAsync(OrderFilterReqDto filter);
 }

@@ -82,9 +82,9 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
     }
     
     [HttpPut("admin/orders/status")]
-    [OpenApiOperation("Update Order Status", "Update Order Status")]
+    [OpenApiOperation("Manager Update Order Status", "Manager Update Order Status")]
     [Authorize]
-    public async Task<IActionResult> UpdateOrderStatusAsync([FromBody] UpdateOrderStatusReqDto req)
+    public async Task<IActionResult> ManagerUpdateOrderStatusAsync([FromBody] ManagerUpdateOrderStatusReqDto req)
     {
         try
         {
@@ -103,4 +103,25 @@ public class OrderController(IOrderService orderService, ILogger<AuthController>
         }
     }
     
+    [HttpPut("orders/status")]
+    [OpenApiOperation("Customer Update Order Status", "Customer Update Order Status")]
+    [Authorize]
+    public async Task<IActionResult> CustomerUpdateOrderStatusAsync([FromBody] CustomerUpdateOrderStatusReqDto req)
+    {
+        try
+        {
+            var result = await orderService.CustomerUpdateOrderStatusAsync(req);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at update order status: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error at update order status: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
 }
