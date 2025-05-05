@@ -970,7 +970,6 @@ public class OrderService(
             {
                 { OrderStatus.Pending, [OrderStatus.Stuffing, OrderStatus.Rejected] },
                 { OrderStatus.Stuffing, [OrderStatus.Shipped, OrderStatus.Rejected] }
-                // { OrderStatus.Shipped, [OrderStatus.DeliveryFailed] }
             };
             
             if (orders.Any(order => !validTransitions.ContainsKey(order.Status) || !validTransitions[order.Status].Contains(req.Status)))
@@ -982,26 +981,199 @@ public class OrderService(
                     StatusCode = ErrorCode.InvalidStatus
                 };
             }
+            
+            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            try
+            {
+                var newReason = req.Reason?.Trim() ?? null;
+                var newStatus = req.Status;
+                orders.ForEach(order =>
+                {
+                    order.Status = newStatus;
+                    order.ModifiedAt = DateTime.Now;
+                    order.ModifiedById = validUser.Data.UserId;
+                });
+                var updateResult = await orderRepository.UpdateOrderStatusRangeAsync(orders);
+                if (!updateResult.IsSuccess || !updateResult.Data)
+                {
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = updateResult.StatusCode,
+                        InternalErrorMessage = updateResult.InternalErrorMessage
+                    };
+                }
+                
+                // Update order status history
+                foreach (var orderHistory in orders.Select(order => new OrderStatusHistory
+                         {
+                             OrderId = order.OrderId,
+                             Status = newStatus,
+                             Reason = newReason,
+                             ModifiedAt = DateTime.Now,
+                             ModifiedById = validUser.Data.UserId
+                         }))
+                {
+                    var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryAsync(orderHistory);
+                    if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
+                    {
+                        return new Return<bool>
+                        {
+                            Data = false,
+                            IsSuccess = false,
+                            StatusCode = orderStatusHistory.StatusCode,
+                            InternalErrorMessage = orderStatusHistory.InternalErrorMessage
+                        };
+                    }
+                }
 
-            var updateResult = await orderRepository.UpdateOrderStatusRangeAsync(orders, req.Status, req.Reason);
-            if (!updateResult.IsSuccess || !updateResult.Data)
+                if (newStatus != OrderStatus.Rejected)
+                    return new Return<bool>
+                    {
+                        Data = true,
+                        IsSuccess = true,
+                        StatusCode = ErrorCode.Ok,
+                        TotalRecord = orders.Count
+                    };
+                {
+                    // return products to stock
+                    foreach (var item in orders.SelectMany(order => order.OrderItems))
+                    {
+                        if (item.ProductVariantId.HasValue)
+                        {
+                            var variant = await productRepository.GetProductVariantByIdForUpdateAsync(
+                                item.ProductVariantId.Value
+                            );
+                            if (!variant.IsSuccess || variant.Data == null)
+                            {
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = variant.StatusCode,
+                                    InternalErrorMessage = variant.InternalErrorMessage
+                                };
+                            }
+                            variant.Data.StockQuantity += item.Quantity;
+                            variant.Data.SoldQuantity -= item.Quantity;
+                            if (variant.Data.StockQuantity > 0)
+                                variant.Data.Status = ProductStatus.Active;
+                            var returnedVariant = await productRepository.UpdateProductVariantAsync(
+                                variant.Data
+                            );
+                            if (!returnedVariant.IsSuccess)
+                            {
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = returnedVariant.StatusCode,
+                                    InternalErrorMessage = returnedVariant.InternalErrorMessage
+                                };
+                            }
+                        }
+                        else
+                        {
+                            var product = await productRepository.GetProductByIdForUpdateAsync(
+                                item.ProductId
+                            );
+                            if (!product.IsSuccess || product.Data == null)
+                            {
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = product.StatusCode,
+                                    InternalErrorMessage = product.InternalErrorMessage
+                                };
+                            }
+                            product.Data.StockQuantity += item.Quantity;
+                            product.Data.SoldQuantity -= item.Quantity;
+                            if (product.Data.StockQuantity > 0)
+                                product.Data.Status = ProductStatus.Active;
+                            var returnedProduct = await productRepository.UpdateProductAsync(product.Data);
+                            if (!returnedProduct.IsSuccess)
+                            {
+                                return new Return<bool>
+                                {
+                                    Data = false,
+                                    IsSuccess = false,
+                                    StatusCode = returnedProduct.StatusCode,
+                                    InternalErrorMessage = returnedProduct.InternalErrorMessage
+                                };
+                            }
+                        }
+                    }
+                    
+                    // Update user points
+                    foreach (var order in orders)
+                    {
+                        var userPoint = await userRepository.GetUserByIdAsync(order.UserId);
+                        if (!userPoint.IsSuccess || userPoint.Data == null)
+                        {
+                            return new Return<bool>
+                            {
+                                Data = false,
+                                IsSuccess = false,
+                                StatusCode = userPoint.StatusCode,
+                                InternalErrorMessage = userPoint.InternalErrorMessage
+                            };
+                        }
+                        if (order.PointsUsed < 0)
+                        {
+                            return new Return<bool>
+                            {
+                                Data = false,
+                                IsSuccess = false,
+                                StatusCode = ErrorCode.InvalidInput,
+                                InternalErrorMessage = userPoint.InternalErrorMessage
+                            };
+                        }
+                        if (order.PointsEarned < 0)
+                        {
+                            return new Return<bool>
+                            {
+                                Data = false,
+                                IsSuccess = false,
+                                StatusCode = ErrorCode.InvalidInput,
+                                InternalErrorMessage = userPoint.InternalErrorMessage
+                            };
+                        }
+
+                        // Return PointsUsed và divide PointsEarned
+                        userPoint.Data.Point += order.PointsUsed;
+                        var updatePoint = await userRepository.UpdateUserAsync(userPoint.Data);
+                        if (!updatePoint.IsSuccess)
+                        {
+                            return new Return<bool>
+                            {
+                                Data = false,
+                                IsSuccess = false,
+                                StatusCode = updatePoint.StatusCode,
+                                InternalErrorMessage = updatePoint.InternalErrorMessage
+                            };
+                        }
+                    }
+                }
+
+                return new Return<bool>
+                {
+                    Data = true,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = orders.Count
+                };
+            } catch (Exception ex)
             {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = updateResult.StatusCode,
-                    InternalErrorMessage = updateResult.InternalErrorMessage
+                    StatusCode = ErrorCode.InternalServerError,
+                    InternalErrorMessage = ex
                 };
             }
-
-            return new Return<bool>
-            {
-                Data = true,
-                IsSuccess = true,
-                StatusCode = ErrorCode.Ok,
-                TotalRecord = orders.Count
-            };
         }
         catch (Exception e)
         {

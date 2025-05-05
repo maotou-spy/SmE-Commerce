@@ -297,25 +297,10 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
     }
 
     // Manager update order status
-    public async Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders, string status, string? reason)
+    public async Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders)
     {
         try
         {
-            foreach (var order in orders)
-            {
-                order.Status = status;
-                order.OrderStatusHistories.Add(new OrderStatusHistory
-                {
-                    OrderId = order.OrderId,
-                    Status = status,
-                    Reason = reason ?? null,
-                    ModifiedAt = order.ModifiedAt,
-                    ModifiedBy = order.ModifiedBy
-                });
-                order.ModifiedAt = DateTime.Now;
-                order.ModifiedBy = order.ModifiedBy;
-            }
-
             defaultdb.Orders.UpdateRange(orders);
             await defaultdb.SaveChangesAsync();
             return new Return<bool>
