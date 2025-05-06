@@ -30,10 +30,8 @@ public static class Helper
             ErrorCode.Ok => HttpStatusCode.OK,
 
             // 🔐 Authorization/Auth errors
-            ErrorCode.NotAuthority
-            or ErrorCode.AccountIsInactive
-            or ErrorCode.NotForCustomer
-            or ErrorCode.NotYourAddress => HttpStatusCode.Forbidden, // 403
+            ErrorCode.NotAuthority or ErrorCode.AccountIsInactive or ErrorCode.NotYourAddress =>
+                HttpStatusCode.Forbidden, // 403
 
             ErrorCode.InvalidToken or ErrorCode.InvalidCredentials => HttpStatusCode.Unauthorized, // 401
 
@@ -104,7 +102,7 @@ public static class Helper
             ErrorCode.InternalServerError => HttpStatusCode.InternalServerError, // 500
 
             // 🚫 Default fallback
-            _ => HttpStatusCode.InternalServerError
+            _ => HttpStatusCode.InternalServerError,
         };
     }
 }

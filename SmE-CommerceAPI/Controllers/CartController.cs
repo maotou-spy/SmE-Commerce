@@ -22,7 +22,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     {
         try
         {
-            var result = await cartService.CustomerGetCartAsync();
+            var result = await cartService.GetCartAsync();
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -33,7 +33,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error in CustomerGetCartAsync");
+            logger.LogError(e, "Error in GetCartAsync");
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -94,7 +94,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     {
         try
         {
-            var result = await cartService.CustomerRemoveCartItemByIdAsync(cartId);
+            var result = await cartService.RemoveCartItemByIdAsync(cartId);
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -105,7 +105,30 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error in CustomerRemoveCartItemByIdAsync");
+            logger.LogError(e, "Error in RemoveCartItemByIdAsync");
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
+    [HttpDelete("remove-multiple")]
+    [OpenApiOperation("Remove Cart Items", "Remove cart items by ids")]
+    [Authorize]
+    public async Task<IActionResult> RemoveCartItemByIdsAsync([FromBody] List<Guid> cartIds)
+    {
+        try
+        {
+            var result = await cartService.RemoveCartItemByIdsAsync(cartIds);
+
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at remove cart items: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error in RemoveCartItemByIdsAsync");
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }
@@ -117,7 +140,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
     {
         try
         {
-            var result = await cartService.CustomerClearCartAsync();
+            var result = await cartService.ClearCartAsync();
 
             if (result.IsSuccess)
                 return StatusCode(200, result);
@@ -128,7 +151,7 @@ public class CartController(ICartService cartService, ILogger<CartController> lo
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error in CustomerClearCartAsync");
+            logger.LogError(e, "Error in ClearCartAsync");
             return Helper.GetErrorResponse(ErrorCode.InternalServerError);
         }
     }

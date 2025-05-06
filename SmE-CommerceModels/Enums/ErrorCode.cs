@@ -72,15 +72,15 @@ public static class ErrorCode
     public const string ProductImageMinimum = "302";
     public const string OverStockQuantity = "303";
     public const string VariantNameConflict = "304";
-    public const string OrderAmountTooLow = "305";
+    public const string QuantityExceedStock = "305";
 
     // Authorization
     public const string NotAuthority = "401";
     public const string AccountIsInactive = "402";
     public const string InvalidCredentials = "403";
+    public const string OrderAmountTooLow = "404";
 
     // Not For Customer
-    public const string NotForCustomer = "501";
     public const string NotYourAddress = "502";
 
     // Data inconsistency

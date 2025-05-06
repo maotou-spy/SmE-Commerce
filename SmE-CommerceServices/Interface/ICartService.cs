@@ -6,13 +6,15 @@ namespace SmE_CommerceServices.Interface;
 
 public interface ICartService
 {
-    Task<Return<List<GetCartResDto>>> CustomerGetCartAsync();
-    
-    Task<Return<int?>> AddToCartAsync(CartItemReqDto cartItem);
-    
+    Task<Return<List<GetCartResDto>>> GetCartAsync();
+
+    Task<Return<int>> AddToCartAsync(CartItemReqDto cartItem);
+
     Task<Return<int?>> UpdateCartItemAsync(Guid cartId, int updatedQuantity);
-    
-    Task<Return<bool>> CustomerRemoveCartItemByIdAsync(Guid cartId);
-    
-    Task<Return<bool>> CustomerClearCartAsync();
+
+    Task<Return<bool>> RemoveCartItemByIdAsync(Guid cartId);
+
+    Task<Return<bool>> RemoveCartItemByIdsAsync(List<Guid> cartIds);
+
+    Task<Return<bool>> ClearCartAsync();
 }
