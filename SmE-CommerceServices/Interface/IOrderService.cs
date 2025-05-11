@@ -1,4 +1,5 @@
-﻿using SmE_CommerceModels.RequestDtos.Order;
+﻿using SmE_CommerceModels.Models;
+using SmE_CommerceModels.RequestDtos.Order;
 using SmE_CommerceModels.ResponseDtos.Order;
 using SmE_CommerceModels.ReturnResult;
 

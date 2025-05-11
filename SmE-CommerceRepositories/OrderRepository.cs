@@ -245,6 +245,34 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
+    
+    // create list order status history by list orderID
+    public async Task<Return<IEnumerable<OrderStatusHistory>>> CreateRangeOrderStatusHistoriesAsync(List<OrderStatusHistory> req)
+    {
+        try
+        {
+            await defaultdb.OrderStatusHistories.AddRangeAsync(req);
+            await defaultdb.SaveChangesAsync();
+            return new Return<IEnumerable<OrderStatusHistory>>
+            {
+                Data = req,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = req.Count,
+                IsSuccess = true
+            };
+        }
+        catch (Exception e)
+        {
+            return new Return<IEnumerable<OrderStatusHistory>>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = e
+            };
+        }
+    }
 
     public async Task<Return<Order>> GetOrderByIdForUpdateAsync(Guid orderId)
     {
@@ -292,6 +320,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         return await defaultdb
             .Orders
             .Include(x => x.OrderStatusHistories)
+            .Include(x => x.OrderItems)
             .Where(o => orderIds.Contains(o.OrderId))
             .ToListAsync();
     }

@@ -25,4 +25,6 @@ public interface IOrderRepository
     Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds);
 
     Task<Return<Order>> GetOrderByIdForUpdateAsync(Guid orderId);
+    
+    Task<Return<IEnumerable<OrderStatusHistory>>> CreateRangeOrderStatusHistoriesAsync(List<OrderStatusHistory> req);
 }
