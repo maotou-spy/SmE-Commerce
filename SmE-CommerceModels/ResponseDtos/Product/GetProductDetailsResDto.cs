@@ -26,6 +26,8 @@ public class GetProductDetailsResDto
 
     public decimal? AverageRating { get; set; }
 
+    public int? TotalRating { get; set; }
+
     public List<GetProductImageResDto>? Images { get; set; } = [];
 
     public List<GetProductAttributeResDto> Attributes { get; set; } = [];

@@ -13,4 +13,6 @@ public class GetProductReviewResDto
     public string CreatedBy { get; set; } = null!;
 
     public string? UserImageUrl { get; set; }
+
+    public string? UserName { get; set; } = null!;
 }
