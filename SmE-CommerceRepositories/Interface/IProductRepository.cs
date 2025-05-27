@@ -26,6 +26,8 @@ public interface IProductRepository
         List<ProductCategory> productCategories
     );
 
+    Task<Return<IEnumerable<Product>>> GetRelatedProductsAsync(Guid productId, int limit = 5);
+
     Task<Return<ProductCategory>> DeleteProductCategoryAsync(
         Guid productId,
         List<Guid> categoryIds

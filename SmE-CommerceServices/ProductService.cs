@@ -1048,6 +1048,77 @@ public class ProductService(
         }
     }
 
+    public async Task<Return<IEnumerable<GetProductsResDto>>> GetRelatedProducts(
+        Guid productId,
+        int limit = 5
+    )
+    {
+        try
+        {
+            // Step 1: Get the product by ID
+            var productResult = await productRepository.GetProductByIdAsync(productId);
+            if (!productResult.IsSuccess || productResult.Data == null)
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = [],
+                    IsSuccess = false,
+                    StatusCode = productResult.StatusCode,
+                    InternalErrorMessage = productResult.InternalErrorMessage,
+                };
+
+            // Step 2: Get related products based on categories
+            var relatedProductsResult = await productRepository.GetRelatedProductsAsync(
+                productId,
+                limit
+            );
+
+            if (!relatedProductsResult.IsSuccess || relatedProductsResult.Data == null)
+                return new Return<IEnumerable<GetProductsResDto>>
+                {
+                    Data = [],
+                    IsSuccess = false,
+                    StatusCode = relatedProductsResult.StatusCode,
+                    InternalErrorMessage = relatedProductsResult.InternalErrorMessage,
+                };
+
+            // Step 3: Map to DTO
+            var relatedProductDtos = relatedProductsResult
+                .Data.Select(p => new GetProductsResDto
+                {
+                    ProductId = p.ProductId,
+                    ProductCode = p.ProductCode,
+                    ProductName = p.Name,
+                    Price = p.Price,
+                    StockQuantity = p.StockQuantity,
+                    SoldQuantity = p.SoldQuantity,
+                    Status = p.Status,
+                    IsTopSeller = p.IsTopSeller,
+                    PrimaryImage = p.PrimaryImage,
+                    AverageRating = p.AverageRating,
+                })
+                .ToList();
+
+            return new Return<IEnumerable<GetProductsResDto>>
+            {
+                Data = relatedProductDtos,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                PageNumber = PagingEnum.PageNumber,
+                PageSize = limit,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<GetProductsResDto>>
+            {
+                Data = [],
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
     public async Task<Return<ManagerGetProductDetailResDto>> ManagerGetProductDetailsAsync(
         Guid productId
     )

@@ -81,6 +81,30 @@ public class ProductController(IProductService productService, ILogger<AuthContr
         }
     }
 
+    [HttpGet("admin/products/related/{productId:guid}")]
+    [OpenApiOperation("Get Related Products", "Get Related Products")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetRelatedProductsAsync(
+        Guid productId,
+        [FromQuery] int limit = 5
+    )
+    {
+        try
+        {
+            var result = await productService.GetRelatedProducts(productId, limit);
+            if (result.IsSuccess)
+                return StatusCode(200, result);
+            if (result.InternalErrorMessage is not null)
+                logger.LogError("Error at get related products: {ex}", result.InternalErrorMessage);
+            return Helper.GetErrorResponse(result.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error at get related products: {ex}", ex);
+            return Helper.GetErrorResponse(ErrorCode.InternalServerError);
+        }
+    }
+
     [HttpPost("admin/products/{productId:guid}/attributes")]
     [OpenApiOperation("Create Product Attribute", "Create Product Attribute")]
     [Authorize]

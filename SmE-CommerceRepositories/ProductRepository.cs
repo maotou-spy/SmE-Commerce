@@ -256,6 +256,81 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    public async Task<Return<IEnumerable<Product>>> GetRelatedProductsAsync(
+        Guid productId,
+        int limit = 5
+    )
+    {
+        try
+        {
+            // Get category IDs for the product
+            var categoryIds = await dbContext
+                .ProductCategories.Where(pc => pc.ProductId == productId)
+                .Select(pc => pc.CategoryId)
+                .ToListAsync();
+
+            // Get related products based on the same categories, excluding the current product
+            var relatedProducts = await dbContext
+                .Products.Join(
+                    dbContext.ProductCategories,
+                    product => product.ProductId,
+                    productCategory => productCategory.ProductId,
+                    (product, productCategory) =>
+                        new { Product = product, ProductCategory = productCategory }
+                )
+                .Where(x =>
+                    categoryIds.Contains(x.ProductCategory.CategoryId)
+                    && x.Product.ProductId != productId
+                    && x.Product.Status == ProductStatus.Active
+                )
+                .Select(x => x.Product)
+                .Distinct()
+                .Take(limit)
+                .ToListAsync();
+
+            // Fallback to top-selling products if not enough related products
+            if (relatedProducts.Count >= limit)
+                return new Return<IEnumerable<Product>>
+                {
+                    Data = relatedProducts,
+                    IsSuccess = true,
+                    StatusCode = ErrorCode.Ok,
+                    TotalRecord = relatedProducts.Count,
+                };
+
+            var additionalProducts = await dbContext
+                .Products.Where(p =>
+                    p.ProductId != productId
+                    && p.Status == ProductStatus.Active
+                    && p.IsTopSeller
+                    && !relatedProducts.Select(rp => rp.ProductId).Contains(p.ProductId)
+                )
+                .Take(limit - relatedProducts.Count)
+                .ToListAsync();
+
+            relatedProducts.AddRange(additionalProducts);
+
+            return new Return<IEnumerable<Product>>
+            {
+                Data = relatedProducts,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = relatedProducts.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Product>>
+            {
+                Data = [],
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
     public async Task<Return<Product>> GetProductByVariantIdForUpdateAsync(Guid productVariantId)
     {
         try

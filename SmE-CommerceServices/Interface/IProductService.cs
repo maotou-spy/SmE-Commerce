@@ -31,6 +31,8 @@ public interface IProductService
         AddProductAttributeReqDto req
     );
 
+    Task<Return<IEnumerable<GetProductsResDto>>> GetRelatedProducts(Guid productId, int limit = 5);
+
     Task<Return<GetProductAttributeResDto>> UpdateProductAttributeAsync(
         Guid productId,
         Guid attributeId,
