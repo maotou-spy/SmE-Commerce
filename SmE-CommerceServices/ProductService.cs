@@ -944,6 +944,78 @@ public class ProductService(
                     StatusCode = ErrorCode.ProductNotFound,
                 };
 
+            var productImages = result
+                .Data.ProductImages.Select(image => new GetProductImageResDto
+                {
+                    ImageId = image.ImageId,
+                    Url = image.Url,
+                    AltText = image.AltText,
+                })
+                .ToList();
+
+            var productCategories = result
+                .Data.ProductCategories.Select(category => new GetProductCategoryResDto
+                {
+                    CategoryId = category.CategoryId,
+                    Name = category.Category.Name,
+                })
+                .ToList();
+
+            var productAttributes = result
+                .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
+                {
+                    AttributeId = attribute.AttributeId,
+                    Name = attribute.AttributeName,
+                    Value = attribute.AttributeValue,
+                })
+                .ToList();
+
+            // If product has variants, get the minimum price
+            var minPrice = result.Data.HasVariant
+                ? result.Data.ProductVariants.Select(x => x.Price).Min()
+                : result.Data.Price;
+
+            // If product has variants
+            var productVariants = result
+                .Data.ProductVariants.Where(v =>
+                    v.Status is ProductStatus.Active or ProductStatus.OutOfStock
+                )
+                .Select(variant => new GetProductVariantResDto
+                {
+                    ProductVariantId = variant.ProductVariantId,
+                    Price = variant.Price,
+                    StockQuantity = variant.StockQuantity,
+                    VariantImage = variant.VariantImage,
+                    Status = variant.Status,
+                    VariantAttributes = variant
+                        .VariantAttributes.Select(attr => new GetVariantAttributeResDto
+                        {
+                            VariantNameId = attr.VariantNameId,
+                            Name = attr.VariantName.Name,
+                            Value = attr.Value,
+                        })
+                        .ToList(),
+                })
+                .ToList();
+
+            // Get the top 5 reviews
+            var top5ProductReviews = result
+                .Data.Reviews.Where(review => review.Status == GeneralStatus.Active)
+                .OrderBy(review => review.IsTop)
+                .Take(5) // Take the top 5 reviews
+                .Select(x => new GetProductReviewResDto
+                {
+                    ReviewId = x.ReviewId,
+                    Rating = x.Rating,
+                    Comment = x.Comment,
+                    CreatedAt = x.CreatedAt,
+                    CreatedBy = x.User.FullName,
+                    UserImageUrl = x.User.Avatar,
+                    UserName = x.User.FullName,
+                })
+                .ToList();
+
+            // Map to GetProductDetailsResDto
             return new Return<GetProductDetailsResDto>
             {
                 Data = new GetProductDetailsResDto
@@ -953,9 +1025,7 @@ public class ProductService(
                     Name = result.Data.Name,
                     PrimaryImage = result.Data.PrimaryImage,
                     Description = result.Data.Description,
-                    Price = result.Data.HasVariant
-                        ? result.Data.ProductVariants.Select(x => x.Price).Min() // Get the minimum price if there are variants
-                        : result.Data.Price,
+                    Price = minPrice,
                     StockQuantity = result.Data.StockQuantity,
                     SoldQuantity = result.Data.SoldQuantity,
                     IsTopSeller = result.Data.IsTopSeller,
@@ -966,71 +1036,18 @@ public class ProductService(
                         MetaDescription = result.Data.MetaDescription,
                     },
                     Status = result.Data.Status,
-                    Images = result
-                        .Data.ProductImages.Select(image => new GetProductImageResDto
-                        {
-                            ImageId = image.ImageId,
-                            Url = image.Url,
-                            AltText = image.AltText,
-                        })
-                        .ToList(),
-                    Categories = result
-                        .Data.ProductCategories.Select(category => new GetProductCategoryResDto
-                        {
-                            CategoryId = category.CategoryId,
-                            Name = category.Category.Name,
-                        })
-                        .ToList(),
-                    Attributes = result
-                        .Data.ProductAttributes.Select(attribute => new GetProductAttributeResDto
-                        {
-                            AttributeId = attribute.AttributeId,
-                            Name = attribute.AttributeName,
-                            Value = attribute.AttributeValue,
-                        })
-                        .ToList(),
+                    Images = productImages,
+                    Categories = productCategories,
+                    Attributes = productAttributes,
+
                     // Variants info
                     HasVariant = result.Data.HasVariant,
                     AverageRating = result.Data.AverageRating,
                     TotalRating = result.Data.Reviews.Count(review =>
                         review.Status == GeneralStatus.Active
                     ),
-                    Variants = result
-                        .Data.ProductVariants.Where(v =>
-                            v.Status is ProductStatus.Active or ProductStatus.OutOfStock
-                        )
-                        .Select(variant => new GetProductVariantResDto
-                        {
-                            ProductVariantId = variant.ProductVariantId,
-                            Price = variant.Price,
-                            StockQuantity = variant.StockQuantity,
-                            VariantImage = variant.VariantImage,
-                            Status = variant.Status,
-                            VariantAttributes = variant
-                                .VariantAttributes.Select(attr => new GetVariantAttributeResDto
-                                {
-                                    VariantNameId = attr.VariantNameId,
-                                    Name = attr.VariantName.Name,
-                                    Value = attr.Value,
-                                })
-                                .ToList(),
-                        })
-                        .ToList(),
-                    Reviews = result
-                        .Data.Reviews.Where(review => review.Status == GeneralStatus.Active)
-                        .OrderBy(review => review.IsTop)
-                        .Take(5) // Take the top 5 reviews
-                        .Select(x => new GetProductReviewResDto
-                        {
-                            ReviewId = x.ReviewId,
-                            Rating = x.Rating,
-                            Comment = x.Comment,
-                            CreatedAt = x.CreatedAt,
-                            CreatedBy = x.User.FullName,
-                            UserImageUrl = x.User.Avatar,
-                            UserName = x.User.FullName,
-                        })
-                        .ToList(),
+                    Variants = productVariants,
+                    Reviews = top5ProductReviews,
                 },
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,

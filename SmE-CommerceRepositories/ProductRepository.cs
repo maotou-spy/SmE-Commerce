@@ -171,6 +171,7 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
                 .Include(x => x.ProductAttributes)
                 .Include(x => x.ProductVariants)
                 .Include(x => x.Reviews)
+                .ThenInclude(x => x.User)
                 .Include(x => x.CreateBy)
                 .Include(x => x.ModifiedBy)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
