@@ -39,4 +39,6 @@ public class GetProductDetailsResDto
     public List<GetProductReviewResDto> Reviews { get; set; } = [];
 
     public required SeoMetadata SeoMetadata { get; set; }
+    
+    public IEnumerable<GetRelatedProductResDto> RelatedProducts { get; set; } = new List<GetRelatedProductResDto>();
 }
