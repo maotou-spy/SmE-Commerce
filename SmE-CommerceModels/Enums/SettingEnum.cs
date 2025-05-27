@@ -13,4 +13,6 @@ public class SettingEnum
     public const string TermsOfService = "TermsOfService";
     public const string PointsConversionRate = "PointsConversionRate";
     public const string PointsToMoneyRate = "PointsToMoneyRate";
+    public const string HomeLimitItem = "HomeLimitItem";
+    public const string HomeLimitReview = "HomeLimitReview";
 }

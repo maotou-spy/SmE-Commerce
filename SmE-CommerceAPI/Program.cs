@@ -126,6 +126,7 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IVariantNameService, VariantNameService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IHomepageService, HomepageService>();
 builder.Services.AddScoped<BearerTokenUtil>();
 
 #endregion

@@ -295,4 +295,35 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
             };
         }
     }
+    
+    public async Task<Return<List<Category>>> GetCategoriesByProductIdAsync(Guid productId)
+    {
+        try
+        {
+            var result = await dbContext
+                .Categories.Include(x => x.ProductCategories)
+                .ThenInclude(y => y.Product)
+                .Where(x => x.ProductCategories.Any(pc => pc.ProductId == productId))
+                .ToListAsync();
+
+            return new Return<List<Category>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = result.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Category>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
 }

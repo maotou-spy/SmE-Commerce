@@ -9,7 +9,7 @@ using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceRepositories;
 
-public class ProductRepository(SmECommerceContext dbContext) : IProductRepository
+public class ProductRepository(SmECommerceContext dbContext, ISettingRepository settingRepository) : IProductRepository
 {
     #region Product
 
@@ -472,6 +472,98 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    public async Task<Return<IEnumerable<Product>>> GetHotProductsAsync()
+    {
+        try
+        {
+            var limit = await settingRepository.GetSettingByKeyAsync(SettingEnum.HomeLimitItem);
+            var limitValue = limit.Data?.Value != null ? int.Parse(limit.Data.Value) : 12;
+            
+            var products = await dbContext.Products
+                .Where(p => p.Status == ProductStatus.Active)
+                .OrderByDescending(p => p.IsTopSeller)
+                .ThenByDescending(p => p.ModifiedAt)
+                .Take(limitValue) 
+                .ToListAsync();
+            
+            return new Return<IEnumerable<Product>>
+            {
+                Data = products,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Product>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+//     public async Task<Return<List<Product>>> GetRelatedProductsAsync(IEnumerable<Guid> categoryIds, int PageSize, int PageNumber)
+// {
+//     try
+//     {
+//         var enumerable = categoryIds as Guid[] ?? categoryIds.ToArray();
+//         if (!enumerable.Any())
+//         {
+//             return new Return<List<Product>>
+//             {
+//                 Data = null,
+//                 IsSuccess = false,
+//                 StatusCode = ErrorCode.InvalidInput
+//             };
+//         }
+//
+//         if (PageSize <= 0 || PageNumber <= 0)
+//         {
+//             return new Return<List<Product>>
+//             {
+//                 Data = null,
+//                 IsSuccess = false,
+//                 StatusCode = ErrorCode.InvalidInput,
+//                 TotalRecord = 0
+//             };
+//         }
+//
+//         var products = await dbContext.Products
+//             .Include(x => x.ProductImages)
+//             .Include(x => x.ProductVariants)
+//             .Where(p => p.ProductCategories.Any(pc => categoryIds.Contains(pc.CategoryId)))
+//             .ToListAsync();
+//
+//         if (!products.Any())
+//         {
+//             
+//         }
+//
+//         return new Return<List<Product>>
+//         {
+//             Data = products,
+//             IsSuccess = true,
+//             StatusCode = ErrorCode.Ok,
+//             InternalErrorMessage = null
+//         };
+//     }
+//     catch (Exception ex)
+//     {
+//         return new Return<List<Product>>
+//         {
+//             Data = null,
+//             IsSuccess = false,
+//             StatusCode = ErrorCode.InternalServerError,
+//             InternalErrorMessage = ex,
+//             TotalRecord = 0
+//         };
+//     }
+// }
+
     #endregion
 
     #region Product Attribute
@@ -604,6 +696,37 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         catch (Exception ex)
         {
             return new Return<ProductAttribute>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+    
+    public async Task<Return<List<ProductAttribute>>> GetProductAttributesByProductIdAsync(
+        Guid productId
+    )
+    {
+        try
+        {
+            var productAttributes = await dbContext
+                .ProductAttributes.Where(x => x.ProductId == productId)
+                .ToListAsync();
+
+            return new Return<List<ProductAttribute>>
+            {
+                Data = productAttributes,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = productAttributes.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<ProductAttribute>>
             {
                 Data = null,
                 IsSuccess = false,
@@ -1098,5 +1221,70 @@ public class ProductRepository(SmECommerceContext dbContext) : IProductRepositor
         }
     }
 
+    #endregion
+
+    #region Review
+    public async Task<Return<List<Review>>> GetProductReviewsByProductIdAsync(Guid productId)
+    {
+        try
+        {
+            var reviews = await dbContext
+                .Reviews.Where(x => x.ProductId == productId)
+                .Include(x => x.User)
+                .ToListAsync();
+
+            return new Return<List<Review>>
+            {
+                Data = reviews,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = reviews.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Review>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
+
+    public async Task<Return<List<Review>>> GetIsTopReviewAsync()
+    {
+        try
+        {
+            var limit = await settingRepository.GetSettingByKeyAsync(SettingEnum.HomeLimitReview);
+            var limitValue = limit.Data?.Value != null ? int.Parse(limit.Data.Value) : 5;
+            var reviews = await dbContext
+                .Reviews.Where(x => x.IsTop && x.Status == GeneralStatus.Active)
+                .Include(x => x.User)
+                .Take(limitValue)
+                .ToListAsync();
+
+            return new Return<List<Review>>
+            {
+                Data = reviews,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = reviews.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Review>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0,
+            };
+        }
+    }
     #endregion
 }

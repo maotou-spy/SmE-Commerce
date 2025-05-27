@@ -1,5 +1,6 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.Product;
+using SmE_CommerceModels.ResponseDtos.Product;
 using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceRepositories.Interface;
@@ -60,4 +61,14 @@ public interface IProductRepository
     Task<Return<bool>> BulkAddVariantAttributeAsync(List<VariantAttribute> variantAttributes);
 
     Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid? productVariantId);
+    
+    Task<Return<List<Review>>> GetProductReviewsByProductIdAsync(Guid productId);
+
+    Task<Return<List<ProductAttribute>>> GetProductAttributesByProductIdAsync( Guid productId );
+    
+    // Task<Return<List<Product>>> GetRelatedProductsAsync(IEnumerable<Category> categoryIds, int PageSize, int PageNumber);
+
+    Task<Return<IEnumerable<Product>>> GetHotProductsAsync();
+
+    Task<Return<List<Review>>> GetIsTopReviewAsync();
 }
