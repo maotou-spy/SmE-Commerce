@@ -29,6 +29,7 @@ public static class ErrorCode
     public const string MinimumVariantRequired = "021";
     public const string InvalidInput = "022";
     public const string InvalidStatus = "023";
+    public const string ConfirmPasswordNotMatch = "024";
 
     // Not found
     public const string ProductNotFound = "101";

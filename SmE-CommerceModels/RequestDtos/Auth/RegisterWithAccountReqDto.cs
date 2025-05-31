@@ -30,4 +30,8 @@ public class RegisterWithAccountReqDto
         ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and must be at least 8 characters long."
     )]
     public string Password { get; set; } = null!;
+    
+    [Required]
+    [Compare("Password", ErrorMessage = "Confirm password does not match.")]
+    public string ConfirmPassword { get; set; } = null!;
 }
