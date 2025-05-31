@@ -44,6 +44,11 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     {
         try
         {
+            if (reqDto.ConfirmPassword.Trim() != reqDto.Password.Trim())
+            {
+                return Helper.GetErrorResponse(ErrorCode.ConfirmPasswordNotMatch);
+            } 
+            
             var result = await authService.RegisterWithAccount(reqDto);
 
             if (result.IsSuccess)

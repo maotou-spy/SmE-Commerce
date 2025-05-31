@@ -477,7 +477,7 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
         try
         {
             var limit = await settingRepository.GetSettingByKeyAsync(SettingEnum.HomeLimitItem);
-            var limitValue = limit.Data?.Value != null ? int.Parse(limit.Data.Value) : 12;
+            var limitValue = limit.Data?.Value != null ? int.Parse(limit.Data.Value) : 10;
             
             var products = await dbContext.Products
                 .Where(p => p.Status == ProductStatus.Active)

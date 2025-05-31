@@ -15,4 +15,5 @@ public class SettingEnum
     public const string PointsToMoneyRate = "PointsToMoneyRate";
     public const string HomeLimitItem = "HomeLimitItem";
     public const string HomeLimitReview = "HomeLimitReview";
+    public const string BlogLimitItem = "BlogLimitItem";
 }
