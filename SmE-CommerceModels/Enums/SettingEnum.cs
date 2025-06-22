@@ -16,4 +16,5 @@ public class SettingEnum
     public const string HomeLimitItem = "HomeLimitItem";
     public const string HomeLimitReview = "HomeLimitReview";
     public const string ThresholdWarning = "ThresholdWarning"; // Threshold for low-stock warning
+    public const string BlogLimitItem = "BlogLimitItem";
 }
