@@ -96,7 +96,7 @@ public class AuthService(
                     IsSuccess = false,
                     StatusCode = ErrorCode.EmailAlreadyExists
                 };
-
+            
             existedUser = await userRepository.GetUserByPhoneAsync(reqDto.Phone);
             if (existedUser is { IsSuccess: true, Data: not null })
                 return new Return<bool>
