@@ -61,11 +61,11 @@ public interface IProductRepository
     Task<Return<bool>> BulkAddVariantAttributeAsync(List<VariantAttribute> variantAttributes);
 
     Task<Return<ProductVariant>> GetProductVariantByIdForUpdateAsync(Guid? productVariantId);
-    
+
     Task<Return<List<Review>>> GetProductReviewsByProductIdAsync(Guid productId);
 
-    Task<Return<List<ProductAttribute>>> GetProductAttributesByProductIdAsync( Guid productId );
-    
+    Task<Return<List<ProductAttribute>>> GetProductAttributesByProductIdAsync(Guid productId);
+
     // Task<Return<List<Product>>> GetRelatedProductsAsync(IEnumerable<Category> categoryIds, int PageSize, int PageNumber);
 
     Task<Return<IEnumerable<Product>>> GetHotProductsAsync();
