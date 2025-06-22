@@ -339,6 +339,7 @@ public class CartService(
                 UserId = currentCustomer.Data.UserId,
                 Quantity = cartItem.Quantity,
                 Price = price,
+                CreatedAt = DateTime.Now
             };
 
             var addResult = await cartRepository.AddToCartAsync(newCartItem);

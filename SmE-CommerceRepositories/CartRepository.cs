@@ -161,21 +161,18 @@ public class CartRepository(SmECommerceContext defaultdbContext) : ICartReposito
     {
         try
         {
-            var query = defaultdbContext
+            var carts = await defaultdbContext
                 .CartItems.Where(x => x.UserId == userId)
                 .Include(x => x.ProductVariant)
                 .Include(x => x.Product)
-                .AsQueryable();
-
-            var totalRecords = await query.CountAsync();
-
-            var carts = await query.ToListAsync();
+                .OrderBy(x => x.CreatedAt)
+                .ToListAsync();
 
             return new Return<List<CartItem>>
             {
                 Data = carts,
                 IsSuccess = true,
-                TotalRecord = totalRecords,
+                TotalRecord = carts.Count,
                 StatusCode = carts.Count == 0 ? ErrorCode.CartNotFound : ErrorCode.Ok,
             };
         }

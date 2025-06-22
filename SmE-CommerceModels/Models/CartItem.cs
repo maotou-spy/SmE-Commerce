@@ -32,6 +32,9 @@ public class CartItem
     [ForeignKey("ProductId")]
     [InverseProperty("CartItems")]
     public virtual Product Product { get; set; } = null!;
+    
+    [Column("createdAt", TypeName = "timestamp without time zone")]
+    public DateTime? CreatedAt { get; set; }
 
     [ForeignKey("ProductVariantId")]
     [InverseProperty("CartItems")]
