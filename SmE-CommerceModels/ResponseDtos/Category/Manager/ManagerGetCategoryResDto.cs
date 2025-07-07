@@ -4,5 +4,7 @@ public class ManagerGetCategoryResDto : GetCategoryResDto
 {
     public required string Status { get; set; }
 
-    public AuditMetadata? AuditMetadata { get; set; }
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
 }

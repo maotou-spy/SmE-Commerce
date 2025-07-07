@@ -9,11 +9,18 @@ public interface ICategoryService
 {
     Task<Return<bool>> AddCategoryAsync(AddCategoryReqDto req);
 
-    Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(string? name, int pageNumber,
-        int pageSize);
+    Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(
+        string? name,
+        int pageNumber,
+        int pageSize
+    );
 
-    Task<Return<IEnumerable<ManagerGetCategoryResDto>>> GetCategoriesForManagerAsync(string? name, int pageNumber,
-        int pageSize);
+    Task<Return<IEnumerable<ManagerGetCategoryResDto>>> GetCategoriesForManagerAsync(
+        string? name,
+        string? status,
+        int pageNumber,
+        int pageSize
+    );
 
     Task<Return<bool>> UpdateCategoryDetailAsync(Guid id, AddCategoryReqDto req);
     Task<Return<bool>> DeleteCategoryAsync(Guid id);

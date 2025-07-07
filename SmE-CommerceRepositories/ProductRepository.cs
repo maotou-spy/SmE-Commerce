@@ -22,7 +22,7 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
         try
         {
             // Step 1: Build a query with only necessary fields
-            var query = dbContext.Set<Product>().AsQueryable();
+            var query = dbContext.Products.AsQueryable();
 
             // Apply search filter
             if (!string.IsNullOrEmpty(filter.SearchTerm))
@@ -105,30 +105,6 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
             // Apply pagination
             var totalCount = await query.CountAsync();
             var items = await query
-                .Select(p => new Product
-                {
-                    ProductId = p.ProductId,
-                    ProductCode = p.ProductCode,
-                    Name = p.Name,
-                    NameUnaccent = p.NameUnaccent,
-                    Price = p.Price,
-                    StockQuantity = p.StockQuantity,
-                    SoldQuantity = p.SoldQuantity,
-                    Status = p.Status,
-                    CreatedAt = p.CreatedAt,
-                    CreateById = p.CreateById,
-                    CreateBy =
-                        p.CreateBy != null ? new User { FullName = p.CreateBy.FullName } : null,
-                    ModifiedAt = p.ModifiedAt,
-                    ModifiedById = p.ModifiedById,
-                    ModifiedBy =
-                        p.ModifiedBy != null ? new User { FullName = p.ModifiedBy.FullName } : null,
-                    IsTopSeller = p.IsTopSeller,
-                    PrimaryImage = p.PrimaryImage,
-                    AverageRating = p.AverageRating,
-                })
-                // .Include(x => x.CreateBy)
-                // .Include(x => x.ModifiedBy)
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();

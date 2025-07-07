@@ -837,7 +837,7 @@ public class ProductService(
             if (filter.PageSize <= 0)
                 filter.PageSize = PagingEnum.PageSize;
 
-            // Step 1: Check user role (Manager)
+            // Step 1: Check user's role (Manager)
             var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<List<ManagerGetProductsResDto>>
@@ -879,15 +879,8 @@ public class ProductService(
                     IsTopSeller = p.IsTopSeller,
                     PrimaryImage = p.PrimaryImage,
                     AverageRating = p.AverageRating,
-                    AuditMetadata = new AuditMetadata
-                    {
-                        CreatedById = p.CreateById,
-                        CreatedAt = p.CreatedAt,
-                        CreatedBy = p.CreateBy?.FullName,
-                        ModifiedById = p.ModifiedById,
-                        ModifiedAt = p.ModifiedAt,
-                        ModifiedBy = p.ModifiedBy?.FullName,
-                    },
+                    CreatedAt = p.CreatedAt,
+                    ModifiedAt = p.ModifiedAt,
                 })
                 .ToList();
 

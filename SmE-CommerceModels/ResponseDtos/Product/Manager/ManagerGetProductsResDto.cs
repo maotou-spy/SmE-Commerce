@@ -2,5 +2,7 @@
 
 public class ManagerGetProductsResDto : GetProductsResDto
 {
-    public AuditMetadata? AuditMetadata { get; set; }
+    public DateTime? CreatedAt { get; set; }
+
+    public DateTime? ModifiedAt { get; set; }
 }

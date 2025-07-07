@@ -75,6 +75,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
     [Authorize]
     public async Task<IActionResult> GetCategoriesForManagerAsync(
         string? name,
+        string? status,
         int pageNumber = PagingEnum.PageNumber,
         int pageSize = PagingEnum.PageSize
     )
@@ -83,6 +84,7 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
         {
             var result = await categoryService.GetCategoriesForManagerAsync(
                 name,
+                status,
                 pageNumber,
                 pageSize
             );
