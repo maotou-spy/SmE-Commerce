@@ -22,4 +22,6 @@ public interface ICategoryRepository
     Task<Return<IEnumerable<Category>>> GetProductsByCategoryIdAsync(Guid id);
     Task<Return<Category>> GetCategoryByIdForUpdateAsync(Guid categoryId);
     Task<Return<List<Category>>> GetCategoriesByProductIdAsync(Guid productId);
+    
+    Task<Return<IEnumerable<Category>>> GetCategoriesForCustomerAsync();
 }

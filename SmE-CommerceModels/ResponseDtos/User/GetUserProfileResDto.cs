@@ -15,4 +15,8 @@ public class GetUserProfileResDto
     public DateOnly? Dob { get; set; }
 
     public string? Avatar { get; set; }
+    
+    public bool? isPhoneVerified { get; set; }
+    
+    public bool? isEmailVerified { get; set; }
 }

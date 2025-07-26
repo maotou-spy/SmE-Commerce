@@ -150,7 +150,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = currentUser.Data.Point,
                 Dob = currentUser.Data.DateOfBirth,
                 Gender = currentUser.Data.Gender,
-                Avatar = currentUser.Data.Avatar
+                Avatar = currentUser.Data.Avatar,
+                isEmailVerified = currentUser.Data.IsEmailVerified,
+                isPhoneVerified = currentUser.Data.IsPhoneVerified
             };
 
             return new Return<GetUserProfileResDto>
@@ -204,7 +206,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Point = user.Data?.Point,
                 Dob = user.Data?.DateOfBirth,
                 Gender = user.Data?.Gender,
-                Avatar = user.Data?.Avatar
+                Avatar = user.Data?.Avatar,
+                isEmailVerified = user.Data?.IsEmailVerified,
+                isPhoneVerified = user.Data?.IsPhoneVerified
             };
 
             return new Return<GetUserProfileResDto>
