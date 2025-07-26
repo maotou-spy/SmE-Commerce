@@ -126,6 +126,68 @@ public class CategoryRepository(SmECommerceContext dbContext) : ICategoryReposit
         }
     }
 
+    public async Task<Return<IEnumerable<Category>>> GetCategoriesForCustomerAsync()
+    {
+        try
+        {
+            var query = dbContext.Categories
+                .Where(x => x.Status == GeneralStatus.Active);
+
+            var totalRecords = await query.CountAsync();
+            var result = await query.ToListAsync();
+
+            return new Return<IEnumerable<Category>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Category>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
+    public async Task<Return<IEnumerable<Category>>> GetCategoriesForCustomerAsync()
+    {
+        try
+        {
+            var query = dbContext.Categories
+                .Where(x => x.Status == GeneralStatus.Active);
+
+            var totalRecords = await query.CountAsync();
+            var result = await query.ToListAsync();
+
+            return new Return<IEnumerable<Category>>
+            {
+                Data = result,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = totalRecords
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Category>>
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
+                TotalRecord = 0
+            };
+        }
+    }
+
     public async Task<Return<List<Category>>> GetCategoriesByIdsAsync(List<Guid> ids)
     {
         try

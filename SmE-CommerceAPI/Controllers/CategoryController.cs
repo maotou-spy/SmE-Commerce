@@ -40,20 +40,12 @@ public class CategoryController(ICategoryService categoryService, ILogger<AuthCo
 
     [HttpGet("categories")]
     [OpenApiOperation("Get Active Categories", "Get Active Categories")]
-    [Authorize]
-    public async Task<IActionResult> GetCategoriesForCustomerAsync(
-        string? name,
-        int pageNumber = PagingEnum.PageNumber,
-        int pageSize = PagingEnum.PageSize
-    )
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCategoriesForCustomerAsync()
     {
         try
         {
-            var result = await categoryService.GetCategoriesForCustomerAsync(
-                name,
-                pageNumber,
-                pageSize
-            );
+            var result = await categoryService.GetCategoriesForCustomerAsync();
             if (result.IsSuccess)
                 return StatusCode(200, result);
             if (result.InternalErrorMessage is not null)

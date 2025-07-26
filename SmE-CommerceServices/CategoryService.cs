@@ -71,20 +71,11 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
         }
     }
 
-    public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync(
-        string? name,
-        int pageNumber,
-        int pageSize
-    )
+    public async Task<Return<IEnumerable<GetCategoryResDto>>> GetCategoriesForCustomerAsync()
     {
         try
         {
-            var result = await categoryRepository.GetCategoriesAsync(
-                name,
-                GeneralStatus.Active,
-                pageNumber,
-                pageSize
-            );
+            var result = await categoryRepository.GetCategoriesForCustomerAsync();
             if (!result.IsSuccess)
                 return new Return<IEnumerable<GetCategoryResDto>>
                 {
