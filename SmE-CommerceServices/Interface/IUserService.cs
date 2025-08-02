@@ -7,13 +7,12 @@ namespace SmE_CommerceServices.Interface;
 
 public interface IUserService
 {
-    Task<Return<IEnumerable<User>>> GetAllUsersAsync(
+    Task<Return<IEnumerable<AdminGetUsersByRoleResDto>>> GetUsersByRoleAsync(
+        string? searchTerm,
         string? status,
+        string? role,
         int? pageSize,
-        int? pageNumber,
-        string? phone,
-        string? email,
-        string? name
+        int? pageNumber
     );
 
     Task<Return<bool>> CreateUser(CreateUserReqDto req);

@@ -5,13 +5,12 @@ namespace SmE_CommerceRepositories.Interface;
 
 public interface IUserRepository
 {
-    Task<Return<IEnumerable<User>>> GetAllUsersAsync(
+    Task<Return<IEnumerable<User>>> GetUsersByRoleAsync(
+        string? searchTerm,
         string? status,
-        int? pageSize,
-        int? pageNumber,
-        string? phone,
-        string? email,
-        string? name
+        string? role,
+        int pageSize,
+        int pageNumber
     );
 
     Task<Return<User>> GetUserByIdAsync(Guid id);

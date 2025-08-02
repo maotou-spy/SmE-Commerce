@@ -627,8 +627,14 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.UserId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.IsEmailVerified).HasDefaultValue(false);
             entity.Property(e => e.IsPhoneVerified).HasDefaultValue(false);
+            entity.Property(e => e.NumberOfOrders).HasDefaultValue(0);
+            entity.Property(e => e.TotalSpent).HasDefaultValue(0);
             entity.Property(e => e.Point).HasDefaultValue(0);
             entity.Property(e => e.Status).HasComment("Values: active, inactive, suspended");
+            entity
+                .Property(e => e.NumberOfOrders)
+                .HasComment("Total number of orders placed by the user");
+            entity.Property(e => e.TotalSpent).HasComment("Total amount spent by the user");
 
             entity
                 .HasOne(d => d.CreateBy)

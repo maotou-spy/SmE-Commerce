@@ -2,8 +2,12 @@
 
 public static class RoleEnum
 {
-    public const string Customer = "Customer";
+    public const string Customer = "customer";
 
-    public const string Manager = "Manager";
-    public const string Staff = "Staff";
+    // Administrator: user management, notification management, log management
+    public const string Administrator = "administrator";
+
+    // Manager: product management, order management, customer management, discount management
+    public const string Manager = "manager";
+    public const string Staff = "staff";
 }

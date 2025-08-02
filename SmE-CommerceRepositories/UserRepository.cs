@@ -4,53 +4,74 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
+using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceRepositories;
 
 public class UserRepository(SmECommerceContext dbContext) : IUserRepository
 {
-    public async Task<Return<IEnumerable<User>>> GetAllUsersAsync(
+    public async Task<Return<IEnumerable<User>>> GetUsersByRoleAsync(
+        string? searchTerm,
         string? status,
-        int? pageSize,
-        int? pageNumber,
-        string? phone,
-        string? email,
-        string? name
+        string? role,
+        int pageSize,
+        int pageNumber
     )
     {
         try
         {
-            var query = dbContext.Users.Where(x => x.Status != GeneralStatus.Deleted);
+            var query = dbContext
+                .Users.AsNoTracking()
+                .Include(u => u.AddressUsers.Where(a => a.IsDefault))
+                .Where(x => x.Status != GeneralStatus.Deleted);
 
-            if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(x => x.Status == status);
-
-            if (!string.IsNullOrWhiteSpace(phone))
-                query = query.Where(x => x.Phone != null && x.Phone.Contains(phone));
-
-            if (!string.IsNullOrWhiteSpace(email))
-                query = query.Where(x => x.Email.Contains(email));
-
-            if (!string.IsNullOrWhiteSpace(name))
-                query = query.Where(x => x.FullName.Contains(name));
-
-            var totalRecord = await query.CountAsync();
-
-            if (pageSize is > 0)
+            if (!string.IsNullOrWhiteSpace(role))
             {
-                pageNumber ??= 1;
-                query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
+                role = role.Trim().ToLower();
+                query = query.Where(x => x.Role.Contains(role));
+            }
+            else
+            {
+                query = query.Where(x => x.Role == RoleEnum.Customer);
             }
 
-            var result = await query.ToListAsync();
+            if (!string.IsNullOrWhiteSpace(status) && status != GeneralStatus.Deleted)
+                query = query.Where(x => x.Status == status);
 
-            // Trả về kết quả
+            var allUsers = await query.ToListAsync(); // fetch full result first
+
+            // Apply search term filtering on client side (case + accent insensitive)
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var normalizedSearch = StringUtils.SimplifyText(searchTerm);
+                allUsers = allUsers
+                    .Where(x =>
+                        StringUtils.SimplifyText(x.FullName).Contains(normalizedSearch)
+                        || x.Email.Contains(normalizedSearch)
+                        || (!string.IsNullOrEmpty(x.Phone) && x.Phone.Contains(searchTerm))
+                    )
+                    .ToList();
+            }
+
+            var totalRecord = allUsers.Count;
+
+            if (pageSize <= 0)
+                return new Return<IEnumerable<User>>
+                {
+                    Data = allUsers,
+                    IsSuccess = true,
+                    StatusCode = allUsers.Count != 0 ? ErrorCode.Ok : ErrorCode.UserNotFound,
+                    TotalRecord = totalRecord,
+                };
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            allUsers = allUsers.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
             return new Return<IEnumerable<User>>
             {
-                Data = result,
+                Data = allUsers,
                 IsSuccess = true,
-                StatusCode = result.Count != 0 ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = totalRecord
+                StatusCode = allUsers.Count != 0 ? ErrorCode.Ok : ErrorCode.UserNotFound,
+                TotalRecord = totalRecord,
             };
         }
         catch (Exception ex)
@@ -60,9 +81,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -80,7 +100,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0
+                TotalRecord = result != null ? 1 : 0,
             };
         }
         catch (Exception ex)
@@ -92,7 +112,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -110,7 +130,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0
+                TotalRecord = result != null ? 1 : 0,
             };
         }
         catch (Exception ex)
@@ -122,7 +142,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -140,7 +160,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0
+                TotalRecord = result != null ? 1 : 0,
             };
         }
         catch (Exception ex)
@@ -152,7 +172,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -170,7 +190,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = result,
                 IsSuccess = true,
                 StatusCode = result != null ? ErrorCode.Ok : ErrorCode.UserNotFound,
-                TotalRecord = result != null ? 1 : 0
+                TotalRecord = result != null ? 1 : 0,
             };
         }
         catch (Exception ex)
@@ -182,7 +202,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -200,7 +220,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
 
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -212,7 +232,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -229,7 +249,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = user,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -241,7 +261,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 StatusCode = ErrorCode.InternalServerError,
 
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -263,7 +283,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = discountCodes,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = discountCodes.Count
+                TotalRecord = discountCodes.Count,
             };
         }
         catch (Exception e)
@@ -274,7 +294,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }

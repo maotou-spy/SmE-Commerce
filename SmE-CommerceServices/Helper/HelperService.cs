@@ -43,7 +43,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            StatusCode = ErrorCode.Ok
+            StatusCode = ErrorCode.Ok,
         };
     }
 
@@ -58,9 +58,10 @@ public class HelperService(
         var isAuthorized = role switch
         {
             nameof(RoleEnum.Customer) => user.Data.Role == RoleEnum.Customer,
+            nameof(RoleEnum.Administrator) => user.Data.Role == RoleEnum.Administrator,
             nameof(RoleEnum.Staff) => user.Data.Role is RoleEnum.Staff or RoleEnum.Manager,
             nameof(RoleEnum.Manager) => user.Data.Role == RoleEnum.Manager,
-            _ => false
+            _ => false,
         };
 
         if (!isAuthorized)
@@ -70,7 +71,7 @@ public class HelperService(
         {
             IsSuccess = true,
             Data = user.Data,
-            StatusCode = ErrorCode.Ok
+            StatusCode = ErrorCode.Ok,
         };
     }
 
@@ -89,7 +90,7 @@ public class HelperService(
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
-                ValidateAudience = false
+                ValidateAudience = false,
             },
             out var validatedToken
         );

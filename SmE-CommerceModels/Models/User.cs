@@ -35,6 +35,12 @@ public class User
     [Column("point")]
     public int Point { get; set; }
 
+    [Column("numberOfOrders")]
+    public int NumberOfOrders { get; set; } = 0;
+
+    [Column("totalSpent")]
+    public decimal TotalSpent { get; set; } = 0;
+
     /// <summary>
     ///     Values: active, inactive, suspended
     /// </summary>

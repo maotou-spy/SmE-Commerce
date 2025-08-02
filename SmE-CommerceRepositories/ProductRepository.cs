@@ -27,10 +27,7 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
             // Apply search filter
             if (!string.IsNullOrEmpty(filter.SearchTerm))
             {
-                var searchTerm = VietnameseStringNormalizer
-                    .Normalize(filter.SearchTerm)
-                    .ToLower()
-                    .Trim();
+                var searchTerm = StringUtils.SimplifyText(filter.SearchTerm).ToLower().Trim();
 
                 // Use EF.Functions.ToTsVector for full-text search (PostgreSQL)
                 query = query.Where(p =>

@@ -49,26 +49,24 @@ public class UserController(
     }
 
     [HttpGet]
-    [OpenApiOperation("Get All Users", "Get all users")]
+    [OpenApiOperation("Get All Users by role", "Get all users by Admin and Manager")]
     [Authorize]
     public async Task<IActionResult> GetAllUsers(
-        [FromQuery] string? status,
-        [FromQuery] int? pageSize,
-        [FromQuery] int? pageNumber,
-        [FromQuery] string? phone,
-        [FromQuery] string? email,
-        [FromQuery] string name
+        [FromQuery] string? searchTerm,
+        string? role,
+        string? status,
+        int? pageSize,
+        int? pageNumber
     )
     {
         try
         {
-            var result = await userService.GetAllUsersAsync(
+            var result = await userService.GetUsersByRoleAsync(
+                searchTerm,
                 status,
+                role,
                 pageSize,
-                pageNumber,
-                phone,
-                email,
-                name
+                pageNumber
             );
 
             if (result.IsSuccess)

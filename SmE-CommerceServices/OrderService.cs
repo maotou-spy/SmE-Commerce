@@ -7,6 +7,7 @@ using SmE_CommerceModels.ResponseDtos.Order;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceServices;
 
@@ -90,24 +91,6 @@ public class OrderService(
                 InternalErrorMessage = e,
             };
         }
-    }
-
-    private static string CreateFullAddressString(Address? address)
-    {
-        if (address == null)
-            return string.Empty;
-
-        var addressParts = new List<string>
-        {
-            address.Address1.Trim(),
-            address.Ward.Trim(),
-            address.District.Trim(),
-            address.City.Trim(),
-        }
-            .Where(part => !string.IsNullOrWhiteSpace(part))
-            .ToList();
-
-        return string.Join(", ", addressParts);
     }
 
     #endregion
@@ -768,7 +751,7 @@ public class OrderService(
                 FullName = order.Data.User.FullName,
                 ReceiverName = order.Data.Address.ReceiverName,
                 ReceiverPhone = order.Data.Address.ReceiverPhone,
-                AddressFull = CreateFullAddressString(order.Data.Address),
+                AddressFull = StringUtils.CreateFullAddressString(order.Data.Address),
                 TotalAmount = order.Data.TotalAmount,
                 ShippingFee = order.Data.ShippingFee,
                 DiscountCode = order.Data.DiscountCode?.Code,
@@ -794,7 +777,7 @@ public class OrderService(
                         ProductName = x.ProductName,
                         VariantName =
                             x is { ProductVariantId: not null, ProductVariant: not null }
-                            && x.ProductVariant.VariantAttributes.Any()
+                            && x.ProductVariant.VariantAttributes.Count != 0
                                 ? string.Join(
                                     "-",
                                     x.ProductVariant.VariantAttributes.Select(v => v.Value)
@@ -932,265 +915,206 @@ public class OrderService(
     {
         try
         {
+            // Validate current manager
             var validUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Manager);
             if (!validUser.IsSuccess || validUser.Data == null)
-            {
                 return new Return<bool>
                 {
-                    Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.UserNotFound,
+                    StatusCode = validUser.StatusCode,
                     InternalErrorMessage = validUser.InternalErrorMessage,
                 };
-            }
 
-            // Validate input
             if (!req.OrderIds.Any() || string.IsNullOrEmpty(req.Status))
-            {
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidInput,
-                };
-            }
+                return new Return<bool> { IsSuccess = false, StatusCode = ErrorCode.InvalidInput };
 
             var orders = await orderRepository.GetOrdersByIdsAsync(req.OrderIds);
-            if (!orders.Any())
-            {
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.OrderNotFound,
-                    TotalRecord = 0,
-                };
-            }
+            if (orders.Count == 0)
+                return new Return<bool> { IsSuccess = false, StatusCode = ErrorCode.OrderNotFound };
 
             var validTransitions = new Dictionary<string, List<string>>
             {
                 { OrderStatus.Pending, [OrderStatus.Stuffing, OrderStatus.Rejected] },
                 { OrderStatus.Stuffing, [OrderStatus.Shipped, OrderStatus.Rejected] },
+                { OrderStatus.Shipped, [OrderStatus.Completed] },
             };
 
             if (
-                orders.Any(order =>
-                    !validTransitions.ContainsKey(order.Status)
-                    || !validTransitions[order.Status].Contains(req.Status)
+                orders.Any(o =>
+                    !validTransitions.TryGetValue(o.Status, out var targets)
+                    || !targets.Contains(req.Status)
                 )
             )
-            {
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidStatus,
-                };
-            }
+                return new Return<bool> { IsSuccess = false, StatusCode = ErrorCode.InvalidStatus };
 
             using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-            try
+            var newStatus = req.Status;
+            var newReason = req.Reason?.Trim();
+            var now = DateTime.Now;
+
+            // Update orders
+            foreach (var order in orders)
             {
-                var newReason = req.Reason?.Trim() ?? null;
-                var newStatus = req.Status;
-                orders.ForEach(order =>
+                order.Status = newStatus;
+                order.ModifiedAt = now;
+                order.ModifiedById = validUser.Data.UserId;
+            }
+
+            var updateOrders = await orderRepository.UpdateOrderStatusRangeAsync(orders);
+            if (!updateOrders.IsSuccess || !updateOrders.Data)
+                return new Return<bool>
                 {
-                    order.Status = newStatus;
-                    order.ModifiedAt = DateTime.Now;
-                    order.ModifiedById = validUser.Data.UserId;
-                });
-                var updateResult = await orderRepository.UpdateOrderStatusRangeAsync(orders);
-                if (!updateResult.IsSuccess || !updateResult.Data)
-                {
-                    return new Return<bool>
-                    {
-                        Data = false,
-                        IsSuccess = false,
-                        StatusCode = updateResult.StatusCode,
-                        InternalErrorMessage = updateResult.InternalErrorMessage,
-                    };
-                }
-                
-                var now = DateTime.Now;
-                // Update order status history
-                var orderHistory = orders.Select(o => new OrderStatusHistory
+                    IsSuccess = false,
+                    StatusCode = updateOrders.StatusCode,
+                    InternalErrorMessage = updateOrders.InternalErrorMessage,
+                };
+
+            // Add order status history
+            var histories = orders
+                .Select(o => new OrderStatusHistory
                 {
                     OrderId = o.OrderId,
                     Status = newStatus,
                     Reason = newReason,
                     ModifiedAt = now,
                     ModifiedById = validUser.Data.UserId,
-                }).ToList();
-                var newOrderStatusHistory =
-                    await orderRepository.CreateRangeOrderStatusHistoriesAsync(orderHistory);
-                if (!newOrderStatusHistory.IsSuccess || newOrderStatusHistory.Data == null)
-                {
-                    return new Return<bool>
-                    {
-                        Data = false,
-                        IsSuccess = false,
-                        StatusCode = newOrderStatusHistory.StatusCode,
-                        InternalErrorMessage = newOrderStatusHistory.InternalErrorMessage,
-                    };
-                }
-                if (newStatus != OrderStatus.Rejected)
-                {
-                    transaction.Complete();
-                    return new Return<bool>
-                    {
-                        Data = true,
-                        IsSuccess = true,
-                        StatusCode = ErrorCode.Ok,
-                        TotalRecord = orders.Count,
-                    };
-                }
+                })
+                .ToList();
 
-                // if change to status: rejected => return products to stock
-                foreach (var item in orders.SelectMany(order => order.OrderItems))
+            var createHistories = await orderRepository.CreateRangeOrderStatusHistoriesAsync(
+                histories
+            );
+            if (!createHistories.IsSuccess)
+                return new Return<bool>
                 {
-                    if (item.ProductVariantId.HasValue)
-                    {
-                        var variant = await productRepository.GetProductVariantByIdForUpdateAsync(
-                            item.ProductVariantId.Value
-                        );
-                        if (!variant.IsSuccess || variant.Data == null)
-                        {
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = variant.StatusCode,
-                                InternalErrorMessage = variant.InternalErrorMessage,
-                            };
-                        }
-                        variant.Data.StockQuantity += item.Quantity;
-                        variant.Data.SoldQuantity -= item.Quantity;
-                        variant.Data.ModifiedAt = now;
-                        variant.Data.ModifiedById = validUser.Data.UserId;
-                        // if (variant.Data.StockQuantity > 0)
-                        //     variant.Data.Status = ProductStatus.Active;
-                        var returnedVariant = await productRepository.UpdateProductVariantAsync(
-                            variant.Data
-                        );
-                        if (!returnedVariant.IsSuccess)
-                        {
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = returnedVariant.StatusCode,
-                                InternalErrorMessage = returnedVariant.InternalErrorMessage,
-                            };
-                        }
-                    }
-                    else
-                    {
-                        var product = await productRepository.GetProductByIdForUpdateAsync(
-                            item.ProductId
-                        );
-                        if (!product.IsSuccess || product.Data == null)
-                        {
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = product.StatusCode,
-                                InternalErrorMessage = product.InternalErrorMessage,
-                            };
-                        }
-                        product.Data.StockQuantity += item.Quantity;
-                        product.Data.SoldQuantity -= item.Quantity;
-                        product.Data.ModifiedAt = now;
-                        product.Data.ModifiedById = validUser.Data.UserId;
-                        if (product.Data.StockQuantity > 0)
-                            product.Data.Status = ProductStatus.Active;
-                        var returnedProduct = await productRepository.UpdateProductAsync(
-                            product.Data
-                        );
-                        if (!returnedProduct.IsSuccess)
-                        {
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = returnedProduct.StatusCode,
-                                InternalErrorMessage = returnedProduct.InternalErrorMessage,
-                            };
-                        }
-                    }
-                }
+                    IsSuccess = false,
+                    StatusCode = createHistories.StatusCode,
+                    InternalErrorMessage = createHistories.InternalErrorMessage,
+                };
 
-                // Update user points
-                foreach (var order in orders)
-                {
-                    var userPoint = await userRepository.GetUserByIdAsync(order.UserId);
-                    if (!userPoint.IsSuccess || userPoint.Data == null)
-                    {
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = userPoint.StatusCode,
-                            InternalErrorMessage = userPoint.InternalErrorMessage,
-                        };
-                    }
-                    if (order.PointsUsed < 0 || order.PointsEarned < 0)
-                    {
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = ErrorCode.InvalidInput,
-                            InternalErrorMessage = userPoint.InternalErrorMessage,
-                        };
-                    }
-
-                    // Return PointsUsed và divide PointsEarned
-                    userPoint.Data.Point += order.PointsUsed;
-                    userPoint.Data.ModifiedAt = now;
-                    userPoint.Data.ModifiedById = validUser.Data.UserId;
-                    var updatePoint = await userRepository.UpdateUserAsync(userPoint.Data);
-                    if (!updatePoint.IsSuccess)
-                    {
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = updatePoint.StatusCode,
-                            InternalErrorMessage = updatePoint.InternalErrorMessage,
-                        };
-                    }
-                }
-
+            // Nếu không phải rejected thì kết thúc tại đây
+            if (newStatus != OrderStatus.Rejected)
+            {
                 transaction.Complete();
                 return new Return<bool>
                 {
-                    Data = true,
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
                     TotalRecord = orders.Count,
                 };
             }
-            catch (Exception ex)
-            {
-                return new Return<bool>
+
+            // Nếu là Rejected thì rollback tồn kho và point
+            foreach (var item in orders.SelectMany(o => o.OrderItems))
+                if (item.ProductVariantId.HasValue)
                 {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.InternalServerError,
-                    InternalErrorMessage = ex,
-                };
+                    var variantResult = await productRepository.GetProductVariantByIdForUpdateAsync(
+                        item.ProductVariantId.Value
+                    );
+                    if (!variantResult.IsSuccess || variantResult.Data == null)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = variantResult.StatusCode,
+                            InternalErrorMessage = variantResult.InternalErrorMessage,
+                        };
+
+                    var variant = variantResult.Data;
+                    variant.StockQuantity += item.Quantity;
+                    variant.SoldQuantity = Math.Max(0, variant.SoldQuantity - item.Quantity);
+                    variant.ModifiedAt = now;
+                    variant.ModifiedById = validUser.Data.UserId;
+
+                    var updateVariant = await productRepository.UpdateProductVariantAsync(variant);
+                    if (!updateVariant.IsSuccess)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = updateVariant.StatusCode,
+                            InternalErrorMessage = updateVariant.InternalErrorMessage,
+                        };
+                }
+                else
+                {
+                    var productResult = await productRepository.GetProductByIdForUpdateAsync(
+                        item.ProductId
+                    );
+                    if (!productResult.IsSuccess || productResult.Data == null)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = productResult.StatusCode,
+                            InternalErrorMessage = productResult.InternalErrorMessage,
+                        };
+
+                    var product = productResult.Data;
+                    product.StockQuantity += item.Quantity;
+                    product.SoldQuantity = Math.Max(0, product.SoldQuantity - item.Quantity);
+                    product.ModifiedAt = now;
+                    product.ModifiedById = validUser.Data.UserId;
+
+                    if (product.StockQuantity > 0)
+                        product.Status = ProductStatus.Active;
+
+                    var updateProduct = await productRepository.UpdateProductAsync(product);
+                    if (!updateProduct.IsSuccess)
+                        return new Return<bool>
+                        {
+                            IsSuccess = false,
+                            StatusCode = updateProduct.StatusCode,
+                            InternalErrorMessage = updateProduct.InternalErrorMessage,
+                        };
+                }
+
+            // Trả lại điểm
+            foreach (var order in orders)
+            {
+                var userResult = await userRepository.GetUserByIdAsync(order.UserId);
+                if (!userResult.IsSuccess || userResult.Data == null)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = userResult.StatusCode,
+                        InternalErrorMessage = userResult.InternalErrorMessage,
+                    };
+
+                if (order.PointsUsed < 0 || order.PointsEarned < 0)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = ErrorCode.InvalidPointBalance,
+                    };
+
+                var user = userResult.Data;
+                user.Point += order.PointsUsed;
+                user.ModifiedAt = now;
+                user.ModifiedById = validUser.Data.UserId;
+
+                var updateUser = await userRepository.UpdateUserAsync(user);
+                if (!updateUser.IsSuccess)
+                    return new Return<bool>
+                    {
+                        IsSuccess = false,
+                        StatusCode = updateUser.StatusCode,
+                        InternalErrorMessage = updateUser.InternalErrorMessage,
+                    };
             }
+
+            transaction.Complete();
+            return new Return<bool>
+            {
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+                TotalRecord = orders.Count,
+            };
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             return new Return<bool>
             {
-                Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = e,
-                TotalRecord = 0,
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -1203,7 +1127,6 @@ public class OrderService(
         {
             var validUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
             if (!validUser.IsSuccess || validUser.Data == null)
-            {
                 return new Return<bool>
                 {
                     Data = false,
@@ -1211,11 +1134,9 @@ public class OrderService(
                     StatusCode = ErrorCode.UserNotFound,
                     InternalErrorMessage = validUser.InternalErrorMessage,
                 };
-            }
 
             var order = await orderRepository.GetOrderByIdAsync(req.OrderId, validUser.Data.UserId);
             if (!order.IsSuccess || order.Data == null)
-            {
                 return new Return<bool>
                 {
                     Data = false,
@@ -1223,19 +1144,16 @@ public class OrderService(
                     StatusCode = ErrorCode.OrderNotFound,
                     InternalErrorMessage = order.InternalErrorMessage,
                 };
-            }
 
             // Validate status
             var orderStatusValid = new List<string> { OrderStatus.Pending, OrderStatus.Shipped };
             if (!orderStatusValid.Contains(order.Data.Status))
-            {
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.InvalidStatus,
                 };
-            }
 
             using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             try
@@ -1272,7 +1190,6 @@ public class OrderService(
 
                 var orderUpdated = await orderRepository.UpdateOrderAsync(order.Data);
                 if (!orderUpdated.IsSuccess)
-                {
                     return new Return<bool>
                     {
                         Data = false,
@@ -1280,7 +1197,6 @@ public class OrderService(
                         StatusCode = orderUpdated.StatusCode,
                         InternalErrorMessage = orderUpdated.InternalErrorMessage,
                     };
-                }
 
                 // Update order status history
                 if (newStatus != null)
@@ -1297,7 +1213,6 @@ public class OrderService(
                         orderHistory
                     );
                     if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
-                    {
                         return new Return<bool>
                         {
                             Data = false,
@@ -1305,7 +1220,6 @@ public class OrderService(
                             StatusCode = orderStatusHistory.StatusCode,
                             InternalErrorMessage = orderStatusHistory.InternalErrorMessage,
                         };
-                    }
                 }
 
                 switch (newStatus)
@@ -1314,7 +1228,6 @@ public class OrderService(
                     {
                         // Return products to stock
                         foreach (var item in order.Data.OrderItems)
-                        {
                             if (item.ProductVariantId.HasValue)
                             {
                                 var variant =
@@ -1322,7 +1235,6 @@ public class OrderService(
                                         item.ProductVariantId.Value
                                     );
                                 if (!variant.IsSuccess || variant.Data == null)
-                                {
                                     return new Return<bool>
                                     {
                                         Data = false,
@@ -1330,7 +1242,6 @@ public class OrderService(
                                         StatusCode = variant.StatusCode,
                                         InternalErrorMessage = variant.InternalErrorMessage,
                                     };
-                                }
                                 variant.Data.StockQuantity += item.Quantity;
                                 variant.Data.SoldQuantity -= item.Quantity;
                                 if (variant.Data.StockQuantity > 0)
@@ -1338,7 +1249,6 @@ public class OrderService(
                                 var updateResult =
                                     await productRepository.UpdateProductVariantAsync(variant.Data);
                                 if (!updateResult.IsSuccess)
-                                {
                                     return new Return<bool>
                                     {
                                         Data = false,
@@ -1346,7 +1256,6 @@ public class OrderService(
                                         StatusCode = updateResult.StatusCode,
                                         InternalErrorMessage = updateResult.InternalErrorMessage,
                                     };
-                                }
                             }
                             else
                             {
@@ -1354,7 +1263,6 @@ public class OrderService(
                                     item.ProductId
                                 );
                                 if (!product.IsSuccess || product.Data == null)
-                                {
                                     return new Return<bool>
                                     {
                                         Data = false,
@@ -1362,7 +1270,6 @@ public class OrderService(
                                         StatusCode = product.StatusCode,
                                         InternalErrorMessage = product.InternalErrorMessage,
                                     };
-                                }
                                 product.Data.StockQuantity += item.Quantity;
                                 product.Data.SoldQuantity -= item.Quantity;
                                 if (product.Data.StockQuantity > 0)
@@ -1371,7 +1278,6 @@ public class OrderService(
                                     product.Data
                                 );
                                 if (!updateResult.IsSuccess)
-                                {
                                     return new Return<bool>
                                     {
                                         Data = false,
@@ -1379,16 +1285,13 @@ public class OrderService(
                                         StatusCode = updateResult.StatusCode,
                                         InternalErrorMessage = updateResult.InternalErrorMessage,
                                     };
-                                }
                             }
-                        }
 
                         // Update user points
                         var userPoint = await userRepository.GetUserByIdAsync(
                             validUser.Data.UserId
                         );
                         if (!userPoint.IsSuccess || userPoint.Data == null)
-                        {
                             return new Return<bool>
                             {
                                 Data = false,
@@ -1396,9 +1299,7 @@ public class OrderService(
                                 StatusCode = userPoint.StatusCode,
                                 InternalErrorMessage = userPoint.InternalErrorMessage,
                             };
-                        }
-                        if (order.Data.PointsUsed < 0)
-                        {
+                        if (order.Data.PointsUsed < 0 || order.Data.PointsEarned < 0)
                             return new Return<bool>
                             {
                                 Data = false,
@@ -1406,23 +1307,11 @@ public class OrderService(
                                 StatusCode = ErrorCode.InvalidInput,
                                 InternalErrorMessage = userPoint.InternalErrorMessage,
                             };
-                        }
-                        if (order.Data.PointsEarned < 0)
-                        {
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = ErrorCode.InvalidInput,
-                                InternalErrorMessage = userPoint.InternalErrorMessage,
-                            };
-                        }
 
                         // Return PointsUsed và divide PointsEarned
                         userPoint.Data.Point += order.Data.PointsUsed;
                         var updatePoint = await userRepository.UpdateUserAsync(userPoint.Data);
                         if (!updatePoint.IsSuccess)
-                        {
                             return new Return<bool>
                             {
                                 Data = false,
@@ -1430,7 +1319,6 @@ public class OrderService(
                                 StatusCode = updatePoint.StatusCode,
                                 InternalErrorMessage = updatePoint.InternalErrorMessage,
                             };
-                        }
 
                         break;
                     }
@@ -1438,7 +1326,6 @@ public class OrderService(
                     {
                         var user = await userRepository.GetUserByIdAsync(validUser.Data.UserId);
                         if (!user.IsSuccess || user.Data == null)
-                        {
                             return new Return<bool>
                             {
                                 Data = false,
@@ -1446,11 +1333,9 @@ public class OrderService(
                                 StatusCode = user.StatusCode,
                                 InternalErrorMessage = user.InternalErrorMessage,
                             };
-                        }
                         user.Data.Point += order.Data.PointsEarned;
                         var updatePoint = await userRepository.UpdateUserAsync(user.Data);
                         if (!updatePoint.IsSuccess)
-                        {
                             return new Return<bool>
                             {
                                 Data = false,
@@ -1458,7 +1343,6 @@ public class OrderService(
                                 StatusCode = updatePoint.StatusCode,
                                 InternalErrorMessage = updatePoint.InternalErrorMessage,
                             };
-                        }
 
                         break;
                     }
