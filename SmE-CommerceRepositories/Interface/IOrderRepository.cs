@@ -27,4 +27,6 @@ public interface IOrderRepository
     Task<Return<Order>> GetOrderByIdForUpdateAsync(Guid orderId);
     
     Task<Return<IEnumerable<OrderStatusHistory>>> CreateRangeOrderStatusHistoriesAsync(List<OrderStatusHistory> req);
+
+    Task<Return<List<Order>>> GetShippedOrdersOlderThanAsync(DateTime dateTime);
 }
