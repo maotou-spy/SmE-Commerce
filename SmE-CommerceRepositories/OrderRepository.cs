@@ -379,4 +379,44 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
             };
         }
     }
+    
+    // background task to update order status to completed (after 10 day from last modified to shipped and still havent change status to completed)
+    public async Task<Return<List<Order>>> GetShippedOrdersOlderThanAsync(DateTime dateTime)
+    {
+        try
+        {
+            var orders = await defaultdb.Orders
+                .Where(x => x.Status == OrderStatus.Shipped && x.ModifiedAt <= dateTime)
+                .Include(x => x.OrderStatusHistories)
+                .ToListAsync();
+            
+            if (orders.Count == 0)
+                return new Return<List<Order>>
+                {
+                    Data = null,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    IsSuccess = false,
+                    TotalRecord = 0
+                };
+            
+            return new Return<List<Order>>
+            {
+                Data = orders,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = orders.Count
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<List<Order>>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex
+            };
+        }
+    }
 }

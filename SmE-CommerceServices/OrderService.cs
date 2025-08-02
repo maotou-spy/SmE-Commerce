@@ -849,10 +849,9 @@ public class OrderService(
                     TotalRecord = 0,
                 };
 
-            var currentUser = currentUserIdResult.Data;
-            var userId = currentUser.Role.Equals(RoleEnum.Manager)
+            var userId = currentUserIdResult.Data.Role.Equals(RoleEnum.Manager)
                 ? Guid.Empty
-                : currentUser.UserId;
+                : currentUserIdResult.Data.UserId;
 
             // Step 2: Validation
             if (
@@ -1049,7 +1048,6 @@ public class OrderService(
                 // if change to status: rejected => return products to stock
                 foreach (var item in orders.SelectMany(order => order.OrderItems))
                 {
-                Console.WriteLine(item);
                     if (item.ProductVariantId.HasValue)
                     {
                         var variant = await productRepository.GetProductVariantByIdForUpdateAsync(
