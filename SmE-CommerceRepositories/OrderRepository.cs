@@ -21,7 +21,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
         catch (Exception ex)
@@ -32,7 +32,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -42,14 +42,16 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         try
         {
             var query = defaultdb
-                .Orders.Include(x => x.Address)
+                .Orders.AsSplitQuery()
+                .Include(x => x.Address)
                 .Include(x => x.User)
-                .Include(x => x.DiscountCode)
+                // .Include(x => x.DiscountCode)
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.ProductVariant)
                 .ThenInclude(x => x!.VariantAttributes)
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.Product)
+                .Include(x => x.OrderStatusHistories)
                 .Where(x => x.OrderId == orderId);
 
             if (userId.HasValue)
@@ -63,7 +65,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             return new Return<Order>
@@ -71,7 +73,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
         }
         catch (Exception ex)
@@ -82,7 +84,46 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
+            };
+        }
+    }
+
+    public async Task<Return<IEnumerable<Order>>> GetShippedOrdersBeforeDate(DateTime dateTime)
+    {
+        try
+        {
+            var orders = await defaultdb
+                .Orders.Include(x => x.User)
+                .Where(x => x.Status == OrderStatus.Shipped && x.CreatedAt < dateTime)
+                .ToListAsync();
+
+            if (orders.Count == 0)
+                return new Return<IEnumerable<Order>>
+                {
+                    Data = null,
+                    StatusCode = ErrorCode.OrderNotFound,
+                    IsSuccess = false,
+                    TotalRecord = 0,
+                };
+
+            return new Return<IEnumerable<Order>>
+            {
+                Data = orders,
+                StatusCode = ErrorCode.Ok,
+                IsSuccess = true,
+                TotalRecord = orders.Count,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<IEnumerable<Order>>
+            {
+                Data = null,
+                StatusCode = ErrorCode.InternalServerError,
+                IsSuccess = false,
+                TotalRecord = 0,
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -99,14 +140,14 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
             return new Return<List<Order>>
             {
                 Data = orders,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = orders.Count
+                TotalRecord = orders.Count,
             };
         }
         catch (Exception ex)
@@ -117,7 +158,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -183,12 +224,12 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                         UserId = o.User.UserId,
                         FullName = o.User.FullName,
                         Email = o.User.Email,
-                        Phone = o.User.Phone
+                        Phone = o.User.Phone,
                     },
                     TotalAmount = o.TotalAmount,
                     Status = o.Status,
                     CreatedAt = o.CreatedAt,
-                    ModifiedAt = o.ModifiedAt
+                    ModifiedAt = o.ModifiedAt,
                 })
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
@@ -201,7 +242,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.Ok,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = totalCount
+                TotalRecord = totalCount,
             };
         }
         catch (Exception ex)
@@ -214,12 +255,12 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 InternalErrorMessage = ex,
                 PageNumber = filter.PageNumber,
                 PageSize = filter.PageSize,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
 
-    public async Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req)
+    public async Task<Return<OrderStatusHistory>> AddOrderStatusHistoryAsync(OrderStatusHistory req)
     {
         try
         {
@@ -230,7 +271,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = req,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = 1,
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
         catch (Exception ex)
@@ -241,13 +282,15 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
-    
+
     // create list order status history by list orderID
-    public async Task<Return<IEnumerable<OrderStatusHistory>>> CreateRangeOrderStatusHistoriesAsync(List<OrderStatusHistory> req)
+    public async Task<Return<IEnumerable<OrderStatusHistory>>> AddRangeOrderStatusHistoriesAsync(
+        List<OrderStatusHistory> req
+    )
     {
         try
         {
@@ -258,7 +301,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = req,
                 StatusCode = ErrorCode.Ok,
                 TotalRecord = req.Count,
-                IsSuccess = true
+                IsSuccess = true,
             };
         }
         catch (Exception e)
@@ -269,7 +312,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = e
+                InternalErrorMessage = e,
             };
         }
     }
@@ -279,47 +322,47 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         try
         {
             var order = await defaultdb
-                .Orders
-                .Include(x => x.OrderStatusHistories)
+                .Orders.Include(x => x.OrderStatusHistories)
                 .FirstOrDefaultAsync(x => x.OrderId == orderId);
 
             if (order == null)
-            {
                 return new Return<Order>
                 {
                     Data = null,
                     StatusCode = ErrorCode.OrderNotFound,
                     IsSuccess = false,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
-            }
 
             await defaultdb.Database.ExecuteSqlRawAsync(
-                "SELECT * FROM public.\"Order\" WHERE \"OrderId\" = {0} FOR UPDATE", orderId);
+                "SELECT * FROM public.\"Order\" WHERE \"OrderId\" = {0} FOR UPDATE",
+                orderId
+            );
 
             return new Return<Order>
             {
                 Data = order,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new Return<Order>
             {
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
+
     public async Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds)
     {
         return await defaultdb
-            .Orders
-            .Include(x => x.OrderStatusHistories)
+            .Orders.Include(x => x.OrderStatusHistories)
             .Include(x => x.OrderItems)
             .Where(o => orderIds.Contains(o.OrderId))
             .ToListAsync();
@@ -337,7 +380,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = true,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = orders.Count
+                TotalRecord = orders.Count,
             };
         }
         catch
@@ -347,7 +390,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 Data = false,
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -359,15 +402,16 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         {
             defaultdb.Orders.Update(order);
             await defaultdb.SaveChangesAsync();
-            
+
             return new Return<bool>
             {
                 Data = true,
                 StatusCode = ErrorCode.Ok,
                 IsSuccess = true,
-                TotalRecord = 1
+                TotalRecord = 1,
             };
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new Return<bool>
             {
@@ -375,47 +419,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                 StatusCode = ErrorCode.InternalServerError,
                 IsSuccess = false,
                 TotalRecord = 0,
-                InternalErrorMessage = ex
-            };
-        }
-    }
-    
-    // background task to update order status to completed (after 10 day from last modified to shipped and still havent change status to completed)
-    public async Task<Return<List<Order>>> GetShippedOrdersOlderThanAsync(DateTime dateTime)
-    {
-        try
-        {
-            var orders = await defaultdb.Orders
-                .Where(x => x.Status == OrderStatus.Shipped && x.ModifiedAt <= dateTime)
-                .Include(x => x.OrderStatusHistories)
-                .ToListAsync();
-            
-            if (orders.Count == 0)
-                return new Return<List<Order>>
-                {
-                    Data = null,
-                    StatusCode = ErrorCode.OrderNotFound,
-                    IsSuccess = false,
-                    TotalRecord = 0
-                };
-            
-            return new Return<List<Order>>
-            {
-                Data = orders,
-                StatusCode = ErrorCode.Ok,
-                IsSuccess = true,
-                TotalRecord = orders.Count
-            };
-        }
-        catch (Exception ex)
-        {
-            return new Return<List<Order>>
-            {
-                Data = null,
-                StatusCode = ErrorCode.InternalServerError,
-                IsSuccess = false,
-                TotalRecord = 0,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }

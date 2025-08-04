@@ -350,7 +350,7 @@ public class OrderService(
             if (totalAmount < 0)
                 totalAmount = 0;
 
-            // Check payment method (no status check as per your requirement)
+            // Check payment method
             var paymentMethod = await paymentRepository.GetPaymentMethodByIdAsync(
                 req.PaymentMethodId
             );
@@ -380,27 +380,15 @@ public class OrderService(
                     StatusCode = ErrorCode.NotYourAddress,
                 };
 
-            var earnedPoints = await settingRepository.GetSettingByKeyAsync(
+            // Calculate points earned
+            var pointsConversionRate = await settingRepository.GetSettingByKeyAsync(
                 SettingEnum.PointsConversionRate
             );
+            var convertedPoints = int.TryParse(pointsConversionRate.Data?.Value, out var points)
+                ? points
+                : 0;
 
-            if (earnedPoints is { IsSuccess: false, Data: null })
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = earnedPoints.StatusCode,
-                    InternalErrorMessage = earnedPoints.InternalErrorMessage,
-                };
-
-            if (!int.TryParse(earnedPoints.Data?.Value, out var parsedPoint) || parsedPoint <= 0)
-                return new Return<bool>
-                {
-                    Data = false,
-                    IsSuccess = false,
-                    StatusCode = ErrorCode.InternalServerError,
-                };
-
+            // Order items with product details
             var orderItems = new List<OrderItem>();
             foreach (var item in orderItemsWithPrice)
             {
@@ -451,8 +439,7 @@ public class OrderService(
                 UserId = currentCustomer.Data.UserId,
                 CreateById = currentCustomer.Data.UserId,
                 CreatedAt = DateTime.Now,
-                // Do not set PointsEarned here, it will be calculated later when the order status changed to Completed
-                // PointsEarned = (int)(subTotal * parsedPoint / 100) // ex: 1% of total amount
+                PointsEarned = (int)((subTotal - discountAmount) * convertedPoints / 100), // ex: 1% of total amount
             };
 
             var result = await orderRepository.CreateOrderAsync(order);
@@ -473,9 +460,7 @@ public class OrderService(
                 ModifiedAt = DateTime.Now,
                 ModifiedById = currentCustomer.Data.UserId,
             };
-            var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryAsync(
-                orderHistory
-            );
+            var orderStatusHistory = await orderRepository.AddOrderStatusHistoryAsync(orderHistory);
             if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
                 return new Return<bool>
                 {
@@ -936,7 +921,8 @@ public class OrderService(
             {
                 { OrderStatus.Pending, [OrderStatus.Stuffing, OrderStatus.Rejected] },
                 { OrderStatus.Stuffing, [OrderStatus.Shipped, OrderStatus.Rejected] },
-                { OrderStatus.Shipped, [OrderStatus.Completed] },
+                // Managers cannot update Shipped -> Completed directly
+                // { OrderStatus.Shipped, [OrderStatus.Completed] },
             };
 
             if (
@@ -958,6 +944,16 @@ public class OrderService(
                 order.Status = newStatus;
                 order.ModifiedAt = now;
                 order.ModifiedById = validUser.Data.UserId;
+                order.OrderStatusHistories.Add(
+                    new OrderStatusHistory
+                    {
+                        OrderId = order.OrderId,
+                        Status = newStatus,
+                        Reason = newReason,
+                        ModifiedAt = now,
+                        ModifiedById = validUser.Data.UserId,
+                    }
+                );
             }
 
             var updateOrders = await orderRepository.UpdateOrderStatusRangeAsync(orders);
@@ -967,29 +963,6 @@ public class OrderService(
                     IsSuccess = false,
                     StatusCode = updateOrders.StatusCode,
                     InternalErrorMessage = updateOrders.InternalErrorMessage,
-                };
-
-            // Add order status history
-            var histories = orders
-                .Select(o => new OrderStatusHistory
-                {
-                    OrderId = o.OrderId,
-                    Status = newStatus,
-                    Reason = newReason,
-                    ModifiedAt = now,
-                    ModifiedById = validUser.Data.UserId,
-                })
-                .ToList();
-
-            var createHistories = await orderRepository.CreateRangeOrderStatusHistoriesAsync(
-                histories
-            );
-            if (!createHistories.IsSuccess)
-                return new Return<bool>
-                {
-                    IsSuccess = false,
-                    StatusCode = createHistories.StatusCode,
-                    InternalErrorMessage = createHistories.InternalErrorMessage,
                 };
 
             // Nếu không phải rejected thì kết thúc tại đây
@@ -1078,19 +1051,18 @@ public class OrderService(
                         InternalErrorMessage = userResult.InternalErrorMessage,
                     };
 
-                if (order.PointsUsed < 0 || order.PointsEarned < 0)
+                if (order.PointsUsed < 0)
                     return new Return<bool>
                     {
                         IsSuccess = false,
                         StatusCode = ErrorCode.InvalidPointBalance,
                     };
 
-                var user = userResult.Data;
-                user.Point += order.PointsUsed;
-                user.ModifiedAt = now;
-                user.ModifiedById = validUser.Data.UserId;
+                userResult.Data.Point += order.PointsUsed;
+                userResult.Data.ModifiedAt = now;
+                userResult.Data.ModifiedById = validUser.Data.UserId;
 
-                var updateUser = await userRepository.UpdateUserAsync(user);
+                var updateUser = await userRepository.UpdateUserAsync(userResult.Data);
                 if (!updateUser.IsSuccess)
                     return new Return<bool>
                     {
@@ -1125,17 +1097,20 @@ public class OrderService(
     {
         try
         {
-            var validUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
-            if (!validUser.IsSuccess || validUser.Data == null)
+            var currentUser = await helperService.GetCurrentUserWithRoleAsync(RoleEnum.Customer);
+            if (!currentUser.IsSuccess || currentUser.Data == null)
                 return new Return<bool>
                 {
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.UserNotFound,
-                    InternalErrorMessage = validUser.InternalErrorMessage,
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
-            var order = await orderRepository.GetOrderByIdAsync(req.OrderId, validUser.Data.UserId);
+            var order = await orderRepository.GetOrderByIdAsync(
+                req.OrderId,
+                currentUser.Data.UserId
+            );
             if (!order.IsSuccess || order.Data == null)
                 return new Return<bool>
                 {
@@ -1158,35 +1133,24 @@ public class OrderService(
             using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             try
             {
-                var newReason = req.Reason?.Trim() ?? null;
-                var newStatus = order.Data.Status switch
-                {
-                    OrderStatus.Pending => OrderStatus.Rejected,
-                    OrderStatus.Shipped => OrderStatus.Completed,
-                    _ => null,
-                };
+                var newStatus =
+                    order.Data.Status == OrderStatus.Pending
+                        ? OrderStatus.Cancelled
+                        : OrderStatus.Completed;
 
-                order.Data.Status = newStatus!;
+                order.Data.Status = newStatus;
                 order.Data.ModifiedAt = DateTime.Now;
-                order.Data.ModifiedById = validUser.Data.UserId;
-                if (newStatus == OrderStatus.Completed)
-                {
-                    var pointsConversionRate = await settingRepository.GetSettingByKeyAsync(
-                        SettingEnum.PointsConversionRate
-                    );
-                    var convertedPoints = int.TryParse(
-                        pointsConversionRate.Data?.Value,
-                        out var points
-                    )
-                        ? points
-                        : 0;
-                    order.Data.PointsEarned = (int)
-                        (
-                            (order.Data.SubTotal - order.Data.DiscountAmount)
-                            * convertedPoints
-                            / 100
-                        )!;
-                }
+                order.Data.ModifiedById = currentUser.Data.UserId;
+                order.Data.OrderStatusHistories.Add(
+                    new OrderStatusHistory
+                    {
+                        OrderId = req.OrderId,
+                        Status = newStatus,
+                        Reason = req.Reason?.Trim(),
+                        ModifiedAt = DateTime.Now,
+                        ModifiedById = currentUser.Data.UserId,
+                    }
+                );
 
                 var orderUpdated = await orderRepository.UpdateOrderAsync(order.Data);
                 if (!orderUpdated.IsSuccess)
@@ -1197,30 +1161,6 @@ public class OrderService(
                         StatusCode = orderUpdated.StatusCode,
                         InternalErrorMessage = orderUpdated.InternalErrorMessage,
                     };
-
-                // Update order status history
-                if (newStatus != null)
-                {
-                    var orderHistory = new OrderStatusHistory
-                    {
-                        OrderId = req.OrderId,
-                        Status = newStatus,
-                        Reason = newReason,
-                        ModifiedAt = DateTime.Now,
-                        ModifiedById = validUser.Data.UserId,
-                    };
-                    var orderStatusHistory = await orderRepository.CreateOrderStatusHistoryAsync(
-                        orderHistory
-                    );
-                    if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
-                        return new Return<bool>
-                        {
-                            Data = false,
-                            IsSuccess = false,
-                            StatusCode = orderStatusHistory.StatusCode,
-                            InternalErrorMessage = orderStatusHistory.InternalErrorMessage,
-                        };
-                }
 
                 switch (newStatus)
                 {
@@ -1287,66 +1227,37 @@ public class OrderService(
                                     };
                             }
 
-                        // Update user points
-                        var userPoint = await userRepository.GetUserByIdAsync(
-                            validUser.Data.UserId
-                        );
-                        if (!userPoint.IsSuccess || userPoint.Data == null)
+                        if (order.Data.PointsUsed < 0)
                             return new Return<bool>
                             {
                                 Data = false,
                                 IsSuccess = false,
-                                StatusCode = userPoint.StatusCode,
-                                InternalErrorMessage = userPoint.InternalErrorMessage,
-                            };
-                        if (order.Data.PointsUsed < 0 || order.Data.PointsEarned < 0)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = ErrorCode.InvalidInput,
-                                InternalErrorMessage = userPoint.InternalErrorMessage,
+                                StatusCode = ErrorCode.BadRequest,
                             };
 
                         // Return PointsUsed và divide PointsEarned
-                        userPoint.Data.Point += order.Data.PointsUsed;
-                        var updatePoint = await userRepository.UpdateUserAsync(userPoint.Data);
-                        if (!updatePoint.IsSuccess)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = updatePoint.StatusCode,
-                                InternalErrorMessage = updatePoint.InternalErrorMessage,
-                            };
+                        currentUser.Data.Point += order.Data.PointsUsed;
 
                         break;
                     }
                     case OrderStatus.Completed:
                     {
-                        var user = await userRepository.GetUserByIdAsync(validUser.Data.UserId);
-                        if (!user.IsSuccess || user.Data == null)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = user.StatusCode,
-                                InternalErrorMessage = user.InternalErrorMessage,
-                            };
-                        user.Data.Point += order.Data.PointsEarned;
-                        var updatePoint = await userRepository.UpdateUserAsync(user.Data);
-                        if (!updatePoint.IsSuccess)
-                            return new Return<bool>
-                            {
-                                Data = false,
-                                IsSuccess = false,
-                                StatusCode = updatePoint.StatusCode,
-                                InternalErrorMessage = updatePoint.InternalErrorMessage,
-                            };
+                        // Update points earned
+                        currentUser.Data.Point += order.Data.PointsEarned;
 
                         break;
                     }
                 }
+
+                var updatedUser = await userRepository.UpdateUserAsync(currentUser.Data);
+                if (!updatedUser.IsSuccess)
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = updatedUser.StatusCode,
+                        InternalErrorMessage = updatedUser.InternalErrorMessage,
+                    };
 
                 // Commit transaction
                 transaction.Complete();
@@ -1377,6 +1288,95 @@ public class OrderService(
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = e,
+            };
+        }
+    }
+
+    public async Task<Return<bool>> SystemAutoCompleteShippedOrdersAsync(int autoCompleteDays = 10)
+    {
+        try
+        {
+            // Get previously autoCompleteDays
+            var tenDaysAgo = DateTime.Now.AddDays(-autoCompleteDays);
+
+            // Update orders that are Shipped and created before 10 days ago
+            var updatedOrders = await orderRepository.GetShippedOrdersBeforeDate(tenDaysAgo);
+            if (!updatedOrders.IsSuccess || updatedOrders.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = updatedOrders.StatusCode,
+                    InternalErrorMessage = updatedOrders.InternalErrorMessage,
+                };
+
+            using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            foreach (var order in updatedOrders.Data)
+            {
+                // Update order status to Completed
+                var now = DateTime.Now;
+                order.Status = OrderStatus.Completed;
+                order.ModifiedAt = now;
+                order.ModifiedById = Guid.Empty; // System user
+
+                // Calculate points earned
+                var pointsConversionRate = await settingRepository.GetSettingByKeyAsync(
+                    SettingEnum.PointsConversionRate
+                );
+                var convertedPoints = int.TryParse(pointsConversionRate.Data?.Value, out var points)
+                    ? points
+                    : 0;
+                order.PointsEarned = (int)
+                    ((order.SubTotal - order.DiscountAmount) * convertedPoints / 100)!;
+
+                // Update order
+                var updateOrderResult = await orderRepository.UpdateOrderAsync(order);
+                if (!updateOrderResult.IsSuccess || !updateOrderResult.Data)
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = updateOrderResult.StatusCode,
+                        InternalErrorMessage = updateOrderResult.InternalErrorMessage,
+                    };
+
+                // Create order status history
+                var history = new OrderStatusHistory
+                {
+                    OrderId = order.OrderId,
+                    Status = OrderStatus.Completed,
+                    Reason = "System auto-completed the order",
+                    ModifiedAt = DateTime.Now,
+                    ModifiedById = Guid.Empty, // System user
+                };
+                var createHistoryResult = await orderRepository.AddOrderStatusHistoryAsync(history);
+                if (!createHistoryResult.IsSuccess || createHistoryResult.Data == null)
+                    return new Return<bool>
+                    {
+                        Data = false,
+                        IsSuccess = false,
+                        StatusCode = createHistoryResult.StatusCode,
+                        InternalErrorMessage = createHistoryResult.InternalErrorMessage,
+                    };
+            }
+
+            // Commit transaction
+            transaction.Complete();
+            return new Return<bool>
+            {
+                Data = true,
+                IsSuccess = true,
+                StatusCode = ErrorCode.Ok,
+            };
+        }
+        catch (Exception ex)
+        {
+            return new Return<bool>
+            {
+                Data = false,
+                IsSuccess = false,
+                StatusCode = ErrorCode.InternalServerError,
+                InternalErrorMessage = ex,
             };
         }
     }

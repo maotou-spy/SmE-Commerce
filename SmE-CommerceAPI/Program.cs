@@ -13,6 +13,7 @@ using SmE_CommerceModels.DBContext;
 using SmE_CommerceRepositories;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices;
+using SmE_CommerceServices.BackgroundTaskService;
 using SmE_CommerceServices.Firebase;
 using SmE_CommerceServices.Helper;
 using SmE_CommerceServices.Interface;
@@ -58,7 +59,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
                 IsSuccess = false,
                 Data = false,
-                ValidationErrors = errors
+                ValidationErrors = errors,
             }
         );
     };
@@ -112,6 +113,12 @@ builder.Services.AddScoped<IFirebaseAuthService, FirebaseService>();
 
 #endregion
 
+#region Background Task Service
+
+builder.Services.AddHostedService<OrderAutoCompleteBackgroundService>();
+
+#endregion
+
 #region Services
 
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -128,7 +135,6 @@ builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IHomepageService, HomepageService>();
 builder.Services.AddScoped<BearerTokenUtil>();
-builder.Services.AddHostedService<BackgoundTaskService>();
 
 #endregion
 
@@ -172,7 +178,7 @@ builder
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
             };
         }
     );
@@ -194,7 +200,7 @@ builder.Services.AddOpenApiDocument(document =>
             In = OpenApiSecurityApiKeyLocation.Header,
             Type = OpenApiSecuritySchemeType.Http,
             Scheme = "Bearer",
-            BearerFormat = "JWT"
+            BearerFormat = "JWT",
         }
     );
 

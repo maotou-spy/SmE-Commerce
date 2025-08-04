@@ -16,7 +16,7 @@ public interface IOrderRepository
 
     Task<Return<IEnumerable<Order>>> GetOrdersAsync(OrderFilterReqDto filter, Guid userId);
 
-    Task<Return<OrderStatusHistory>> CreateOrderStatusHistoryAsync(OrderStatusHistory req);
+    Task<Return<OrderStatusHistory>> AddOrderStatusHistoryAsync(OrderStatusHistory req);
 
     Task<Return<bool>> UpdateOrderStatusRangeAsync(List<Order> orders);
 
@@ -25,8 +25,10 @@ public interface IOrderRepository
     Task<List<Order>> GetOrdersByIdsAsync(IEnumerable<Guid> orderIds);
 
     Task<Return<Order>> GetOrderByIdForUpdateAsync(Guid orderId);
-    
-    Task<Return<IEnumerable<OrderStatusHistory>>> CreateRangeOrderStatusHistoriesAsync(List<OrderStatusHistory> req);
 
-    Task<Return<List<Order>>> GetShippedOrdersOlderThanAsync(DateTime dateTime);
+    Task<Return<IEnumerable<OrderStatusHistory>>> AddRangeOrderStatusHistoriesAsync(
+        List<OrderStatusHistory> req
+    );
+
+    Task<Return<IEnumerable<Order>>> GetShippedOrdersBeforeDate(DateTime dateTime);
 }

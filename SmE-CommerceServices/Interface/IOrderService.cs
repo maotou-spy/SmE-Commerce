@@ -10,10 +10,12 @@ public interface IOrderService
     Task<Return<bool>> CustomerCreateOrderAsync(CreateOrderReqDto req);
 
     Task<Return<GetOrderDetailsResDto>> GetOrderByIdAsync(Guid orderId);
-    
+
     Task<Return<bool>> ManagerUpdateOrderStatusAsync(ManagerUpdateOrderStatusReqDto req);
 
     Task<Return<bool>> CustomerUpdateOrderStatusAsync(CustomerUpdateOrderStatusReqDto req);
-    
+
     Task<Return<IEnumerable<GetOrderResDto>>> GetOrdersAsync(OrderFilterReqDto filter);
+
+    Task<Return<bool>> SystemAutoCompleteShippedOrdersAsync(int autoCompleteDays);
 }
