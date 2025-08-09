@@ -18,5 +18,11 @@ public class AdminGetUsersByRoleResDto
 
     public required string status { get; set; }
 
-    public required DateTime lastLogin { get; set; }
+    public DateTime? lastLogin { get; set; }
+
+    public DateTime? createdAt { get; set; }
+
+    public DateTime? modifiedAt { get; set; }
+
+    public Guid? modifiedBy { get; set; }
 }

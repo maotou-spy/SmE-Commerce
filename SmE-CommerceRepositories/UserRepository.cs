@@ -23,7 +23,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
             var query = dbContext
                 .Users.AsNoTracking()
                 .Include(u => u.AddressUsers.Where(a => a.IsDefault))
-                .Where(x => x.Status != GeneralStatus.Deleted);
+                .Where(x => x.Status != UserStatus.Deleted);
 
             if (!string.IsNullOrWhiteSpace(role))
             {
@@ -35,7 +35,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 query = query.Where(x => x.Role == RoleEnum.Customer);
             }
 
-            if (!string.IsNullOrWhiteSpace(status) && status != GeneralStatus.Deleted)
+            if (!string.IsNullOrWhiteSpace(status) && status != UserStatus.Deleted)
                 query = query.Where(x => x.Status == status);
 
             var allUsers = await query.ToListAsync(); // fetch full result first
@@ -92,7 +92,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var result = await dbContext
-                .Users.Where(x => x.Status != GeneralStatus.Deleted)
+                .Users.Where(x => x.Status != UserStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.UserId == id);
 
             return new Return<User>
@@ -122,7 +122,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var result = await dbContext
-                .Users.Where(x => x.Status != GeneralStatus.Deleted)
+                .Users.Where(x => x.Status != UserStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Email == email);
 
             return new Return<User>
@@ -152,7 +152,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var result = await dbContext
-                .Users.Where(x => x.Status != GeneralStatus.Deleted)
+                .Users.Where(x => x.Status != UserStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Phone == phone);
 
             return new Return<User>
@@ -182,7 +182,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var result = await dbContext
-                .Users.Where(x => x.Status != GeneralStatus.Deleted)
+                .Users.Where(x => x.Status != UserStatus.Deleted)
                 .FirstOrDefaultAsync(x => x.Email == emailOrPhone || x.Phone == emailOrPhone);
 
             return new Return<User>

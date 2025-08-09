@@ -75,7 +75,10 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                     numberOfOrders = x.NumberOfOrders,
                     totalSpent = x.TotalSpent,
                     status = x.Status.ToString(),
-                    lastLogin = x.LastLogin ?? DateTime.Now,
+                    lastLogin = x.LastLogin,
+                    createdAt = x.CreatedAt,
+                    modifiedAt = x.ModifiedAt,
+                    modifiedBy = x.ModifiedById,
                 }),
                 TotalRecord = users.TotalRecord,
             };
