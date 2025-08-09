@@ -1,6 +1,7 @@
 ﻿using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
 using SmE_CommerceModels.ResponseDtos.User;
+using SmE_CommerceModels.ResponseDtos.User.Admin;
 using SmE_CommerceModels.ReturnResult;
 
 namespace SmE_CommerceServices.Interface;

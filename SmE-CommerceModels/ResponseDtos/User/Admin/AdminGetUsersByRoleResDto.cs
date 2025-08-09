@@ -1,28 +1,30 @@
-﻿namespace SmE_CommerceModels.ResponseDtos.User;
+﻿namespace SmE_CommerceModels.ResponseDtos.User.Admin;
 
 public class AdminGetUsersByRoleResDto
 {
-    public required string name { get; set; }
+    public required string Name { get; set; }
 
-    public string? avatar { get; set; }
+    public string? Avatar { get; set; }
 
-    public string? address { get; set; }
+    public string? Address { get; set; }
 
-    public required string email { get; set; }
+    public required string Email { get; set; }
 
-    public string? phone { get; set; }
+    public string? Phone { get; set; }
 
-    public int numberOfOrders { get; set; } = 0;
+    public int NumberOfOrders { get; set; } = 0;
 
-    public decimal totalSpent { get; set; } = 0;
+    public decimal TotalSpent { get; set; } = 0;
 
-    public required string status { get; set; }
+    public bool IsAdmin { get; set; } = false;
 
-    public DateTime? lastLogin { get; set; }
+    public required string Status { get; set; }
 
-    public DateTime? createdAt { get; set; }
+    public DateTime? LastLogin { get; set; }
 
-    public DateTime? modifiedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
 
-    public Guid? modifiedBy { get; set; }
+    public DateTime? ModifiedAt { get; set; }
+
+    public Guid? ModifiedBy { get; set; }
 }
