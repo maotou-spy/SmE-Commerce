@@ -11,39 +11,32 @@ namespace SmE_CommerceUnitTest.OrderServiceUnitTest;
 public class SystemAutoCompleteShippedOrdersAsyncTests
 {
     private readonly Mock<IOrderRepository> _orderRepositoryMock;
-    private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<IDiscountRepository> _discountRepositoryMock;
-    private readonly Mock<IAddressRepository> _addressRepositoryMock;
-    private readonly Mock<IPaymentRepository> _paymentRepositoryMock;
-    private readonly Mock<ICartRepository> _cartRepositoryMock;
     private readonly Mock<ISettingRepository> _settingRepositoryMock;
-    private readonly Mock<IHelperService> _helperServiceMock;
 
     private readonly OrderService _orderService;
 
     public SystemAutoCompleteShippedOrdersAsyncTests()
     {
         _orderRepositoryMock = new Mock<IOrderRepository>();
-        _productRepositoryMock = new Mock<IProductRepository>();
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _discountRepositoryMock = new Mock<IDiscountRepository>();
-        _addressRepositoryMock = new Mock<IAddressRepository>();
-        _paymentRepositoryMock = new Mock<IPaymentRepository>();
-        _cartRepositoryMock = new Mock<ICartRepository>();
+        var productRepositoryMock = new Mock<IProductRepository>();
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var discountRepositoryMock = new Mock<IDiscountRepository>();
+        var addressRepositoryMock = new Mock<IAddressRepository>();
+        var paymentRepositoryMock = new Mock<IPaymentRepository>();
+        var cartRepositoryMock = new Mock<ICartRepository>();
         _settingRepositoryMock = new Mock<ISettingRepository>();
-        _helperServiceMock = new Mock<IHelperService>();
+        var helperServiceMock = new Mock<IHelperService>();
 
         _orderService = new OrderService(
             _orderRepositoryMock.Object,
-            _productRepositoryMock.Object,
-            _userRepositoryMock.Object,
-            _discountRepositoryMock.Object,
-            _addressRepositoryMock.Object,
-            _paymentRepositoryMock.Object,
-            _cartRepositoryMock.Object,
+            productRepositoryMock.Object,
+            userRepositoryMock.Object,
+            discountRepositoryMock.Object,
+            addressRepositoryMock.Object,
+            paymentRepositoryMock.Object,
+            cartRepositoryMock.Object,
             _settingRepositoryMock.Object,
-            _helperServiceMock.Object
+            helperServiceMock.Object
         );
     }
 
@@ -53,8 +46,6 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldReturnTrue_WhenAutoCompleteSuccessfully()
     {
         // Arrange
-        const int autoCompleteDays = 10;
-        var tenDaysAgo = DateTime.Now.AddDays(-autoCompleteDays);
 
         var orders = new List<Order>
         {
@@ -83,9 +74,9 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         };
 
         _orderRepositoryMock
-            .Setup(x => x.GetShippedOrdersBeforeDate(tenDaysAgo))
+            .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = orders,
                     IsSuccess = true,
@@ -127,7 +118,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -153,7 +144,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = new List<Order>(),
                     IsSuccess = true,
@@ -202,7 +193,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = new List<Order> { order },
                     IsSuccess = true,
@@ -276,7 +267,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = new List<Order> { order },
                     IsSuccess = true,
@@ -339,11 +330,11 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.NotFound,
+                    StatusCode = ErrorCode.OrderNotFound,
                     InternalErrorMessage = new Exception("Database error"),
                 }
             );
@@ -354,7 +345,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         // Assert
         Assert.False(result.IsSuccess);
         Assert.False(result.Data);
-        Assert.Equal(ErrorCode.NotFound, result.StatusCode);
+        Assert.Equal(ErrorCode.OrderNotFound, result.StatusCode);
         Assert.NotNull(result.InternalErrorMessage);
     }
 
@@ -379,7 +370,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = new List<Order> { order },
                     IsSuccess = true,
@@ -441,9 +432,9 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
-                    Data = new List<Order> { order },
+                    Data = [order],
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
                 }
@@ -525,9 +516,9 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
-                    Data = new List<Order>(),
+                    Data = [],
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
                 }
@@ -557,7 +548,6 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldSetSystemUser_WhenUpdatingOrders()
     {
         // Arrange
-        var autoCompleteDays = 10;
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
@@ -572,7 +562,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x => x.GetShippedOrdersBeforeDate(It.IsAny<DateTime>()))
             .ReturnsAsync(
-                new Return<List<Order>>
+                new Return<IEnumerable<Order>>
                 {
                     Data = new List<Order> { order },
                     IsSuccess = true,
@@ -618,7 +608,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
