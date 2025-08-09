@@ -174,7 +174,6 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldCalculatePointsCorrectly_WhenConversionRateExists()
     {
         // Arrange
-        var autoCompleteDays = 10;
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
@@ -235,7 +234,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
