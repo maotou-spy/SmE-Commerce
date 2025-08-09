@@ -178,6 +178,9 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 Avatar = currentUser.Data.Avatar,
                 IsEmailVerified = currentUser.Data.IsEmailVerified ?? false,
                 IsPhoneVerified = currentUser.Data.IsPhoneVerified ?? false,
+                Address = StringUtils.CreateFullAddressString(
+                    currentUser.Data.AddressUsers.FirstOrDefault()
+                ),
             };
 
             return new Return<GetUserProfileResDto>
