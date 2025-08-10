@@ -2,6 +2,7 @@
 
 public class AdminGetUsersByRoleResDto
 {
+    public Guid UserId { get; set; }
     public required string Name { get; set; }
 
     public string? Avatar { get; set; }

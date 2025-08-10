@@ -68,6 +68,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 StatusCode = users.StatusCode,
                 Data = users.Data.Select(x => new AdminGetUsersByRoleResDto
                 {
+                    UserId = x.UserId,
                     Name = x.FullName,
                     Avatar = x.Avatar,
                     Address = StringUtils.CreateFullAddressString(x.AddressUsers.FirstOrDefault()),
