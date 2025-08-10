@@ -19,4 +19,6 @@ public class GetUserProfileResDto
     public bool IsPhoneVerified { get; set; }
 
     public bool IsEmailVerified { get; set; }
+    
+    public string? Address { get; set; }
 }

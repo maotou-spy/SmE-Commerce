@@ -9,5 +9,6 @@ public class GetUserAddressesResDto
     public string Ward { get; set; } = null!;
     public string District { get; set; } = null!;
     public string City { get; set; } = null!;
+    public string fullAddress { get; set; }
     public bool IsDefault { get; set; } = false;
 }

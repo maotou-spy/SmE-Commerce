@@ -6,6 +6,7 @@ using SmE_CommerceModels.ResponseDtos.Address;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
+using SmE_CommerceUtilities.Utils;
 
 namespace SmE_CommerceServices;
 
@@ -54,7 +55,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Ward = address.Ward,
                     District = address.District,
                     City = address.City,
-                    IsDefault = address.IsDefault
+                    IsDefault = address.IsDefault,
+                    fullAddress = string.Join(", ", new[] {
+                        address.Address1,
+                        address.Ward,
+                        address.District,
+                        address.City
+                    }.Where(s => !string.IsNullOrWhiteSpace(s)))
+
                 })
                 .ToList();
 

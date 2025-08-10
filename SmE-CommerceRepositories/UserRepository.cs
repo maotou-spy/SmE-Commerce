@@ -92,7 +92,8 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var result = await dbContext
-                .Users.Where(x => x.Status != UserStatus.Deleted)
+                .Users.Where(x => x.Status != GeneralStatus.Deleted)
+                .Include(x => x.AddressUsers.Where(a => a.IsDefault))
                 .FirstOrDefaultAsync(x => x.UserId == id);
 
             return new Return<User>

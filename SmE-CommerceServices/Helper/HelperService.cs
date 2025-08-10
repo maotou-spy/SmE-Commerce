@@ -57,10 +57,10 @@ public class HelperService(
         // Improved role check
         var isAuthorized = role switch
         {
-            nameof(RoleEnum.Customer) => user.Data.Role == RoleEnum.Customer,
-            nameof(RoleEnum.Administrator) => user.Data.Role == RoleEnum.Administrator,
-            nameof(RoleEnum.Staff) => user.Data.Role is RoleEnum.Staff or RoleEnum.Manager,
-            nameof(RoleEnum.Manager) => user.Data.Role == RoleEnum.Manager,
+            RoleEnum.Customer => user.Data.Role == RoleEnum.Customer,
+            RoleEnum.Administrator => user.Data.Role == RoleEnum.Administrator,
+            RoleEnum.Staff => user.Data.Role is RoleEnum.Staff or RoleEnum.Manager,
+            RoleEnum.Manager => user.Data.Role == RoleEnum.Manager,
             _ => false,
         };
 
