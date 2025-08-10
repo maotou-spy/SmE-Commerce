@@ -3,6 +3,7 @@ using SmE_CommerceModels.Enums;
 using SmE_CommerceModels.Models;
 using SmE_CommerceModels.RequestDtos.User;
 using SmE_CommerceModels.ResponseDtos.User;
+using SmE_CommerceModels.ResponseDtos.User.Admin;
 using SmE_CommerceModels.ReturnResult;
 using SmE_CommerceRepositories.Interface;
 using SmE_CommerceServices.Interface;
@@ -67,18 +68,19 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 StatusCode = users.StatusCode,
                 Data = users.Data.Select(x => new AdminGetUsersByRoleResDto
                 {
-                    name = x.FullName,
-                    avatar = x.Avatar,
-                    address = StringUtils.CreateFullAddressString(x.AddressUsers.FirstOrDefault()),
-                    email = x.Email,
-                    phone = x.Phone,
-                    numberOfOrders = x.NumberOfOrders,
-                    totalSpent = x.TotalSpent,
-                    status = x.Status.ToString(),
-                    lastLogin = x.LastLogin,
-                    createdAt = x.CreatedAt,
-                    modifiedAt = x.ModifiedAt,
-                    modifiedBy = x.ModifiedById,
+                    Name = x.FullName,
+                    Avatar = x.Avatar,
+                    Address = StringUtils.CreateFullAddressString(x.AddressUsers.FirstOrDefault()),
+                    Email = x.Email,
+                    Phone = x.Phone,
+                    NumberOfOrders = x.NumberOfOrders,
+                    TotalSpent = x.TotalSpent,
+                    IsAdmin = x.Role == RoleEnum.Administrator,
+                    Status = x.Status.ToString(),
+                    LastLogin = x.LastLogin,
+                    CreatedAt = x.CreatedAt,
+                    ModifiedAt = x.ModifiedAt,
+                    ModifiedBy = x.ModifiedById,
                 }),
                 TotalRecord = users.TotalRecord,
             };
