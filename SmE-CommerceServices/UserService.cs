@@ -76,7 +76,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                     Phone = x.Phone,
                     NumberOfOrders = x.NumberOfOrders,
                     TotalSpent = x.TotalSpent,
-                    IsAdmin = x.Role == RoleEnum.Administrator,
+                    Role = x.Role,
                     Status = x.Status.ToString(),
                     LastLogin = x.LastLogin,
                     CreatedAt = x.CreatedAt,

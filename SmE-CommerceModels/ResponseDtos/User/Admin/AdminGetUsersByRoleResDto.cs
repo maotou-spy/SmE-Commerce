@@ -3,6 +3,7 @@
 public class AdminGetUsersByRoleResDto
 {
     public Guid UserId { get; set; }
+
     public required string Name { get; set; }
 
     public string? Avatar { get; set; }
@@ -17,7 +18,7 @@ public class AdminGetUsersByRoleResDto
 
     public decimal TotalSpent { get; set; } = 0;
 
-    public bool IsAdmin { get; set; } = false;
+    public string Role { get; set; } = null!;
 
     public required string Status { get; set; }
 
