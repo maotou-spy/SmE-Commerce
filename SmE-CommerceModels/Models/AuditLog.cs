@@ -12,6 +12,10 @@ public class AuditLog
     [Column("userId")]
     public Guid? UserId { get; set; }
 
+    [Column("username")]
+    [StringLength(50)]
+    public required string Username { get; set; }
+
     [Column("action")]
     [StringLength(50)]
     public string Action { get; set; } = null!;
@@ -24,18 +28,14 @@ public class AuditLog
     public Guid RecordId { get; set; }
 
     [Column("oldValue", TypeName = "jsonb")]
-    public string OldValue { get; set; } = null!;
+    public required string OldValue { get; set; } = null!;
 
     [Column("newValue", TypeName = "jsonb")]
-    public string NewValue { get; set; } = null!;
+    public required string NewValue { get; set; } = null!;
 
     [Column("ipAddress")]
     [StringLength(50)]
     public string IpAddress { get; set; } = null!;
-
-    [Column("userAgent")]
-    [StringLength(255)]
-    public string? UserAgent { get; set; }
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
     public DateTime? CreatedAt { get; set; }

@@ -32,16 +32,18 @@ public class ProductVariant
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("variantImage")]
     [StringLength(255)]
@@ -49,14 +51,6 @@ public class ProductVariant
 
     [InverseProperty("ProductVariant")]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("ProductVariantCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("ProductVariantModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("ProductVariant")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

@@ -30,9 +30,5 @@ public class Setting
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("Settings")]
-    public virtual User? ModifiedBy { get; set; }
+    public string? ModifiedById { get; set; }
 }

@@ -47,16 +47,18 @@ public class Product
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("slug")]
     [StringLength(255)]
@@ -89,17 +91,9 @@ public class Product
     public virtual ICollection<ContentProduct> ContentProducts { get; set; } =
         new List<ContentProduct>();
 
-    [ForeignKey("CreateById")]
-    [InverseProperty("ProductCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
     [InverseProperty("Product")]
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
         new List<DiscountProduct>();
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("ProductModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Product")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

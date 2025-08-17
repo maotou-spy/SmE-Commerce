@@ -28,5 +28,5 @@ public class AdminGetUsersByRoleResDto
 
     public DateTime? ModifiedAt { get; set; }
 
-    public Guid? ModifiedBy { get; set; }
+    public string? ModifiedBy { get; set; }
 }

@@ -12,18 +12,17 @@ namespace SmE_CommerceUnitTest.ProductServiceUnitTest;
 public class UpdateProductVariantAsyncTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
-    private readonly IProductService _productService;
+    private readonly ProductService _productService;
 
     public UpdateProductVariantAsyncTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
-        _categoryRepositoryMock = new Mock<ICategoryRepository>();
+        var categoryRepositoryMock = new Mock<ICategoryRepository>();
         _helperServiceMock = new Mock<IHelperService>();
         _productService = new ProductService(
             _productRepositoryMock.Object,
-            _categoryRepositoryMock.Object,
+            categoryRepositoryMock.Object,
             _helperServiceMock.Object
         );
     }
@@ -62,7 +61,7 @@ public class UpdateProductVariantAsyncTests
             Price = 100000,
             StockQuantity = 50,
             VariantImage = "https://example.com/image.jpg",
-            VariantValues = []
+            VariantValues = [],
         };
 
         // Act
@@ -95,10 +94,10 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
+                    VariantValue = "S",
+                },
                 // Act
-            ]
+            ],
         };
 
         // Act
@@ -131,9 +130,9 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
-            ]
+                    VariantValue = "S",
+                },
+            ],
         };
 
         // Act
@@ -167,8 +166,8 @@ public class UpdateProductVariantAsyncTests
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "L" }, // Duplicate
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -186,12 +185,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -200,7 +201,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -210,7 +211,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -220,7 +221,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -262,9 +263,9 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
-            ]
+                    VariantValue = "S",
+                },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -302,9 +303,9 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
-            ]
+                    VariantValue = "S",
+                },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -313,7 +314,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -352,9 +353,9 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
-            ]
+                    VariantValue = "S",
+                },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -363,7 +364,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -372,8 +373,8 @@ public class UpdateProductVariantAsyncTests
                 new Return<Product>
                 {
                     IsSuccess = true,
-                    Data = new Product { Status = ProductStatus.Deleted },
-                    StatusCode = ErrorCode.Ok
+                    Data = new Product { Status = ProductStatus.Deleted, CreateById = "AnhNV" },
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -407,9 +408,9 @@ public class UpdateProductVariantAsyncTests
                 new ProductVariantValueReqDto
                 {
                     VariantNameId = Guid.NewGuid(),
-                    VariantValue = "S"
-                }
-            ]
+                    VariantValue = "S",
+                },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -418,7 +419,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -431,9 +432,10 @@ public class UpdateProductVariantAsyncTests
                     {
                         HasVariant = false,
                         ProductVariants = new List<ProductVariant>(),
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -465,8 +467,8 @@ public class UpdateProductVariantAsyncTests
             VariantImage = "https://example.com/image.jpg",
             VariantValues =
             [
-                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -475,7 +477,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -492,12 +494,14 @@ public class UpdateProductVariantAsyncTests
                             new()
                             {
                                 ProductVariantId = Guid.NewGuid(),
-                                Status = ProductStatus.Active
-                            }
+                                Status = ProductStatus.Active,
+                                CreateById = "AnhNV",
+                            },
                         },
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -529,8 +533,8 @@ public class UpdateProductVariantAsyncTests
             VariantImage = "https://example.com/image.jpg",
             VariantValues =
             [
-                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+            ],
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -539,7 +543,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -559,13 +563,15 @@ public class UpdateProductVariantAsyncTests
                                 Status = ProductStatus.Deleted,
                                 VariantAttributes = new List<VariantAttribute>
                                 {
-                                    new() { VariantNameId = sizeId, Value = "S" }
-                                }
-                            }
+                                    new() { VariantNameId = sizeId, Value = "S" },
+                                },
+                                CreateById = "AnhNV",
+                            },
                         },
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -599,8 +605,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -618,12 +624,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -632,7 +640,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -642,7 +650,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -676,8 +684,8 @@ public class UpdateProductVariantAsyncTests
             VariantImage = "https://example.com/newimage.jpg",
             VariantValues =
             [
-                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -695,12 +703,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -709,7 +719,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -719,7 +729,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -754,8 +764,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = brandId, VariantValue = "Nike" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = brandId, VariantValue = "Nike" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -773,12 +783,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -787,7 +799,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -797,7 +809,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -831,8 +843,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -850,8 +862,9 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
@@ -862,12 +875,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "M" },
-                        new() { VariantNameId = colorId, Value = "Blue" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Blue" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 90,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -876,7 +891,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -886,7 +901,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -920,8 +935,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -939,12 +954,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -953,7 +970,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -963,7 +980,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -997,8 +1014,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1016,12 +1033,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1030,7 +1049,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1040,7 +1059,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1050,7 +1069,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1086,8 +1105,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1105,12 +1124,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Inactive
+            Status = ProductStatus.Inactive,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1119,7 +1140,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1129,7 +1150,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1139,7 +1160,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1175,8 +1196,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1194,12 +1215,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1208,7 +1231,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1218,7 +1241,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1228,7 +1251,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1264,8 +1287,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1283,12 +1306,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1297,7 +1322,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1307,7 +1332,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1317,7 +1342,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1352,8 +1377,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1371,12 +1396,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1385,7 +1412,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1395,7 +1422,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1405,7 +1432,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1440,8 +1467,8 @@ public class UpdateProductVariantAsyncTests
             VariantValues =
             [
                 new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Blue" },
+            ],
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1459,12 +1486,14 @@ public class UpdateProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -1473,7 +1502,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1483,7 +1512,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1492,7 +1521,7 @@ public class UpdateProductVariantAsyncTests
                 new Return<Product>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InternalServerError
+                    StatusCode = ErrorCode.InternalServerError,
                 }
             );
 
@@ -1524,8 +1553,8 @@ public class UpdateProductVariantAsyncTests
             VariantImage = "https://example.com/newimage.jpg",
             VariantValues =
             [
-                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" }
-            ]
+                new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
+            ],
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1535,7 +1564,7 @@ public class UpdateProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock

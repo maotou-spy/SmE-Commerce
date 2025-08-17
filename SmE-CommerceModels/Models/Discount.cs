@@ -47,16 +47,18 @@ public class Discount
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("minQuantity")]
     public int? MinQuantity { get; set; }
@@ -67,18 +69,10 @@ public class Discount
     [Column("isFirstOrder")]
     public bool IsFirstOrder { get; set; }
 
-    [ForeignKey("CreateById")]
-    [InverseProperty("DiscountCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
     [InverseProperty("Discount")]
     public virtual ICollection<DiscountCode> DiscountCodes { get; set; } = new List<DiscountCode>();
 
     [InverseProperty("Discount")]
     public virtual ICollection<DiscountProduct> DiscountProducts { get; set; } =
         new List<DiscountProduct>();
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("DiscountModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 }

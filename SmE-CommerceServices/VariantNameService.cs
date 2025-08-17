@@ -25,7 +25,7 @@ public class VariantNameService(
                     Data = [],
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
             var variantsResult = await variantRepository.GetVariantNamesAsync();
@@ -35,7 +35,7 @@ public class VariantNameService(
                     Data = [],
                     IsSuccess = false,
                     StatusCode = variantsResult.StatusCode,
-                    InternalErrorMessage = variantsResult.InternalErrorMessage
+                    InternalErrorMessage = variantsResult.InternalErrorMessage,
                 };
 
             var variants = variantsResult
@@ -47,11 +47,9 @@ public class VariantNameService(
                     {
                         CreatedById = variantName.CreatedById,
                         CreatedAt = variantName.CreatedAt,
-                        CreatedBy = variantName.CreatedBy?.FullName,
                         ModifiedById = variantName.ModifiedById,
                         ModifiedAt = variantName.ModifiedAt,
-                        ModifiedBy = variantName.ModifiedBy?.FullName
-                    }
+                    },
                 })
                 .ToList();
 
@@ -60,7 +58,7 @@ public class VariantNameService(
                 Data = variants,
                 IsSuccess = true,
                 StatusCode = ErrorCode.Ok,
-                TotalRecord = variants.Count
+                TotalRecord = variants.Count,
             };
         }
         catch (Exception ex)
@@ -71,7 +69,7 @@ public class VariantNameService(
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -87,14 +85,14 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
             var variants = req.Select(variant => new VariantName
                 {
                     Name = variant,
                     CreatedAt = DateTime.Now,
-                    CreatedById = currentUser.Data.UserId
+                    CreatedById = currentUser.Data.Username,
                 })
                 .ToList();
 
@@ -108,7 +106,7 @@ public class VariantNameService(
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -127,7 +125,7 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
             var existingVariant = await variantRepository.GetVariantNameByIdAsync(variantNameId);
@@ -137,7 +135,7 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantNameNotFound,
-                    InternalErrorMessage = existingVariant.InternalErrorMessage
+                    InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
             // Check if the attribute name is the same
             if (existingVariant.Data.Name == variantNameReq.VariantName)
@@ -145,7 +143,7 @@ public class VariantNameService(
                 {
                     Data = true,
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 };
 
             // Check if the attribute name already exists
@@ -159,12 +157,12 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantNameAlreadyExists,
-                    InternalErrorMessage = existingVariantsResult.InternalErrorMessage
+                    InternalErrorMessage = existingVariantsResult.InternalErrorMessage,
                 };
 
             existingVariant.Data.Name = variantNameReq.VariantName;
             existingVariant.Data.ModifiedAt = DateTime.Now;
-            existingVariant.Data.ModifiedById = currentUser.Data.UserId;
+            existingVariant.Data.ModifiedById = currentUser.Data.Username;
 
             return await variantRepository.UpdateVariantNameAsync(existingVariant.Data);
         }
@@ -176,7 +174,7 @@ public class VariantNameService(
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -192,7 +190,7 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
             var existingVariant = await variantRepository.GetVariantNameByIdAsync(nameId);
@@ -202,7 +200,7 @@ public class VariantNameService(
                     Data = false,
                     IsSuccess = false,
                     StatusCode = ErrorCode.VariantNameNotFound,
-                    InternalErrorMessage = existingVariant.InternalErrorMessage
+                    InternalErrorMessage = existingVariant.InternalErrorMessage,
                 };
 
             // // Check if the attribute is used in any product variant
@@ -211,7 +209,7 @@ public class VariantNameService(
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.VariantNameConflict
+                    StatusCode = ErrorCode.VariantNameConflict,
                 };
 
             return await variantRepository.DeleteVariantNamesAsync(existingVariant.Data);
@@ -224,7 +222,7 @@ public class VariantNameService(
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }

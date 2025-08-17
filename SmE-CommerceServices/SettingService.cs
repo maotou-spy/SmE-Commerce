@@ -23,7 +23,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     Data = null,
                     IsSuccess = false,
                     StatusCode = settings.StatusCode,
-                    InternalErrorMessage = settings.InternalErrorMessage
+                    InternalErrorMessage = settings.InternalErrorMessage,
                 };
 
             return new Return<List<SettingResDto>>
@@ -34,13 +34,13 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                         SettingId = x.SettingId,
                         Key = x.Key,
                         Value = x.Value,
-                        Description = x.Description
+                        Description = x.Description,
                     })
                     .ToList(),
                 IsSuccess = settings.IsSuccess,
                 StatusCode = settings.StatusCode,
                 TotalRecord = settings.TotalRecord,
-                InternalErrorMessage = settings.InternalErrorMessage
+                InternalErrorMessage = settings.InternalErrorMessage,
             };
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -66,7 +66,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     Data = null,
                     IsSuccess = false,
                     StatusCode = setting.StatusCode,
-                    InternalErrorMessage = setting.InternalErrorMessage
+                    InternalErrorMessage = setting.InternalErrorMessage,
                 };
 
             if (setting.Data == null)
@@ -74,7 +74,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.SettingNotFound
+                    StatusCode = ErrorCode.SettingNotFound,
                 };
 
             return new Return<SettingResDto>
@@ -84,12 +84,12 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     SettingId = setting.Data.SettingId,
                     Key = setting.Data.Key,
                     Value = setting.Data.Value,
-                    Description = setting.Data.Description
+                    Description = setting.Data.Description,
                 },
                 IsSuccess = setting.IsSuccess,
                 StatusCode = setting.StatusCode,
                 TotalRecord = 1,
-                InternalErrorMessage = setting.InternalErrorMessage
+                InternalErrorMessage = setting.InternalErrorMessage,
             };
         }
         catch (Exception ex)
@@ -99,7 +99,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -117,7 +117,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentUser.StatusCode,
-                    InternalErrorMessage = currentUser.InternalErrorMessage
+                    InternalErrorMessage = currentUser.InternalErrorMessage,
                 };
 
             var existedSettings = await settingRepository.GetSettingsByIds(
@@ -129,7 +129,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     Data = null,
                     IsSuccess = false,
                     StatusCode = existedSettings.StatusCode,
-                    InternalErrorMessage = existedSettings.InternalErrorMessage
+                    InternalErrorMessage = existedSettings.InternalErrorMessage,
                 };
 
             if (existedSettings.Data?.Count == 0)
@@ -137,7 +137,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = ErrorCode.SettingNotFound
+                    StatusCode = ErrorCode.SettingNotFound,
                 };
 
             var settingList = settings
@@ -161,7 +161,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
 
                     existedSetting.Description =
                         inputSetting.Description ?? existedSetting.Description;
-                    existedSetting.ModifiedById = currentUser.Data.UserId;
+                    existedSetting.ModifiedById = currentUser.Data.Username;
                     existedSetting.ModifiedAt = DateTime.Now;
 
                     return existedSetting;
@@ -176,7 +176,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                     Data = null,
                     IsSuccess = false,
                     StatusCode = settingResult.StatusCode,
-                    InternalErrorMessage = settingResult.InternalErrorMessage
+                    InternalErrorMessage = settingResult.InternalErrorMessage,
                 };
 
             return new Return<List<ManagerSettingResDto>>
@@ -191,15 +191,14 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                         AuditMetadata = new AuditMetadata
                         {
                             ModifiedById = x.ModifiedById,
-                            ModifiedBy = x.ModifiedBy?.FullName,
-                            ModifiedAt = x.ModifiedAt
-                        }
+                            ModifiedAt = x.ModifiedAt,
+                        },
                     })
                     .ToList(),
                 IsSuccess = settingResult.IsSuccess,
                 StatusCode = settingResult.StatusCode,
                 TotalRecord = settingResult.Data?.Count ?? 0,
-                InternalErrorMessage = settingResult.InternalErrorMessage
+                InternalErrorMessage = settingResult.InternalErrorMessage,
             };
         }
         catch (Exception ex)
@@ -209,7 +208,7 @@ public class SettingService(IHelperService helperService, ISettingRepository set
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }

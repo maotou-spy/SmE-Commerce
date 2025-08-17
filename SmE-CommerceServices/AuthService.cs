@@ -28,7 +28,7 @@ public class AuthService(
                 {
                     IsSuccess = false,
                     StatusCode = userResult.StatusCode,
-                    InternalErrorMessage = userResult.InternalErrorMessage
+                    InternalErrorMessage = userResult.InternalErrorMessage,
                 };
 
             var user = userResult.Data;
@@ -36,7 +36,7 @@ public class AuthService(
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.AccountIsInactive
+                    StatusCode = ErrorCode.AccountIsInactive,
                 };
 
             if (
@@ -46,18 +46,18 @@ public class AuthService(
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InvalidCredentials
+                    StatusCode = ErrorCode.InvalidCredentials,
                 };
 
             user.LastLogin = DateTime.Now;
-            user.ModifiedById = user.UserId;
+            user.ModifiedById = user.Username;
             user.ModifiedAt = DateTime.Now;
             var updateResult = await userRepository.UpdateUserAsync(user);
             if (!updateResult.IsSuccess || updateResult.Data == null)
                 return new Return<LoginResDto>
                 {
                     IsSuccess = false,
-                    StatusCode = updateResult.StatusCode
+                    StatusCode = updateResult.StatusCode,
                 };
 
             var token = bearerTokenUtil.GenerateBearerToken(user.UserId, user.Role);
@@ -66,12 +66,12 @@ public class AuthService(
                 Data = new LoginResDto
                 {
                     BearerToken = token,
-                    Name = user.FullName ?? "",
+                    Name = user.FullName,
                     Email = user.Email,
-                    Phone = user.Phone
+                    Phone = user.Phone,
                 },
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -80,7 +80,7 @@ public class AuthService(
             {
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -94,15 +94,15 @@ public class AuthService(
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.EmailAlreadyExists
+                    StatusCode = ErrorCode.EmailAlreadyExists,
                 };
-            
+
             existedUser = await userRepository.GetUserByPhoneAsync(reqDto.Phone);
             if (existedUser is { IsSuccess: true, Data: not null })
                 return new Return<bool>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.PhoneAlreadyExists
+                    StatusCode = ErrorCode.PhoneAlreadyExists,
                 };
 
             User newUser = new()
@@ -116,7 +116,7 @@ public class AuthService(
                 IsEmailVerified = false,
                 IsPhoneVerified = false,
                 Status = UserStatus.Active,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
             };
 
             var userResult = await userRepository.CreateNewUser(newUser);
@@ -127,7 +127,7 @@ public class AuthService(
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -136,7 +136,7 @@ public class AuthService(
             {
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }

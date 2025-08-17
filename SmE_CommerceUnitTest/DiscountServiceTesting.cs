@@ -42,7 +42,8 @@ public class DiscountServiceTesting
             DiscountId = discountId,
             DiscountName = "Discount 1",
             DiscountValue = 10,
-            IsPercentage = true
+            IsPercentage = true,
+            CreateById = "AnhNV",
         };
         var discountReq = new UpdateDiscountReqDto { DiscountName = "Discount 1" };
 
@@ -54,7 +55,7 @@ public class DiscountServiceTesting
                     Data = new User { UserId = Guid.NewGuid(), Role = RoleEnum.Manager },
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 1
+                    TotalRecord = 1,
                 }
             );
 
@@ -66,7 +67,7 @@ public class DiscountServiceTesting
                     Data = discount,
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 1
+                    TotalRecord = 1,
                 }
             );
 
@@ -78,7 +79,7 @@ public class DiscountServiceTesting
                     Data = null,
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 }
             );
 
@@ -87,10 +88,15 @@ public class DiscountServiceTesting
             .ReturnsAsync(
                 new Return<Product>
                 {
-                    Data = new Product { ProductId = Guid.NewGuid(), PrimaryImage = "image.jpg" },
+                    Data = new Product
+                    {
+                        ProductId = Guid.NewGuid(),
+                        PrimaryImage = "image.jpg",
+                        CreateById = "AnhNV",
+                    },
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 1
+                    TotalRecord = 1,
                 }
             );
 
@@ -102,7 +108,7 @@ public class DiscountServiceTesting
                     Data = discount,
                     IsSuccess = true,
                     StatusCode = ErrorCode.Ok,
-                    TotalRecord = 1
+                    TotalRecord = 1,
                 }
             );
 

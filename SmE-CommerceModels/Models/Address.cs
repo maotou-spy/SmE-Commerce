@@ -47,24 +47,18 @@ public class Address
     public DateTime? CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public string? CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("isDefault")]
     public bool IsDefault { get; set; }
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("AddressCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("AddressModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Address")]
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

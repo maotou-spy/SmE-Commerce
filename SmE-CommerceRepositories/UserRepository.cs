@@ -272,8 +272,7 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
         try
         {
             var discountCodes = await dbContext
-                .DiscountCodes.Include(x => x.User)
-                .Include(x => x.Discount)
+                .DiscountCodes.Include(x => x.Discount)
                 .Where(x =>
                     x.UserId == cusId || (x.UserId == null && x.Status == GeneralStatus.Active)
                 )

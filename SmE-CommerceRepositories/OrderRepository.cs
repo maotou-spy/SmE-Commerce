@@ -94,8 +94,7 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
         try
         {
             var orders = await defaultdb
-                .Orders.Include(x => x.User)
-                .Where(x => x.Status == OrderStatus.Shipped && x.CreatedAt < dateTime)
+                .Orders.Where(x => x.Status == OrderStatus.Shipped && x.CreatedAt < dateTime)
                 .ToListAsync();
 
             if (orders.Count == 0)
@@ -225,10 +224,12 @@ public class OrderRepository(SmECommerceContext defaultdb) : IOrderRepository
                         FullName = o.User.FullName,
                         Email = o.User.Email,
                         Phone = o.User.Phone,
+                        CreateById = o.User.CreateById,
                     },
                     TotalAmount = o.TotalAmount,
                     Status = o.Status,
                     CreatedAt = o.CreatedAt,
+                    CreateById = o.CreateById,
                     ModifiedAt = o.ModifiedAt,
                 })
                 .Skip((filter.PageNumber - 1) * filter.PageSize)

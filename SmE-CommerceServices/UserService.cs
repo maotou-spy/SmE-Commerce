@@ -124,7 +124,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
                 FullName = req.FullName,
                 Role = req.Role,
                 Status = UserStatus.Active,
-                CreateById = currentUser.Data.UserId,
+                CreateById = currentUser.Data.Username,
                 CreatedAt = DateTime.Now,
             };
 
@@ -332,7 +332,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             user.Data.DateOfBirth = req.Dob;
             user.Data.Gender = req.Gender;
             user.Data.ModifiedAt = DateTime.Now;
-            user.Data.ModifiedById = currentUser.Data.UserId;
+            user.Data.ModifiedById = currentUser.Data.Username;
 
             var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
@@ -390,7 +390,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             currentUser.Data.PasswordHash = HashUtil.Hash(req.NewPassword);
             currentUser.Data.ModifiedAt = DateTime.Now;
-            currentUser.Data.ModifiedById = currentUser.Data.UserId;
+            currentUser.Data.ModifiedById = currentUser.Data.Username;
 
             var updateResult = await userRepository.UpdateUserAsync(currentUser.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
@@ -444,7 +444,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
 
             user.Data.Status = UserStatus.Deleted;
             user.Data.ModifiedAt = DateTime.Now;
-            user.Data.ModifiedById = currentUser.Data.UserId;
+            user.Data.ModifiedById = currentUser.Data.Username;
 
             var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)
@@ -503,7 +503,7 @@ public class UserService(IUserRepository userRepository, IHelperService helperSe
             user.Data.Status =
                 user.Data.Status == UserStatus.Active ? UserStatus.Inactive : UserStatus.Active;
             user.Data.ModifiedAt = DateTime.Now;
-            user.Data.ModifiedById = currentUser.Data.UserId;
+            user.Data.ModifiedById = currentUser.Data.Username;
 
             var updateResult = await userRepository.UpdateUserAsync(user.Data);
             if (!updateResult.IsSuccess || updateResult.Data == null)

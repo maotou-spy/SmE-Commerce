@@ -40,7 +40,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                 Description = req.Description,
                 Status = GeneralStatus.Active,
                 Slug = SlugUtil.GenerateSlug(req.Name).Trim(),
-                CreateById = currentUser.Data.UserId,
+                CreateById = currentUser.Data.Username,
                 CreatedAt = DateTime.Now,
             };
 
@@ -217,7 +217,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
             oldCategory.Data.Status = oldCategory.Data.Status;
             oldCategory.Data.Slug = SlugUtil.GenerateSlug(req.Name).Trim();
             oldCategory.Data.ModifiedAt = DateTime.Now;
-            oldCategory.Data.ModifiedById = currentUser.Data.UserId;
+            oldCategory.Data.ModifiedById = currentUser.Data.Username;
 
             var result = await categoryRepository.UpdateCategoryAsync(oldCategory.Data);
             if (!result.IsSuccess)
@@ -288,7 +288,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
 
             category.Data.Status = GeneralStatus.Deleted;
             category.Data.ModifiedAt = DateTime.Now;
-            category.Data.ModifiedById = currentUser.Data.UserId;
+            category.Data.ModifiedById = currentUser.Data.Username;
 
             var result = await categoryRepository.UpdateCategoryAsync(category.Data);
             if (result.Data == null || !result.IsSuccess)
@@ -344,7 +344,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IHelperServ
                     ? GeneralStatus.Inactive
                     : GeneralStatus.Active;
             category.Data.ModifiedAt = DateTime.Now;
-            category.Data.ModifiedById = currentUser.Data.UserId;
+            category.Data.ModifiedById = currentUser.Data.Username;
 
             var result = await categoryRepository.UpdateCategoryAsync(category.Data);
             if (result.Data == null || !result.IsSuccess)

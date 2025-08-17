@@ -12,18 +12,17 @@ namespace SmE_CommerceUnitTest.ProductServiceUnitTest;
 public class AddProductVariantAsyncTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
-    private readonly IProductService _productService;
+    private readonly ProductService _productService;
 
     public AddProductVariantAsyncTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
-        _categoryRepositoryMock = new Mock<ICategoryRepository>();
+        var categoryRepositoryMock = new Mock<ICategoryRepository>();
         _helperServiceMock = new Mock<IHelperService>();
         _productService = new ProductService(
             _productRepositoryMock.Object,
-            _categoryRepositoryMock.Object,
+            categoryRepositoryMock.Object,
             _helperServiceMock.Object
         );
     }
@@ -57,8 +56,8 @@ public class AddProductVariantAsyncTests
             {
                 Price = 10,
                 StockQuantity = 10,
-                VariantValues = new List<ProductVariantValueReqDto>()
-            }
+                VariantValues = new List<ProductVariantValueReqDto>(),
+            },
         };
 
         // Act - Execute the method with the invalid request
@@ -87,10 +86,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
 
         // Act - Call the method with the invalid price
@@ -119,10 +118,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
 
         // Act - Execute the method with the invalid stock quantity
@@ -151,10 +150,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -188,10 +187,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -200,7 +199,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -228,10 +227,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -240,7 +239,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -275,10 +274,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -287,7 +286,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -296,8 +295,8 @@ public class AddProductVariantAsyncTests
                 new Return<Product>
                 {
                     IsSuccess = true,
-                    Data = new Product { Status = ProductStatus.Deleted },
-                    StatusCode = ErrorCode.Ok
+                    Data = new Product { Status = ProductStatus.Deleted, CreateById = "AnhNV" },
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -327,10 +326,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = Guid.NewGuid(),
-                        VariantValue = "value"
-                    }
-                ]
-            }
+                        VariantValue = "value",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -339,7 +338,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -351,9 +350,10 @@ public class AddProductVariantAsyncTests
                     Data = new Product
                     {
                         HasVariant = false,
-                        ProductVariants = new List<ProductVariant>()
+                        ProductVariants = new List<ProductVariant>(),
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -385,15 +385,15 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId2,
-                        VariantValue = "value2"
+                        VariantValue = "value2",
                     },
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId2,
-                        VariantValue = "value3"
-                    }
-                ]
-            }
+                        VariantValue = "value3",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -402,7 +402,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -420,12 +420,14 @@ public class AddProductVariantAsyncTests
                             {
                                 VariantAttributes = new List<VariantAttribute>
                                 {
-                                    new() { VariantNameId = variantNameId1, Value = "value1" }
-                                }
-                            }
-                        }
+                                    new() { VariantNameId = variantNameId1, Value = "value1" },
+                                },
+                                CreateById = "AnhNV",
+                            },
+                        },
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -456,10 +458,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
-            }
+                        VariantValue = "value1",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -468,7 +470,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -490,9 +492,10 @@ public class AddProductVariantAsyncTests
                                     new VariantAttribute
                                     {
                                         VariantNameId = variantNameId,
-                                        Value = "value1"
-                                    }
-                                ]
+                                        Value = "value1",
+                                    },
+                                ],
+                                CreateById = "AnhNV",
                             },
                             new ProductVariant
                             {
@@ -501,12 +504,14 @@ public class AddProductVariantAsyncTests
                                     new VariantAttribute
                                     {
                                         VariantNameId = variantNameId,
-                                        Value = "value2"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                                        Value = "value2",
+                                    },
+                                ],
+                                CreateById = "AnhNV",
+                            },
+                        ],
+                        CreateById = "AnhNV",
+                    },
                 }
             );
 
@@ -537,9 +542,9 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
+                        VariantValue = "value1",
+                    },
+                ],
             },
             new()
             {
@@ -550,10 +555,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
-            }
+                        VariantValue = "value1",
+                    },
+                ],
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -562,7 +567,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -574,9 +579,10 @@ public class AddProductVariantAsyncTests
                     Data = new Product
                     {
                         HasVariant = false,
-                        ProductVariants = new List<ProductVariant>()
+                        ProductVariants = new List<ProductVariant>(),
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -601,8 +607,8 @@ public class AddProductVariantAsyncTests
             {
                 Price = 10,
                 StockQuantity = 10,
-                VariantValues = new List<ProductVariantValueReqDto>()
-            }
+                VariantValues = new List<ProductVariantValueReqDto>(),
+            },
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -611,7 +617,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = Guid.NewGuid() },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -623,9 +629,10 @@ public class AddProductVariantAsyncTests
                     Data = new Product
                     {
                         HasVariant = false,
-                        ProductVariants = new List<ProductVariant>()
+                        ProductVariants = new List<ProductVariant>(),
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -656,9 +663,9 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
+                        VariantValue = "value1",
+                    },
+                ],
             },
             new()
             {
@@ -669,10 +676,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value2"
-                    }
-                ]
-            }
+                        VariantValue = "value2",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -682,7 +689,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         var product = new Product
@@ -690,7 +697,8 @@ public class AddProductVariantAsyncTests
             HasVariant = false,
             ProductVariants = new List<ProductVariant>(),
             StockQuantity = 0,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _productRepositoryMock
             .Setup(x => x.GetProductByIdForUpdateAsync(productId))
@@ -699,7 +707,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -709,7 +717,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -741,10 +749,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value3"
-                    }
-                ]
-            }
+                        VariantValue = "value3",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -754,7 +762,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         var product = new Product
@@ -766,19 +774,22 @@ public class AddProductVariantAsyncTests
                 {
                     VariantAttributes =
                     [
-                        new VariantAttribute { VariantNameId = variantNameId, Value = "value1" }
-                    ]
+                        new VariantAttribute { VariantNameId = variantNameId, Value = "value1" },
+                    ],
+                    CreateById = "AnhNV",
                 },
                 new ProductVariant
                 {
                     VariantAttributes =
                     [
-                        new VariantAttribute { VariantNameId = variantNameId, Value = "value2" }
-                    ]
-                }
+                        new VariantAttribute { VariantNameId = variantNameId, Value = "value2" },
+                    ],
+                    CreateById = "AnhNV",
+                },
             ],
             StockQuantity = 5,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _productRepositoryMock
             .Setup(x => x.GetProductByIdForUpdateAsync(productId))
@@ -787,7 +798,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -797,7 +808,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -829,9 +840,9 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
+                        VariantValue = "value1",
+                    },
+                ],
             },
             new()
             {
@@ -842,10 +853,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value2"
-                    }
-                ]
-            }
+                        VariantValue = "value2",
+                    },
+                ],
+            },
         };
 
         var userId = Guid.NewGuid();
@@ -856,7 +867,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -864,7 +875,8 @@ public class AddProductVariantAsyncTests
         {
             HasVariant = false,
             ProductVariants = new List<ProductVariant>(),
-            StockQuantity = 0
+            StockQuantity = 0,
+            CreateById = "AnhNV",
         };
 
         _productRepositoryMock
@@ -874,7 +886,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -884,7 +896,7 @@ public class AddProductVariantAsyncTests
                 new Return<Product>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InternalServerError
+                    StatusCode = ErrorCode.InternalServerError,
                 }
             );
 
@@ -915,10 +927,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = variantNameId,
-                        VariantValue = "value1"
-                    }
-                ]
-            }
+                        VariantValue = "value1",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -928,7 +940,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -961,8 +973,8 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 5,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-                ]
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+                ],
             },
             new()
             {
@@ -974,10 +986,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Blue"
-                    }
-                ]
-            }
+                        VariantValue = "Blue",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -987,7 +999,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -999,9 +1011,10 @@ public class AddProductVariantAsyncTests
                     Data = new Product
                     {
                         HasVariant = false,
-                        ProductVariants = new List<ProductVariant>()
+                        ProductVariants = new List<ProductVariant>(),
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1030,8 +1043,8 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 5,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-                ]
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+                ],
             },
             new()
             {
@@ -1042,10 +1055,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Blue"
-                    }
-                ]
-            }
+                        VariantValue = "Blue",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1055,7 +1068,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1067,9 +1080,10 @@ public class AddProductVariantAsyncTests
                     Data = new Product
                     {
                         HasVariant = false,
-                        ProductVariants = new List<ProductVariant>()
+                        ProductVariants = new List<ProductVariant>(),
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1099,9 +1113,9 @@ public class AddProductVariantAsyncTests
                 VariantValues =
                 [
                     new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-                ]
-            }
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1111,7 +1125,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1130,12 +1144,14 @@ public class AddProductVariantAsyncTests
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "L" },
-                                    new() { VariantNameId = colorId, Value = "Red" } // 2 attributes
-                                }
-                            }
-                        }
+                                    new() { VariantNameId = colorId, Value = "Red" }, // 2 attributes
+                                },
+                                CreateById = "AnhNV",
+                            },
+                        },
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1169,10 +1185,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = materialId,
-                        VariantValue = "Cotton"
-                    }
-                ]
-            }
+                        VariantValue = "Cotton",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1182,7 +1198,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1201,12 +1217,14 @@ public class AddProductVariantAsyncTests
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "S" },
-                                    new() { VariantNameId = colorId, Value = "Red" } // Size + Color
-                                }
-                            }
-                        }
+                                    new() { VariantNameId = colorId, Value = "Red" }, // Size + Color
+                                },
+                                CreateById = "AnhNV",
+                            },
+                        },
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1234,9 +1252,9 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 5,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-                ]
-            }
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1246,7 +1264,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1264,13 +1282,15 @@ public class AddProductVariantAsyncTests
                             {
                                 VariantAttributes = new List<VariantAttribute>
                                 {
-                                    new() { VariantNameId = sizeId, Value = "M" }
-                                }
-                            }
+                                    new() { VariantNameId = sizeId, Value = "M" },
+                                },
+                                CreateById = "AnhNV",
+                            },
                         },
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1300,8 +1320,8 @@ public class AddProductVariantAsyncTests
                 VariantValues =
                 [
                     new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
-                    new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" }
-                ]
+                    new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" },
+                ],
             },
             new()
             {
@@ -1313,10 +1333,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Blue"
-                    }
-                ]
-            }
+                        VariantValue = "Blue",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1326,7 +1346,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         var product = new Product
@@ -1334,7 +1354,8 @@ public class AddProductVariantAsyncTests
             HasVariant = false,
             ProductVariants = [],
             StockQuantity = 0,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _productRepositoryMock
             .Setup(x => x.GetProductByIdForUpdateAsync(productId))
@@ -1343,7 +1364,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1359,7 +1380,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1390,8 +1411,8 @@ public class AddProductVariantAsyncTests
                 VariantValues =
                 [
                     new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
-                    new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" }
-                ]
+                    new ProductVariantValueReqDto { VariantNameId = colorId, VariantValue = "Red" },
+                ],
             },
             new()
             {
@@ -1403,10 +1424,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Blue"
-                    }
-                ]
-            }
+                        VariantValue = "Blue",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1416,7 +1437,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         var product = new Product
@@ -1424,7 +1445,8 @@ public class AddProductVariantAsyncTests
             HasVariant = false,
             ProductVariants = new List<ProductVariant>(),
             StockQuantity = 0,
-            Status = ProductStatus.Inactive
+            Status = ProductStatus.Inactive,
+            CreateById = "AnhNV",
         };
         _productRepositoryMock
             .Setup(x => x.GetProductByIdForUpdateAsync(productId))
@@ -1433,7 +1455,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1449,7 +1471,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1479,9 +1501,9 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 15,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "L" } // Only size
-                ]
-            }
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "L" }, // Only size
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1491,7 +1513,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1510,22 +1532,25 @@ public class AddProductVariantAsyncTests
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "S" },
-                                    new() { VariantNameId = colorId, Value = "Red" }
-                                }
+                                    new() { VariantNameId = colorId, Value = "Red" },
+                                },
+                                CreateById = "AnhNV",
                             },
                             new()
                             {
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "M" },
-                                    new() { VariantNameId = colorId, Value = "Blue" }
-                                }
-                            }
+                                    new() { VariantNameId = colorId, Value = "Blue" },
+                                },
+                                CreateById = "AnhNV",
+                            },
                         },
                         StockQuantity = 20,
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1559,15 +1584,15 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Green"
+                        VariantValue = "Green",
                     },
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = materialId,
-                        VariantValue = "Cotton"
-                    } // Extra attribute
-                ]
-            }
+                        VariantValue = "Cotton",
+                    }, // Extra attribute
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1577,7 +1602,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1596,22 +1621,25 @@ public class AddProductVariantAsyncTests
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "S" },
-                                    new() { VariantNameId = colorId, Value = "Red" }
-                                }
+                                    new() { VariantNameId = colorId, Value = "Red" },
+                                },
+                                CreateById = "AnhNV",
                             },
                             new()
                             {
                                 VariantAttributes = new List<VariantAttribute>
                                 {
                                     new() { VariantNameId = sizeId, Value = "M" },
-                                    new() { VariantNameId = colorId, Value = "Blue" }
-                                }
-                            }
+                                    new() { VariantNameId = colorId, Value = "Blue" },
+                                },
+                                CreateById = "AnhNV",
+                            },
                         },
                         StockQuantity = 20,
-                        Status = ProductStatus.Active
+                        Status = ProductStatus.Active,
+                        CreateById = "AnhNV",
                     },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1644,9 +1672,9 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Green"
-                    }
-                ]
+                        VariantValue = "Green",
+                    },
+                ],
             },
             new()
             {
@@ -1658,10 +1686,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Black"
-                    }
-                ]
-            }
+                        VariantValue = "Black",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         _helperServiceMock
@@ -1671,7 +1699,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         var product = new Product
@@ -1684,20 +1712,23 @@ public class AddProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "M" },
-                        new() { VariantNameId = colorId, Value = "Blue" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Blue" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 20,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _productRepositoryMock
             .Setup(x => x.GetProductByIdForUpdateAsync(productId))
@@ -1706,7 +1737,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -1716,7 +1747,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1746,8 +1777,8 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 5,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" }
-                ]
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "S" },
+                ],
             },
             new()
             {
@@ -1755,9 +1786,9 @@ public class AddProductVariantAsyncTests
                 StockQuantity = 10,
                 VariantValues =
                 [
-                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" }
-                ]
-            }
+                    new ProductVariantValueReqDto { VariantNameId = sizeId, VariantValue = "M" },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1766,7 +1797,8 @@ public class AddProductVariantAsyncTests
             HasVariant = false,
             ProductVariants = new List<ProductVariant>(),
             StockQuantity = 0,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
 
         _helperServiceMock
@@ -1776,7 +1808,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1787,7 +1819,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1802,7 +1834,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1840,10 +1872,10 @@ public class AddProductVariantAsyncTests
                     new ProductVariantValueReqDto
                     {
                         VariantNameId = colorId,
-                        VariantValue = "Green"
-                    }
-                ]
-            }
+                        VariantValue = "Green",
+                    },
+                ],
+            },
         };
         var userId = Guid.NewGuid();
         var product = new Product
@@ -1858,8 +1890,9 @@ public class AddProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "S" },
-                        new() { VariantNameId = colorId, Value = "Red" }
-                    }
+                        new() { VariantNameId = colorId, Value = "Red" },
+                    },
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
@@ -1867,12 +1900,14 @@ public class AddProductVariantAsyncTests
                     VariantAttributes = new List<VariantAttribute>
                     {
                         new() { VariantNameId = sizeId, Value = "M" },
-                        new() { VariantNameId = colorId, Value = "Blue" }
-                    }
-                }
+                        new() { VariantNameId = colorId, Value = "Blue" },
+                    },
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 50,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
 
         _helperServiceMock
@@ -1882,7 +1917,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1893,7 +1928,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -1904,7 +1939,7 @@ public class AddProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 

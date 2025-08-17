@@ -146,8 +146,6 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
                 .Include(x => x.ProductVariants)
                 .Include(x => x.Reviews)
                 .ThenInclude(x => x.User)
-                .Include(x => x.CreateBy)
-                .Include(x => x.ModifiedBy)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)
@@ -192,8 +190,6 @@ public class ProductRepository(SmECommerceContext dbContext, ISettingRepository 
                 .Include(x => x.ProductAttributes)
                 .Include(x => x.ProductVariants)
                 .ThenInclude(x => x.VariantAttributes)
-                .Include(x => x.CreateBy)
-                .Include(x => x.ModifiedBy)
                 .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             if (product is null)

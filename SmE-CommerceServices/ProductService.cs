@@ -328,7 +328,6 @@ public class ProductService(
             }
 
             // Step 6: Add ProductVariants and VariantAttributes
-            var currentUserId = currentUser.Data.UserId;
             var now = DateTime.Now;
 
             // Map product variants
@@ -352,7 +351,7 @@ public class ProductService(
                             Value = v.VariantValue,
                         })
                         .ToList(),
-                    CreateById = currentUserId,
+                    CreateById = currentUser.Data.Username,
                     CreatedAt = now,
                 })
                 .ToList();
@@ -381,7 +380,7 @@ public class ProductService(
             existingProduct.Data.Price = existingProduct
                 .Data.ProductVariants.Select(x => x.Price)
                 .Min();
-            existingProduct.Data.ModifiedById = currentUserId;
+            existingProduct.Data.ModifiedById = currentUser.Data.Username;
             existingProduct.Data.ModifiedAt = now;
 
             var updateProductResult = await productRepository.UpdateProductAsync(
@@ -592,7 +591,7 @@ public class ProductService(
             foreach (var va in variantToUpdate.VariantAttributes)
                 va.Value = newAttributesDict[va.VariantNameId];
 
-            variantToUpdate.ModifiedById = currentUser.Data.UserId;
+            variantToUpdate.ModifiedById = currentUser.Data.Username;
             variantToUpdate.ModifiedAt = now;
 
             existingProduct.Data.StockQuantity += stockDifference;
@@ -610,7 +609,7 @@ public class ProductService(
             existingProduct.Data.Price = existingProduct
                 .Data.ProductVariants.Select(x => x.Price)
                 .Min();
-            existingProduct.Data.ModifiedById = currentUser.Data.UserId;
+            existingProduct.Data.ModifiedById = currentUser.Data.Username;
             existingProduct.Data.ModifiedAt = now;
 
             // Step 9: Save changes
@@ -711,10 +710,10 @@ public class ProductService(
             var now = DateTime.Now;
             variant.Status = ProductStatus.Deleted;
             variant.ModifiedAt = now;
-            variant.ModifiedById = currentUser.Data.UserId;
+            variant.ModifiedById = currentUser.Data.Username;
 
             existingProduct.Data.StockQuantity -= variant.StockQuantity;
-            existingProduct.Data.ModifiedById = currentUser.Data.UserId;
+            existingProduct.Data.ModifiedById = currentUser.Data.Username;
             existingProduct.Data.ModifiedAt = now;
 
             // Reset stock quantity to 0
@@ -1203,10 +1202,8 @@ public class ProductService(
                     {
                         CreatedById = result.Data.CreateById,
                         CreatedAt = result.Data.CreatedAt,
-                        CreatedBy = result.Data.CreateBy?.FullName,
                         ModifiedById = result.Data.ModifiedById,
                         ModifiedAt = result.Data.ModifiedAt,
-                        ModifiedBy = result.Data.ModifiedBy?.FullName,
                     },
                     // Variant info
                     HasVariant = result.Data.HasVariant,
@@ -1223,10 +1220,8 @@ public class ProductService(
                             {
                                 CreatedById = variant.CreateById,
                                 CreatedAt = variant.CreatedAt,
-                                CreatedBy = variant.CreateBy?.FullName,
                                 ModifiedById = variant.ModifiedById,
                                 ModifiedAt = variant.ModifiedAt,
-                                ModifiedBy = variant.ModifiedBy?.FullName,
                             },
                             VariantAttributes = variant
                                 .VariantAttributes.Select(attr => new GetVariantAttributeResDto
@@ -1315,7 +1310,6 @@ public class ProductService(
                 req.Description?.Trim() ?? $"Buy {req.Name.Trim()} at the best price!";
 
             var now = DateTime.Now;
-            var curUserId = currentUser.Data.UserId;
             var product = new Product
             {
                 Name = req.Name.Trim(),
@@ -1326,9 +1320,9 @@ public class ProductService(
                 SoldQuantity = 0,
                 Status = req.StockQuantity > 0 ? ProductStatus.Active : ProductStatus.OutOfStock,
                 CreatedAt = now,
-                CreateById = curUserId,
+                CreateById = currentUser.Data.Username,
                 ModifiedAt = now,
-                ModifiedById = curUserId,
+                ModifiedById = currentUser.Data.Username,
                 Slug = slug,
                 MetaTitle = metaTitle,
                 MetaDescription = metaDescription,
@@ -1598,7 +1592,7 @@ public class ProductService(
             product.MetaDescription =
                 req.Description?.Trim() ?? $"Buy {req.Name.Trim()} at the best price!";
             product.Status = newStatus;
-            product.ModifiedById = currentUser.Data.UserId;
+            product.ModifiedById = currentUser.Data.Username;
             product.ModifiedAt = DateTime.Now;
 
             // Step 8: Update product in the database
@@ -1716,7 +1710,7 @@ public class ProductService(
             // Step 4: Update product status to deleted
             var now = DateTime.Now;
             product.Data.Status = ProductStatus.Deleted;
-            product.Data.ModifiedById = currentUser.Data.UserId;
+            product.Data.ModifiedById = currentUser.Data.Username;
             product.Data.ModifiedAt = now;
 
             // Step 5: Update status of ProductVariants if any
@@ -1724,7 +1718,7 @@ public class ProductService(
                 foreach (var variant in product.Data.ProductVariants)
                 {
                     variant.Status = ProductStatus.Deleted;
-                    variant.ModifiedById = currentUser.Data.UserId;
+                    variant.ModifiedById = currentUser.Data.Username;
                     variant.ModifiedAt = now;
                 }
 

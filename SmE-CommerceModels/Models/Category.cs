@@ -25,28 +25,22 @@ public class Category
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("slug")]
     [StringLength(255)]
     public string? Slug { get; set; }
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("CategoryCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("CategoryModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Category")]
     public virtual ICollection<ProductCategory> ProductCategories { get; set; } =

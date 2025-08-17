@@ -14,24 +14,18 @@ public class VariantName
     public string Name { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createdById")]
-    public Guid? CreatedById { get; set; }
+    [StringLength(50)]
+    public required string CreatedById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
-
-    [ForeignKey("CreatedById")]
-    [InverseProperty("VariantNameCreatedBies")]
-    public virtual User? CreatedBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("VariantNameModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [InverseProperty("VariantName")]
     public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } =

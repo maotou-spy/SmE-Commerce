@@ -29,7 +29,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = null,
                     IsSuccess = false,
                     StatusCode = currentCustomer.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             var result = await addressRepository.GetAddressesByUserIdAsync(
@@ -42,7 +42,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = null,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             var addresses = result
@@ -56,13 +56,16 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     District = address.District,
                     City = address.City,
                     IsDefault = address.IsDefault,
-                    fullAddress = string.Join(", ", new[] {
-                        address.Address1,
-                        address.Ward,
-                        address.District,
-                        address.City
-                    }.Where(s => !string.IsNullOrWhiteSpace(s)))
-
+                    fullAddress = string.Join(
+                        ", ",
+                        new[]
+                        {
+                            address.Address1,
+                            address.Ward,
+                            address.District,
+                            address.City,
+                        }.Where(s => !string.IsNullOrWhiteSpace(s))
+                    ),
                 })
                 .ToList();
 
@@ -71,7 +74,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = addresses,
                 IsSuccess = true,
                 StatusCode = result.StatusCode,
-                TotalRecord = result.TotalRecord
+                TotalRecord = result.TotalRecord,
             };
         }
         catch (Exception ex)
@@ -82,7 +85,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -101,7 +104,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentCustomer.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             var isDuplicate = await CheckDuplicateAddressAsync(
@@ -114,7 +117,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = false,
                     IsSuccess = false,
                     StatusCode = isDuplicate.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             if (addressReq.IsDefault)
@@ -125,7 +128,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     {
                         Data = false,
                         IsSuccess = false,
-                        StatusCode = removeDefault.StatusCode
+                        StatusCode = removeDefault.StatusCode,
                     };
             }
 
@@ -140,8 +143,8 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 IsDefault = addressReq.IsDefault,
                 UserId = currentCustomer.Data.UserId,
                 CreatedAt = DateTime.Now,
-                CreateById = currentCustomer.Data.UserId,
-                Status = GeneralStatus.Active
+                CreateById = currentCustomer.Data.Username,
+                Status = GeneralStatus.Active,
             };
 
             var result = await addressRepository.AddAddressAsync(address);
@@ -152,7 +155,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = false,
                     IsSuccess = false,
                     StatusCode = result.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             scope.Complete();
@@ -162,7 +165,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.StatusCode,
-                TotalRecord = result.TotalRecord
+                TotalRecord = result.TotalRecord,
             };
         }
         catch (Exception ex)
@@ -173,7 +176,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -194,7 +197,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = currentCustomer.StatusCode
+                    StatusCode = currentCustomer.StatusCode,
                 };
 
             var existingAddress = await addressRepository.GetAddressByIdAsync(addressId);
@@ -203,7 +206,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = existingAddress.StatusCode
+                    StatusCode = existingAddress.StatusCode,
                 };
 
             // Check if there is no changes in the address
@@ -219,10 +222,10 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                         Ward = existingAddress.Data.Ward,
                         District = existingAddress.Data.District,
                         City = existingAddress.Data.City,
-                        IsDefault = existingAddress.Data.IsDefault
+                        IsDefault = existingAddress.Data.IsDefault,
                     },
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 };
 
             var isDuplicate = await CheckDuplicateAddressAsync(
@@ -236,7 +239,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = null,
                     IsSuccess = false,
                     StatusCode = isDuplicate.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             if (addressReq.IsDefault)
@@ -247,7 +250,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     {
                         Data = null,
                         IsSuccess = false,
-                        StatusCode = removeDefault.StatusCode
+                        StatusCode = removeDefault.StatusCode,
                     };
             }
 
@@ -259,7 +262,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             existingAddress.Data.City = addressReq.City.Trim();
             existingAddress.Data.IsDefault = addressReq.IsDefault;
             existingAddress.Data.ModifiedAt = DateTime.Now;
-            existingAddress.Data.ModifiedById = currentCustomer.Data.UserId;
+            existingAddress.Data.ModifiedById = currentCustomer.Data.Username;
 
             var result = await addressRepository.UpdateAddressAsync(existingAddress.Data);
 
@@ -268,7 +271,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = null,
                     IsSuccess = false,
-                    StatusCode = result.StatusCode
+                    StatusCode = result.StatusCode,
                 };
 
             scope.Complete();
@@ -281,14 +284,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Ward = result.Data.Ward,
                 District = result.Data.District,
                 City = result.Data.City,
-                IsDefault = result.Data.IsDefault
+                IsDefault = result.Data.IsDefault,
             };
 
             return new Return<GetUserAddressesResDto>
             {
                 Data = addressDto,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -298,7 +301,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -316,7 +319,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentCustomer.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             var result = await addressRepository.DeleteAddressAsync(id);
@@ -326,7 +329,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.StatusCode,
-                TotalRecord = result.TotalRecord
+                TotalRecord = result.TotalRecord,
             };
         }
         catch (Exception ex)
@@ -337,7 +340,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -355,7 +358,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                     Data = false,
                     IsSuccess = false,
                     StatusCode = currentCustomer.StatusCode,
-                    TotalRecord = 0
+                    TotalRecord = 0,
                 };
 
             var result = await addressRepository.SetDefaultAddressAsync(id);
@@ -365,7 +368,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = result.Data,
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.StatusCode,
-                TotalRecord = result.TotalRecord
+                TotalRecord = result.TotalRecord,
             };
         }
         catch (Exception ex)
@@ -376,7 +379,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
                 InternalErrorMessage = ex,
-                TotalRecord = 0
+                TotalRecord = 0,
             };
         }
     }
@@ -385,6 +388,15 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
     {
         try
         {
+            var currentCustomer = await helperService.GetCurrentUser();
+            if (!currentCustomer.IsSuccess || currentCustomer.Data == null)
+                return new Return<bool>
+                {
+                    Data = false,
+                    IsSuccess = false,
+                    StatusCode = currentCustomer.StatusCode,
+                };
+
             var defaultAddress = await addressRepository.GetDefaultAddressAsync(userId);
 
             if (defaultAddress is not { Data: not null, IsSuccess: true })
@@ -392,12 +404,12 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = true,
                     IsSuccess = true,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 };
 
             defaultAddress.Data.IsDefault = false;
             defaultAddress.Data.ModifiedAt = DateTime.Now;
-            defaultAddress.Data.ModifiedById = userId;
+            defaultAddress.Data.ModifiedById = currentCustomer.Data.Username;
 
             var updateAddress = await addressRepository.UpdateAddressAsync(defaultAddress.Data);
 
@@ -406,14 +418,14 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 {
                     Data = false,
                     IsSuccess = false,
-                    StatusCode = updateAddress.StatusCode
+                    StatusCode = updateAddress.StatusCode,
                 };
 
             return new Return<bool>
             {
                 Data = true,
                 IsSuccess = true,
-                StatusCode = ErrorCode.Ok
+                StatusCode = ErrorCode.Ok,
             };
         }
         catch (Exception ex)
@@ -423,7 +435,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
                 Data = false,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-                InternalErrorMessage = ex
+                InternalErrorMessage = ex,
             };
         }
     }
@@ -441,7 +453,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
             {
                 Data = false,
                 IsSuccess = true,
-                StatusCode = ErrorCode.AddressAlreadyExists
+                StatusCode = ErrorCode.AddressAlreadyExists,
             };
 
         var isDuplicate =
@@ -475,7 +487,7 @@ public class AddressService(IAddressRepository addressRepository, IHelperService
         {
             Data = isDuplicate,
             IsSuccess = true,
-            StatusCode = isDuplicate ? ErrorCode.AddressAlreadyExists : ErrorCode.Ok
+            StatusCode = isDuplicate ? ErrorCode.AddressAlreadyExists : ErrorCode.Ok,
         };
     }
 

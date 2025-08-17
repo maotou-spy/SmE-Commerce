@@ -41,16 +41,18 @@ public class Order
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("note", TypeName = "character varying")]
     public string? Note { get; set; }
@@ -84,17 +86,9 @@ public class Order
     [InverseProperty("Orders")]
     public virtual Address Address { get; set; } = null!;
 
-    [ForeignKey("CreateById")]
-    [InverseProperty("OrderCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
     [ForeignKey("DiscountCodeId")]
     [InverseProperty("Orders")]
     public virtual DiscountCode? DiscountCode { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("OrderModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 
     [InverseProperty("Order")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

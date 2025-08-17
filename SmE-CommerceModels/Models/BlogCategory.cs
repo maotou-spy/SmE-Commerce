@@ -25,26 +25,20 @@ public class BlogCategory
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [InverseProperty("BlogCategory")]
     public virtual ICollection<ContentCategoryMap> ContentCategoryMaps { get; set; } =
         new List<ContentCategoryMap>();
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("BlogCategoryCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("BlogCategoryModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
 }

@@ -11,18 +11,17 @@ namespace SmE_CommerceUnitTest.ProductServiceUnitTest;
 public class DeleteProductVariantAsyncTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
     private readonly Mock<IHelperService> _helperServiceMock;
-    private readonly IProductService _productService;
+    private readonly ProductService _productService;
 
     public DeleteProductVariantAsyncTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
-        _categoryRepositoryMock = new Mock<ICategoryRepository>();
+        var categoryRepositoryMock = new Mock<ICategoryRepository>();
         _helperServiceMock = new Mock<IHelperService>();
         _productService = new ProductService(
             _productRepositoryMock.Object,
-            _categoryRepositoryMock.Object,
+            categoryRepositoryMock.Object,
             _helperServiceMock.Object
         );
     }
@@ -64,7 +63,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -90,7 +89,7 @@ public class DeleteProductVariantAsyncTests
         var productId = Guid.NewGuid();
         var variantId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var product = new Product { Status = ProductStatus.Deleted };
+        var product = new Product { Status = ProductStatus.Deleted, CreateById = "AnhNV" };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
             .ReturnsAsync(
@@ -98,7 +97,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -108,7 +107,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -133,7 +132,8 @@ public class DeleteProductVariantAsyncTests
         {
             HasVariant = false,
             ProductVariants = new List<ProductVariant>(),
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -142,7 +142,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -152,7 +152,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -177,7 +177,8 @@ public class DeleteProductVariantAsyncTests
         {
             HasVariant = true,
             ProductVariants = new List<ProductVariant>(),
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -186,7 +187,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -196,7 +197,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -222,9 +223,15 @@ public class DeleteProductVariantAsyncTests
             HasVariant = true,
             ProductVariants = new List<ProductVariant>
             {
-                new() { ProductVariantId = Guid.NewGuid(), Status = ProductStatus.Active }
+                new()
+                {
+                    ProductVariantId = Guid.NewGuid(),
+                    Status = ProductStatus.Active,
+                    CreateById = "AnhNV",
+                },
             },
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -233,7 +240,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -243,7 +250,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -269,9 +276,15 @@ public class DeleteProductVariantAsyncTests
             HasVariant = true,
             ProductVariants = new List<ProductVariant>
             {
-                new() { ProductVariantId = variantId, Status = ProductStatus.Deleted }
+                new()
+                {
+                    ProductVariantId = variantId,
+                    Status = ProductStatus.Deleted,
+                    CreateById = "AnhNV",
+                },
             },
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -280,7 +293,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -290,7 +303,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -320,18 +333,26 @@ public class DeleteProductVariantAsyncTests
                 {
                     ProductVariantId = variantId,
                     Status = ProductStatus.Active,
-                    StockQuantity = 10
+                    StockQuantity = 10,
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     ProductVariantId = Guid.NewGuid(),
                     Status = ProductStatus.Active,
-                    StockQuantity = 20
+                    StockQuantity = 20,
+                    CreateById = "AnhNV",
                 },
-                new() { ProductVariantId = Guid.NewGuid(), Status = ProductStatus.Deleted }
+                new()
+                {
+                    ProductVariantId = Guid.NewGuid(),
+                    Status = ProductStatus.Deleted,
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 30,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -340,7 +361,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -350,7 +371,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -380,12 +401,19 @@ public class DeleteProductVariantAsyncTests
                 {
                     ProductVariantId = variantId,
                     Status = ProductStatus.Active,
-                    StockQuantity = 10
+                    StockQuantity = 10,
+                    CreateById = "AnhNV",
                 },
-                new() { ProductVariantId = Guid.NewGuid(), Status = ProductStatus.Deleted }
+                new()
+                {
+                    ProductVariantId = Guid.NewGuid(),
+                    Status = ProductStatus.Deleted,
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 10,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -394,7 +422,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -404,7 +432,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -424,7 +452,7 @@ public class DeleteProductVariantAsyncTests
         // Arrange
         var productId = Guid.NewGuid();
         var variantId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        const string username = "AnhNV";
         var product = new Product
         {
             HasVariant = true,
@@ -434,23 +462,27 @@ public class DeleteProductVariantAsyncTests
                 {
                     ProductVariantId = variantId,
                     Status = ProductStatus.Active,
-                    StockQuantity = 10
+                    StockQuantity = 10,
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     ProductVariantId = Guid.NewGuid(),
                     Status = ProductStatus.Active,
-                    StockQuantity = 20
+                    StockQuantity = 20,
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     ProductVariantId = Guid.NewGuid(),
                     Status = ProductStatus.Active,
-                    StockQuantity = 30
-                }
+                    StockQuantity = 30,
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 60,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -458,8 +490,8 @@ public class DeleteProductVariantAsyncTests
                 new Return<User>
                 {
                     IsSuccess = true,
-                    Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    Data = new User { Username = username },
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -469,7 +501,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -479,7 +511,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
 
@@ -499,7 +531,7 @@ public class DeleteProductVariantAsyncTests
             0,
             product.ProductVariants.First(v => v.ProductVariantId == variantId).StockQuantity
         );
-        Assert.Equal(userId, product.ModifiedById);
+        Assert.Equal(username, product.ModifiedById);
         Assert.Equal(50, product.StockQuantity);
     }
 
@@ -520,23 +552,27 @@ public class DeleteProductVariantAsyncTests
                 {
                     ProductVariantId = variantId,
                     Status = ProductStatus.Active,
-                    StockQuantity = 10
+                    StockQuantity = 10,
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     ProductVariantId = Guid.NewGuid(),
                     Status = ProductStatus.Active,
-                    StockQuantity = 20
+                    StockQuantity = 20,
+                    CreateById = "AnhNV",
                 },
                 new()
                 {
                     ProductVariantId = Guid.NewGuid(),
                     Status = ProductStatus.Active,
-                    StockQuantity = 30
-                }
+                    StockQuantity = 30,
+                    CreateById = "AnhNV",
+                },
             },
             StockQuantity = 60,
-            Status = ProductStatus.Active
+            Status = ProductStatus.Active,
+            CreateById = "AnhNV",
         };
         _helperServiceMock
             .Setup(x => x.GetCurrentUserWithRoleAsync(RoleEnum.Manager))
@@ -545,7 +581,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -555,7 +591,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = product,
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock
@@ -564,7 +600,7 @@ public class DeleteProductVariantAsyncTests
                 new Return<Product>
                 {
                     IsSuccess = false,
-                    StatusCode = ErrorCode.InternalServerError
+                    StatusCode = ErrorCode.InternalServerError,
                 }
             );
 
@@ -592,7 +628,7 @@ public class DeleteProductVariantAsyncTests
                 {
                     IsSuccess = true,
                     Data = new User { UserId = userId },
-                    StatusCode = ErrorCode.Ok
+                    StatusCode = ErrorCode.Ok,
                 }
             );
         _productRepositoryMock

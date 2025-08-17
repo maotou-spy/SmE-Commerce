@@ -60,7 +60,7 @@ public class OrderService(
                 Description = reqDto.Description ?? "",
                 Status = reqDto.Status,
                 CreatedAt = DateTime.Now,
-                CreateById = currentCustomerId,
+                CreateById = order.Data.CreateById,
             };
 
             var result = await paymentRepository.CreatePaymentAsync(payment);
@@ -437,7 +437,7 @@ public class OrderService(
                 Status = OrderStatus.Pending,
                 PointsUsed = Math.Min((int)totalAmount, currentCustomer.Data.Point),
                 UserId = currentCustomer.Data.UserId,
-                CreateById = currentCustomer.Data.UserId,
+                CreateById = currentCustomer.Data.Username,
                 CreatedAt = DateTime.Now,
                 PointsEarned = (int)((subTotal - discountAmount) * convertedPoints / 100), // ex: 1% of total amount
             };
@@ -458,7 +458,7 @@ public class OrderService(
                 OrderId = result.Data.OrderId,
                 Status = OrderStatus.Pending,
                 ModifiedAt = DateTime.Now,
-                ModifiedById = currentCustomer.Data.UserId,
+                ModifiedById = currentCustomer.Data.Username,
             };
             var orderStatusHistory = await orderRepository.AddOrderStatusHistoryAsync(orderHistory);
             if (!orderStatusHistory.IsSuccess || orderStatusHistory.Data == null)
@@ -480,7 +480,7 @@ public class OrderService(
                 {
                     code.Data.Status = DiscountCodeStatus.Used;
                     code.Data.ModifiedAt = DateTime.Now;
-                    code.Data.ModifiedById = currentCustomer.Data.UserId;
+                    code.Data.ModifiedById = currentCustomer.Data.Username;
                     var updateResult = await discountRepository.UpdateDiscountCodeAsync(code.Data);
                     if (!updateResult.IsSuccess)
                         return new Return<bool>
@@ -535,7 +535,7 @@ public class OrderService(
 
                         currentCustomer.Data.Point -= pointToUse;
                         currentCustomer.Data.ModifiedAt = DateTime.Now;
-                        currentCustomer.Data.ModifiedById = currentCustomer.Data.UserId;
+                        currentCustomer.Data.ModifiedById = currentCustomer.Data.Username;
                         var updatePointResult = await userRepository.UpdateUserAsync(
                             currentCustomer.Data
                         );
@@ -747,11 +747,9 @@ public class OrderService(
                 SubTotal = order.Data.SubTotal,
                 Status = order.Data.Status,
                 CreateAt = order.Data.CreatedAt,
-                CreatedBy = order.Data.CreateById,
-                CreatedByUserName = order.Data.CreateBy?.FullName,
+                CreatedByUserName = order.Data.CreateById,
                 ModifiedAt = order.Data.ModifiedAt,
-                ModifiedBy = order.Data.ModifiedById,
-                ModifiedByUserName = order.Data.ModifiedBy?.FullName,
+                ModifiedByUserName = order.Data.ModifiedById,
                 OrderItems = order
                     .Data.OrderItems.Select(x => new GetOrderItemResDto
                     {
@@ -943,7 +941,7 @@ public class OrderService(
             {
                 order.Status = newStatus;
                 order.ModifiedAt = now;
-                order.ModifiedById = validUser.Data.UserId;
+                order.ModifiedById = validUser.Data.Username;
                 order.OrderStatusHistories.Add(
                     new OrderStatusHistory
                     {
@@ -951,7 +949,7 @@ public class OrderService(
                         Status = newStatus,
                         Reason = newReason,
                         ModifiedAt = now,
-                        ModifiedById = validUser.Data.UserId,
+                        ModifiedById = validUser.Data.Username,
                     }
                 );
             }
@@ -996,7 +994,7 @@ public class OrderService(
                     variant.StockQuantity += item.Quantity;
                     variant.SoldQuantity = Math.Max(0, variant.SoldQuantity - item.Quantity);
                     variant.ModifiedAt = now;
-                    variant.ModifiedById = validUser.Data.UserId;
+                    variant.ModifiedById = validUser.Data.Username;
 
                     var updateVariant = await productRepository.UpdateProductVariantAsync(variant);
                     if (!updateVariant.IsSuccess)
@@ -1024,7 +1022,7 @@ public class OrderService(
                     product.StockQuantity += item.Quantity;
                     product.SoldQuantity = Math.Max(0, product.SoldQuantity - item.Quantity);
                     product.ModifiedAt = now;
-                    product.ModifiedById = validUser.Data.UserId;
+                    product.ModifiedById = validUser.Data.Username;
 
                     if (product.StockQuantity > 0)
                         product.Status = ProductStatus.Active;
@@ -1060,7 +1058,7 @@ public class OrderService(
 
                 userResult.Data.Point += order.PointsUsed;
                 userResult.Data.ModifiedAt = now;
-                userResult.Data.ModifiedById = validUser.Data.UserId;
+                userResult.Data.ModifiedById = validUser.Data.Username;
 
                 var updateUser = await userRepository.UpdateUserAsync(userResult.Data);
                 if (!updateUser.IsSuccess)
@@ -1140,7 +1138,7 @@ public class OrderService(
 
                 order.Data.Status = newStatus;
                 order.Data.ModifiedAt = DateTime.Now;
-                order.Data.ModifiedById = currentUser.Data.UserId;
+                order.Data.ModifiedById = currentUser.Data.Username;
                 order.Data.OrderStatusHistories.Add(
                     new OrderStatusHistory
                     {
@@ -1148,7 +1146,7 @@ public class OrderService(
                         Status = newStatus,
                         Reason = req.Reason?.Trim(),
                         ModifiedAt = DateTime.Now,
-                        ModifiedById = currentUser.Data.UserId,
+                        ModifiedById = currentUser.Data.Username,
                     }
                 );
 
@@ -1317,7 +1315,7 @@ public class OrderService(
                 var now = DateTime.Now;
                 order.Status = OrderStatus.Completed;
                 order.ModifiedAt = now;
-                order.ModifiedById = Guid.Empty; // System user
+                order.ModifiedById = RoleEnum.System; // System user
 
                 // Calculate points earned
                 var pointsConversionRate = await settingRepository.GetSettingByKeyAsync(
@@ -1347,7 +1345,7 @@ public class OrderService(
                     Status = OrderStatus.Completed,
                     Reason = "System auto-completed the order",
                     ModifiedAt = DateTime.Now,
-                    ModifiedById = Guid.Empty, // System user
+                    ModifiedById = RoleEnum.System, // System user
                 };
                 var createHistoryResult = await orderRepository.AddOrderStatusHistoryAsync(history);
                 if (!createHistoryResult.IsSuccess || createHistoryResult.Data == null)

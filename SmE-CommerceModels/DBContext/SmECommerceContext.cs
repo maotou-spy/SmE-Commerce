@@ -101,16 +101,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
 
             entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.AddressCreateBies)
-                .HasConstraintName("Addresses_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.AddressModifiedBies)
-                .HasConstraintName("Addresses_modifiedById_fk");
-
-            entity
                 .HasOne(d => d.User)
                 .WithMany(p => p.AddressUsers)
                 .HasConstraintName("fk_useraddress");
@@ -135,16 +125,6 @@ public partial class SmECommerceContext : DbContext
 
             entity.Property(e => e.BankInfoId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.BankInfoCreateBies)
-                .HasConstraintName("BankInfo_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.BankInfoModifiedBies)
-                .HasConstraintName("BankInfo_modifiedById_fk");
         });
 
         modelBuilder.Entity<BlogCategory>(entity =>
@@ -153,16 +133,6 @@ public partial class SmECommerceContext : DbContext
 
             entity.Property(e => e.BlogCategoryId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.BlogCategoryCreateBies)
-                .HasConstraintName("BlogCategories_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.BlogCategoryModifiedBies)
-                .HasConstraintName("BlogCategories_modifiedById_fk");
         });
 
         modelBuilder.Entity<CartItem>(entity =>
@@ -196,16 +166,6 @@ public partial class SmECommerceContext : DbContext
 
             entity.Property(e => e.CategoryId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.CategoryCreateBies)
-                .HasConstraintName("Categories_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.CategoryModifiedBies)
-                .HasConstraintName("Categories_modifiedById_fk");
         });
 
         modelBuilder.Entity<Content>(entity =>
@@ -221,16 +181,6 @@ public partial class SmECommerceContext : DbContext
                 .Property(e => e.Status)
                 .HasComment("Values: draft, pending, published, unpublished, deleted");
             entity.Property(e => e.ViewCount).HasDefaultValue(0);
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.ContentCreateBies)
-                .HasConstraintName("Contents_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.ContentModifiedBies)
-                .HasConstraintName("Contents_modifiedById_fk");
         });
 
         modelBuilder.Entity<ContentCategoryMap>(entity =>
@@ -289,16 +239,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.DiscountId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.IsFirstOrder).HasDefaultValue(false);
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.DiscountCreateBies)
-                .HasConstraintName("Discounts_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.DiscountModifiedBies)
-                .HasConstraintName("Discounts_modifiedById_fk");
         });
 
         modelBuilder.Entity<DiscountCode>(entity =>
@@ -310,20 +250,10 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.UserId).HasComment("this code only for this user");
 
             entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.DiscountCodeCreateBies)
-                .HasConstraintName("DiscountCodes_createById_fk");
-
-            entity
                 .HasOne(d => d.Discount)
                 .WithMany(p => p.DiscountCodes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_discountcode");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.DiscountCodeModifiedBies)
-                .HasConstraintName("DiscountCodes_modifiedById_fk");
 
             entity
                 .HasOne(d => d.User)
@@ -384,19 +314,9 @@ public partial class SmECommerceContext : DbContext
                 .HasConstraintName("fk_addressorder");
 
             entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.OrderCreateBies)
-                .HasConstraintName("Orders_createById_fk");
-
-            entity
                 .HasOne(d => d.DiscountCode)
                 .WithMany(p => p.Orders)
                 .HasConstraintName("fk_discountcodeorder");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.OrderModifiedBies)
-                .HasConstraintName("Orders_modifiedById_fk");
 
             entity
                 .HasOne(d => d.User)
@@ -437,11 +357,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.ModifiedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.OrderStatusHistories)
-                .HasConstraintName("OrderStatusHistory_changedById_fkey");
-
-            entity
                 .HasOne(d => d.Order)
                 .WithMany(p => p.OrderStatusHistories)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -454,16 +369,6 @@ public partial class SmECommerceContext : DbContext
 
             entity.Property(e => e.PaymentId).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Status).HasComment("Values: pending, paid, completed");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.PaymentCreateBies)
-                .HasConstraintName("Payments_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.PaymentModifiedBies)
-                .HasConstraintName("Payments_modifiedById_fk");
 
             entity
                 .HasOne(d => d.Order)
@@ -501,16 +406,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.SoldQuantity).HasDefaultValue(0);
             entity.Property(e => e.Status).HasComment("Values: active, inactive, deleted");
             entity.Property(e => e.StockQuantity).HasDefaultValue(0);
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.ProductCreateBies)
-                .HasConstraintName("Products_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.ProductModifiedBies)
-                .HasConstraintName("Products_modifiedById_fk");
         });
 
         modelBuilder.Entity<ProductAttribute>(entity =>
@@ -567,16 +462,6 @@ public partial class SmECommerceContext : DbContext
             entity.Property(e => e.StockQuantity).HasDefaultValue(0);
 
             entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.ProductVariantCreateBies)
-                .HasConstraintName("ProductVariants_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.ProductVariantModifiedBies)
-                .HasConstraintName("ProductVariants_modifiedById_fk");
-
-            entity
                 .HasOne(d => d.Product)
                 .WithMany(p => p.ProductVariants)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -613,11 +498,6 @@ public partial class SmECommerceContext : DbContext
                 .HasComment(
                     "Values: shopName, address, phone, email, maximumTopReview, privacyPolicy, termsOfService, pointsConversionRate"
                 );
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.Settings)
-                .HasConstraintName("Settings_modifiedById_fk");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -635,16 +515,6 @@ public partial class SmECommerceContext : DbContext
                 .Property(e => e.NumberOfOrders)
                 .HasComment("Total number of orders placed by the user");
             entity.Property(e => e.TotalSpent).HasComment("Total amount spent by the user");
-
-            entity
-                .HasOne(d => d.CreateBy)
-                .WithMany(p => p.InverseCreateBy)
-                .HasConstraintName("Users_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.InverseModifiedBy)
-                .HasConstraintName("Users_modifiedById_fk");
         });
 
         modelBuilder.Entity<VariantAttribute>(entity =>
@@ -671,16 +541,6 @@ public partial class SmECommerceContext : DbContext
             entity.HasKey(e => e.VariantNameId).HasName("variantAttributes_pk");
 
             entity.Property(e => e.VariantNameId).HasDefaultValueSql("gen_random_uuid()");
-
-            entity
-                .HasOne(d => d.CreatedBy)
-                .WithMany(p => p.VariantNameCreatedBies)
-                .HasConstraintName("VariantAttributes_createById_fk");
-
-            entity
-                .HasOne(d => d.ModifiedBy)
-                .WithMany(p => p.VariantNameModifiedBies)
-                .HasConstraintName("VariantAttributes_modifyById_fk");
         });
         modelBuilder.HasSequence("order_code_seq").HasMax(999999L);
         modelBuilder.HasSequence("product_code_seq").StartsAt(4L);

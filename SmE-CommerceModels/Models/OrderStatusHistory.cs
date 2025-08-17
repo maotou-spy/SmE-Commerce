@@ -20,15 +20,13 @@ public class OrderStatusHistory
     [Column(TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
-    public Guid? ModifiedById { get; set; }
+    [Column("modifiedById")]
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 
     [Column("reason")]
     [StringLength(500)]
     public string? Reason { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("OrderStatusHistories")]
-    public virtual User? ModifiedBy { get; set; }
 
     [ForeignKey("OrderId")]
     [InverseProperty("OrderStatusHistories")]

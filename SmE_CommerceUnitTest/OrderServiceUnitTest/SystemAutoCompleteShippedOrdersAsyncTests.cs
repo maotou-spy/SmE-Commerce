@@ -56,6 +56,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
                 SubTotal = 100000,
                 DiscountAmount = 10000,
                 ModifiedAt = DateTime.Now.AddDays(-15),
+                CreateById = "AnhNV",
             },
             new()
             {
@@ -64,6 +65,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
                 SubTotal = 200000,
                 DiscountAmount = 20000,
                 ModifiedAt = DateTime.Now.AddDays(-12),
+                CreateById = "AnhNV",
             },
         };
 
@@ -180,6 +182,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             Status = OrderStatus.Shipped,
             SubTotal = 100000, // 100k
             DiscountAmount = 10000, // 10k
+            CreateById = "AnhNV",
             ModifiedAt = DateTime.Now.AddDays(-15),
         };
 
@@ -253,13 +256,13 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldSetPointsToZero_WhenConversionRateInvalid()
     {
         // Arrange
-        var autoCompleteDays = 10;
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
             Status = OrderStatus.Shipped,
             SubTotal = 100000,
             DiscountAmount = 10000,
+            CreateById = "AnhNV",
             ModifiedAt = DateTime.Now.AddDays(-15),
         };
 
@@ -308,7 +311,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -354,13 +357,13 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldReturnFalse_WhenUpdateOrderFails()
     {
         // Arrange
-        var autoCompleteDays = 10;
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
             Status = OrderStatus.Shipped,
             SubTotal = 100000,
             DiscountAmount = 10000,
+            CreateById = "AnhNV",
             ModifiedAt = DateTime.Now.AddDays(-15),
         };
 
@@ -401,7 +404,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -416,13 +419,13 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
     public async Task SystemAutoCompleteShippedOrdersAsync_ShouldReturnFalse_WhenAddOrderStatusHistoryFails()
     {
         // Arrange
-        var autoCompleteDays = 10;
         var order = new Order
         {
             OrderId = Guid.NewGuid(),
             Status = OrderStatus.Shipped,
             SubTotal = 100000,
             DiscountAmount = 10000,
+            CreateById = "AnhNV",
             ModifiedAt = DateTime.Now.AddDays(-15),
         };
 
@@ -474,7 +477,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         // Act
-        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync(autoCompleteDays);
+        var result = await _orderService.SystemAutoCompleteShippedOrdersAsync();
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -553,6 +556,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             Status = OrderStatus.Shipped,
             SubTotal = 100000,
             DiscountAmount = 10000,
+            CreateById = "AnhNV",
             ModifiedAt = DateTime.Now.AddDays(-15),
         };
 
@@ -581,7 +585,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
             );
 
         _orderRepositoryMock
-            .Setup(x => x.UpdateOrderAsync(It.Is<Order>(o => o.ModifiedById == Guid.Empty)))
+            .Setup(x => x.UpdateOrderAsync(It.Is<Order>(o => o.ModifiedById == RoleEnum.System)))
             .ReturnsAsync(
                 new Return<bool>
                 {
@@ -594,7 +598,7 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         _orderRepositoryMock
             .Setup(x =>
                 x.AddOrderStatusHistoryAsync(
-                    It.Is<OrderStatusHistory>(h => h.ModifiedById == Guid.Empty)
+                    It.Is<OrderStatusHistory>(h => h.ModifiedById == RoleEnum.System)
                 )
             )
             .ReturnsAsync(
@@ -612,13 +616,13 @@ public class SystemAutoCompleteShippedOrdersAsyncTests
         // Assert
         Assert.True(result.IsSuccess);
         _orderRepositoryMock.Verify(
-            x => x.UpdateOrderAsync(It.Is<Order>(o => o.ModifiedById == Guid.Empty)),
+            x => x.UpdateOrderAsync(It.Is<Order>(o => o.ModifiedById == RoleEnum.System)),
             Times.Once
         );
         _orderRepositoryMock.Verify(
             x =>
                 x.AddOrderStatusHistoryAsync(
-                    It.Is<OrderStatusHistory>(h => h.ModifiedById == Guid.Empty)
+                    It.Is<OrderStatusHistory>(h => h.ModifiedById == RoleEnum.System)
                 ),
             Times.Once
         );

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SmE_CommerceModels.Models;
 
@@ -38,22 +39,16 @@ public class BankInfo
     public string Status { get; set; } = null!;
 
     [Column("createdAt", TypeName = "timestamp without time zone")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("createById")]
-    public Guid? CreateById { get; set; }
+    [StringLength(50)]
+    public required string CreateById { get; set; }
 
     [Column("modifiedAt", TypeName = "timestamp without time zone")]
     public DateTime? ModifiedAt { get; set; }
 
     [Column("modifiedById")]
-    public Guid? ModifiedById { get; set; }
-
-    [ForeignKey("CreateById")]
-    [InverseProperty("BankInfoCreateBies")]
-    public virtual User? CreateBy { get; set; }
-
-    [ForeignKey("ModifiedById")]
-    [InverseProperty("BankInfoModifiedBies")]
-    public virtual User? ModifiedBy { get; set; }
+    [StringLength(50)]
+    public string? ModifiedById { get; set; }
 }
