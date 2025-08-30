@@ -20,7 +20,7 @@ public class AuthService(
     {
         try
         {
-            var userResult = await userRepository.GetUserByEmailAsync(
+            var userResult = await userRepository.GetUserByEmailOrPhone(
                 reqDto.EmailOrPhone.ToLower()
             );
             if (!userResult.IsSuccess || userResult.Data == null)

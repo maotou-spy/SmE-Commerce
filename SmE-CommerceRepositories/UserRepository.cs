@@ -201,7 +201,6 @@ public class UserRepository(SmECommerceContext dbContext) : IUserRepository
                 Data = null,
                 IsSuccess = false,
                 StatusCode = ErrorCode.InternalServerError,
-
                 InternalErrorMessage = ex,
                 TotalRecord = 0,
             };
