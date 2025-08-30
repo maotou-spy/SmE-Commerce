@@ -12,5 +12,5 @@ public static class RoleEnum
     public const string Staff = "staff";
 
     // System (not a user role, but for system-level operations)
-    public const string System = "System";
+    public const string System = "system";
 }
